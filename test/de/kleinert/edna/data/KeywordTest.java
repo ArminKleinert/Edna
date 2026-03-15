@@ -12,6 +12,7 @@ class KeywordTest {
 
     @Test
     void getFullyQualified() {
+        Char32 c;
         Assertions.assertFalse(Keyword.keyword(null, "abc").isFullyQualified());
         Assertions.assertFalse(Keyword.keyword("abc").isFullyQualified());
         Assertions.assertTrue(Keyword.keyword("ns", "abc").isFullyQualified());
