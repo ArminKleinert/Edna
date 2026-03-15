@@ -1,5 +1,6 @@
 package de.kleinert.edna;
 
+import de.kleinert.edna.data.EdnCollections;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -12,15 +13,15 @@ public class EdnOptions {
     private boolean allowSchemeUTF32Codes = false;
     private boolean allowDispatchChars = false;
     private @NotNull Map<String, Function<Object, Object>> ednClassDecoders = Map.of();
-    private @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders = new Edn.EdnMap<>(List.of());
+    private @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders = new EdnCollections.EdnMap<>(List.of());
     private boolean moreNumberPrefixes;
     private boolean allowNumericSuffixes = false;
     private boolean allowMoreEncoderDecoderNames = false;
     private @NotNull String encodingSequenceSeparator = ", ";
-    private @NotNull Function<List<?>, List<?>> listToEdnListConverter = Edn.EdnList::new;
-    private @NotNull Function<List<?>, List<?>> listToEdnVectorConverter = Edn.EdnVector::new;
-    private @NotNull Function<List<?>, Set<?>> setToEdnSetConverter = Edn.EdnSet::new;
-    private @NotNull Function<List<Map.Entry<Object,Object>>, Map<?,?>> mapToEdnMapConverter = Edn.EdnMap::new;
+    private @NotNull Function<List<?>, List<?>> listToEdnListConverter = EdnCollections.EdnList::new;
+    private @NotNull Function<List<?>, List<?>> listToEdnVectorConverter = EdnCollections.EdnVector::new;
+    private @NotNull Function<List<?>, Set<?>> setToEdnSetConverter = EdnCollections.EdnSet::new;
+    private @NotNull Function<List<Map.Entry<Object,Object>>, Map<?,?>> mapToEdnMapConverter = EdnCollections.EdnMap::new;
     private boolean allowUTFSymbols = false;
     private boolean allowDefinitionsAndReferences = false;
     private @NotNull Map<String, Function<?, ?>> dispatchMacros=Map.of();

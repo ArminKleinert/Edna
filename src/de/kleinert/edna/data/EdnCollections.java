@@ -1,11 +1,11 @@
-package de.kleinert.edna;
+package de.kleinert.edna.data;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 
-public final class Edn {
+public final class EdnCollections {
     public interface IObj {
         @NotNull Map<Object, Object> meta();
 

@@ -1,4 +1,4 @@
-package de.kleinert.edna.data.reader;
+package de.kleinert.edna.reader;
 
 import org.jetbrains.annotations.NotNull;
 
