@@ -1,3 +1,5 @@
+package de.kleinert.edna.data;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -145,6 +147,10 @@ public class Symbol implements Comparable<Symbol> {
         if (temp == null)
             throw new IllegalArgumentException("Illegal symbol format: " + s);
         return temp;
+    }
+
+    public static @NotNull Symbol parseChecked(final @NotNull String s) {
+        return parseChecked(s, false);
     }
 
     public static @NotNull Symbol get(final @NotNull String s) {

@@ -1,3 +1,5 @@
+package de.kleinert.edna.data;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -189,9 +191,23 @@ class SymbolTest {
     }
 
     @Test
+    void parseChecked() {
+        Assertions.assertEquals(Symbol.symbol("ns", "abc"), Symbol.parseChecked("ns/abc"));
+        Assertions.assertEquals(Symbol.symbol("abc"), Symbol.parseChecked("abc"));
+        Assertions.assertEquals(Symbol.symbol("🎁"), Symbol.parseChecked("🎁", true));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Symbol.parseChecked("")); //not valid
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Symbol.parseChecked("🎁"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Symbol.parseChecked("a/+1"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Symbol.parseChecked("🎁/a"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Symbol.parseChecked("a~/abc"));
+    }
+
+    @Test
     void symbolNamespaceAndName() {
         var xs = List.of(
-                "", " ", "abc", "123", "#", "~", ".", "*", "+", "!", "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁");
+                "", " ", "abc", "123", "#", "~", ".", "*", "+", "!",
+                "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁");
         for (var string : xs) {
             var it = Symbol.symbol(string, "abc");
             Assertions.assertEquals(string, it.getNamespace());
@@ -217,7 +233,8 @@ class SymbolTest {
     @Test
     void symbolOnlyName() {
         var xs = List.of(
-                "", " ", "abc", "123", "#", "~", ".", "*", "+", "!", "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁");
+                "", " ", "abc", "123", "#", "~", ".", "*", "+", "!",
+                "-", "_", "?", "$", "%", "&", "=", "<", ">", "🎁");
         for (var string : xs) {
             var it = Symbol.symbol(string);
             Assertions.assertNull(it.getNamespace());

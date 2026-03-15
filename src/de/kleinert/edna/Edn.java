@@ -1,3 +1,5 @@
+package de.kleinert.edna;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 

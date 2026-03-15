@@ -1,3 +1,5 @@
+package de.kleinert.edna.data.reader;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
