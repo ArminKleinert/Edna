@@ -7,7 +7,7 @@ import java.util.*;
 
 public final class EdnCollections {
     public interface IObj {
-        @NotNull Map<Object, Object> meta();
+        @NotNull @Unmodifiable Map<Object, Object> meta();
 
         @NotNull IObj withMeta(@NotNull Map<Object, Object> newMeta);
 
