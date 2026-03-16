@@ -57,8 +57,27 @@ public final class EdnCollections {
             this.delegate = Collections.unmodifiableList(delegate);
         }
 
+        @SafeVarargs
+        public static <T> @NotNull EdnList<T> of(T... xs) {
+            return new EdnList<>(Arrays.asList(xs));
+        }
+
+        public static <T> @NotNull EdnList<T> create(Iterable<T> xs) {
+            if (xs instanceof EdnList<?>)
+                return (EdnList<T>) xs;
+            var temp = new ArrayList<T>();
+            for (T x : xs) {
+                temp.add(x);
+            }
+            return new EdnList<>(temp);
+        }
+
+        @Override
+        public T getFirst() {return get(0);}
+
         @Override
         public T get(int i) {
+            Objects.checkIndex(i, this.size());
             return delegate.get(i);
         }
 
@@ -76,8 +95,27 @@ public final class EdnCollections {
             this.delegate = Collections.unmodifiableList(delegate);
         }
 
+        @SafeVarargs
+        public static <T> @NotNull EdnVector<T> of(T... xs) {
+            return new EdnVector<>(Arrays.asList(xs));
+        }
+
+        public static <T> @NotNull EdnVector<T> create(Iterable<T> xs) {
+            if (xs instanceof EdnVector<?>)
+                return (EdnVector<T>) xs;
+            var temp = new ArrayList<T>();
+            for (T x : xs) {
+                temp.add(x);
+            }
+            return new EdnVector<>(temp);
+        }
+
+        @Override
+        public T getFirst() {return get(0);}
+
         @Override
         public T get(int i) {
+            Objects.checkIndex(i, size());
             return delegate.get(i);
         }
 
@@ -93,8 +131,23 @@ public final class EdnCollections {
         private final @NotNull Set<T> delegate;
 
         public EdnSet(@NotNull List<T> delegate) {
-            this.delegate = Set.copyOf(delegate);
+            this.delegate = new LinkedHashSet<>(delegate);
             this.elements = delegate;
+        }
+
+        @SafeVarargs
+        public static <T> @NotNull EdnSet<T> of(T... xs) {
+            return new EdnSet<>(Arrays.asList(xs));
+        }
+
+        public static <T> @NotNull EdnSet<T> create(Iterable<T> xs) {
+            if (xs instanceof EdnSet<?>)
+                return (EdnSet<T>) xs;
+            var temp = new ArrayList<T>();
+            for (T x : xs) {
+                temp.add(x);
+            }
+            return new EdnSet<>(temp);
         }
 
         @Override
