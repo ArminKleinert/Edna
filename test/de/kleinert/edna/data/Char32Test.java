@@ -97,14 +97,14 @@ class Char32Test {
     @Test
     void testToString() {
         Assertions.assertEquals("A", Char32.valueOf('A').toString());
-        Assertions.assertEquals("\uD83D\uDD46", new Char32(0x0001F546).toString()); // White latin cross
+        Assertions.assertEquals("\uD83D\uDD46", new Char32(0x0001F546).toString()); // White Latin cross
         Assertions.assertEquals("\uD83C\uDF81", new Char32(0x0001F381).toString()); // Wrapped present 🎁
     }
 
     @Test
     void compareTo() {
         Assertions.assertTrue(Char32.valueOf('A') .compareTo(Char32.valueOf('B')) < 0);
-        Assertions.assertTrue(Char32.valueOf('A') .compareTo(Char32.valueOf('A')) == 0);
+        Assertions.assertEquals(0, Char32.valueOf('A').compareTo(Char32.valueOf('A')));
         Assertions.assertTrue(Char32.valueOf('B') .compareTo(Char32.valueOf('A')) > 0);
     }
 

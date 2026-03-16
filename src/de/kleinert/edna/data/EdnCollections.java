@@ -27,8 +27,9 @@ public final class EdnCollections {
         record Wrapper<T>(@NotNull Map<Object, Object> meta, T element) implements IObj {
             @Override
             public boolean equals(Object o) {
-                if (element == null) return o == null;
-                return element.equals(o);
+                if (!(o instanceof Wrapper<?>(Map<Object, Object> meta1, Object element1)))
+                    return false;
+                return Objects.equals(element, element1) && Objects.equals(meta, meta1);
             }
 
             @Override
@@ -42,7 +43,7 @@ public final class EdnCollections {
             }
 
             @Override
-            public String toString() {
+            public @NotNull String toString() {
                 return element.toString();
             }
         }

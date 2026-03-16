@@ -2,7 +2,7 @@ package de.kleinert.edna.reader;
 
 import org.jetbrains.annotations.Nullable;
 
-public sealed class EdnReaderException extends Exception {
+public sealed class EdnReaderException extends RuntimeException {
     private final int lineIndex;
     private final int textIndex;
 

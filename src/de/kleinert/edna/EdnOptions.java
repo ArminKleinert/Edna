@@ -1,6 +1,7 @@
 package de.kleinert.edna;
 
 import de.kleinert.edna.data.EdnCollections;
+import de.kleinert.edna.data.Symbol;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -30,6 +31,8 @@ public class EdnOptions {
     private int encoderMaxColumn = 80;
     private @NotNull String encoderLineIndent = "  ";
     private boolean encoderPrettyPrint = true;
+    private @NotNull Map<Symbol, Object> referenceTable =Map.of();
+    private boolean allowMetaData = false;
 
     public EdnOptions() {
     }
@@ -211,6 +214,24 @@ public class EdnOptions {
 
     public @NotNull EdnOptions encoderPrettyPrint(final boolean encoderPrettyPrint) {
         this.encoderPrettyPrint = encoderPrettyPrint;
+        return this;
+    }
+
+    public @NotNull Map<Symbol, Object> getReferenceTable() {
+        return referenceTable;
+    }
+
+    public @NotNull EdnOptions referenceTable(final @NotNull Map<Symbol, Object> references) {
+        this.referenceTable = references;
+        return this;
+    }
+
+    public boolean isAllowMetaData() {
+        return allowMetaData;
+    }
+
+    public EdnOptions allowMetaData(boolean allowMetaData) {
+        this.allowMetaData = allowMetaData;
         return this;
     }
 }
