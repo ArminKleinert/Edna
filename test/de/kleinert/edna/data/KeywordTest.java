@@ -12,7 +12,6 @@ class KeywordTest {
 
     @Test
     void getFullyQualified() {
-        Char32 c;
         Assertions.assertFalse(Keyword.keyword(null, "abc").isFullyQualified());
         Assertions.assertFalse(Keyword.keyword("abc").isFullyQualified());
         Assertions.assertTrue(Keyword.keyword("ns", "abc").isFullyQualified());
@@ -290,18 +289,18 @@ class KeywordTest {
     @Test
     void findSymbol() {
         var random = new Random(0xCAFEC0FFEEL);
-       var it = Symbol.symbol(""+random.nextDouble()); // A hopefully random name
-            Assertions.assertNull(Keyword.find(it)); // Did not exist.
-            Assertions.assertNull(Keyword.find(it)); // Was not interned by the first call.
+        var it = Symbol.symbol("" + random.nextDouble()); // A hopefully random name
+        Assertions.assertNull(Keyword.find(it)); // Did not exist.
+        Assertions.assertNull(Keyword.find(it)); // Was not interned by the first call.
 
-            var k = Keyword.intern(it); // Create and intern
-            Assertions.assertEquals(k, Keyword.find(it));
+        var k = Keyword.intern(it); // Create and intern
+        Assertions.assertEquals(k, Keyword.find(it));
     }
 
     @Test
     void findString() {
         var random = new Random(0xDEADBEEFL);
-        var it = ""+random.nextDouble(); // A hopefully random name
+        var it = "" + random.nextDouble(); // A hopefully random name
 
         Assertions.assertNull(Keyword.find(it)); // Did not exist.
         Assertions.assertNull(Keyword.find(it)); // Was not interned by the first call.

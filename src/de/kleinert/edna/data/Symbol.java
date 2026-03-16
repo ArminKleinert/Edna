@@ -15,11 +15,11 @@ public class Symbol implements Comparable<Symbol> {
         this.name = name;
     }
 
-    public static Symbol symbol(@Nullable String namespace, @NotNull String name) {
+    public static @NotNull Symbol symbol(@Nullable String namespace, @NotNull String name) {
         return new Symbol(namespace, name);
     }
 
-    public static Symbol symbol(@NotNull String name) {
+    public static @NotNull Symbol symbol(@NotNull String name) {
         return new Symbol(null, name);
     }
 
@@ -84,7 +84,7 @@ public class Symbol implements Comparable<Symbol> {
         for (int chr : codepoints) {
             index++;
 
-            if ((chr >= 'a' && chr <= 'z')|| (chr >= 'A' && chr <= 'Z')|| (chr >= '0' && chr <= '9')) {
+            if ((chr >= 'a' && chr <= 'z') || (chr >= 'A' && chr <= 'Z') || (chr >= '0' && chr <= '9')) {
                 continue;
             }
 

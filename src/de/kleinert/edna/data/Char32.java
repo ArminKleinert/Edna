@@ -30,35 +30,35 @@ public record Char32(int code) implements Comparable<Char32> {
         return new Char32(s.codePointAt(0));
     }
 
-    public Char32 dec() {
+    public @NotNull Char32 dec() {
         return new Char32(code - 1);
     }
 
-    public Char32 inc() {
+    public @NotNull Char32 inc() {
         return new Char32(code + 1);
     }
 
-    public Char32 minus(final @NotNull Char32 other) {
+    public @NotNull Char32 minus(final @NotNull Char32 other) {
         return new Char32(code - other.code);
     }
 
-    public Char32 minus(final char other) {
+    public @NotNull Char32 minus(final char other) {
         return new Char32(code - other);
     }
 
-    public Char32 minus(final int other) {
+    public @NotNull Char32 minus(final int other) {
         return new Char32(code - other);
     }
 
-    public Char32 plus(final int other) {
+    public @NotNull Char32 plus(final int other) {
         return new Char32(code + other);
     }
 
-    public Char32 plus(final char other) {
+    public @NotNull Char32 plus(final char other) {
         return new Char32(code + other);
     }
 
-    public Char32 plus(final @NotNull Char32 other) {
+    public @NotNull Char32 plus(final @NotNull Char32 other) {
         return new Char32(code + other.code);
     }
 

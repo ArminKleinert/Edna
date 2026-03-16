@@ -1,17 +1,27 @@
 package de.kleinert.edna.data;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
 
 import de.kleinert.edna.data.EdnCollections.EdnSet;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.SequencedSet;
+import java.util.Set;
+import java.util.List;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeSet;
+
 public class EdnSetTest {
     @SafeVarargs
-    private<T> SequencedSet<T> sequencedSetOf(T... xs) {
+    private <T> SequencedSet<T> sequencedSetOf(T... xs) {
         return new LinkedHashSet<>(Arrays.stream(xs).toList());
     }
-    
+
     @Test
     void fromSequencedCollection() {
         Assertions.assertEquals(Set.of(1, 2, 3), EdnSet.create(sequencedSetOf(1, 2, 3)));

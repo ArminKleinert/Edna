@@ -16,8 +16,8 @@ public final class CodePointIterator implements PrimitiveIterator.OfInt, AutoClo
     private int @NotNull [] memory;
     private int memoryIndex = -1;
 
-    private int textIndex=0;
-    private int lineIdx=0;
+    private int textIndex = 0;
+    private int lineIdx = 0;
 
     public CodePointIterator(final @NotNull IntStream codepointStream) {
         this.iterator = codepointStream.iterator();
@@ -47,7 +47,7 @@ public final class CodePointIterator implements PrimitiveIterator.OfInt, AutoClo
         } else {
             code = -1;
         }
-        if (code == (int)'\n') {
+        if (code == (int) '\n') {
             lineIdx++;
         }
         return code;
@@ -69,10 +69,10 @@ public final class CodePointIterator implements PrimitiveIterator.OfInt, AutoClo
     public void unread(final int v) {
         memoryIndex++;
         if (memoryIndex == memory.length) {
-            memory = Arrays.copyOf(memory, memory.length + Integer.min(memory.length/2, 8));
+            memory = Arrays.copyOf(memory, memory.length + Integer.min(memory.length / 2, 8));
         }
         memory[memoryIndex] = v;
-        if (v == (int)'\n') {
+        if (v == (int) '\n') {
             lineIdx--;
         }
     }
@@ -91,7 +91,7 @@ public final class CodePointIterator implements PrimitiveIterator.OfInt, AutoClo
 
     public @NotNull StringBuilder takeCodePoints(final @NotNull StringBuilder dest, final int maxCount, final @NotNull IntPredicate condition) {
         int count = 0;
-        while (count<maxCount&&hasNext()) {
+        while (count < maxCount && hasNext()) {
             int codepoint = nextInt();
             if (!condition.test(codepoint)) {
                 unread(codepoint);
@@ -102,16 +102,20 @@ public final class CodePointIterator implements PrimitiveIterator.OfInt, AutoClo
         }
         return dest;
     }
+
     public void skipLine() {
         while (hasNext()) {
             int ni = nextInt();
-            if (ni == (int)'\n') break;
+            if (ni == (int) '\n') break;
         }
     }
+
     public void skipWhile(final @NotNull IntPredicate condition) {
         while (hasNext()) {
             int ni = nextInt();
-            if (!condition.test(ni)) {unread(ni);break;
+            if (!condition.test(ni)) {
+                unread(ni);
+                break;
             }
         }
     }
@@ -201,6 +205,8 @@ public final class CodePointIterator implements PrimitiveIterator.OfInt, AutoClo
     }
 
     public static class CPIException extends RuntimeException {
-        CPIException(IOException ioe)
-        {super(ioe);}    }
+        CPIException(IOException ioe) {
+            super(ioe);
+        }
+    }
 }

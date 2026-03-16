@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Keyword implements Comparable<Keyword> {

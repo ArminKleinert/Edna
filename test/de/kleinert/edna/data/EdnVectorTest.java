@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+
 import de.kleinert.edna.data.EdnCollections.EdnVector;
 
 public class EdnVectorTest {

@@ -7,7 +7,8 @@ import java.util.*;
 
 public final class EdnCollections {
     public interface IObj {
-        @NotNull @Unmodifiable Map<Object, Object> meta();
+        @Unmodifiable
+        @NotNull Map<Object, Object> meta();
 
         @NotNull IObj withMeta(@NotNull Map<Object, Object> newMeta);
 
@@ -73,7 +74,9 @@ public final class EdnCollections {
         }
 
         @Override
-        public T getFirst() {return get(0);}
+        public T getFirst() {
+            return get(0);
+        }
 
         @Override
         public T get(int i) {
@@ -111,7 +114,9 @@ public final class EdnCollections {
         }
 
         @Override
-        public T getFirst() {return get(0);}
+        public T getFirst() {
+            return get(0);
+        }
 
         @Override
         public T get(int i) {

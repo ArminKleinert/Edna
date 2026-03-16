@@ -22,16 +22,16 @@ public class EdnOptions {
     private @NotNull Function<List<?>, List<?>> listToEdnListConverter = EdnCollections.EdnList::new;
     private @NotNull Function<List<?>, List<?>> listToEdnVectorConverter = EdnCollections.EdnVector::new;
     private @NotNull Function<List<?>, Set<?>> setToEdnSetConverter = EdnCollections.EdnSet::new;
-    private @NotNull Function<List<Map.Entry<Object,Object>>, Map<?,?>> mapToEdnMapConverter = EdnCollections.EdnMap::new;
+    private @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> mapToEdnMapConverter = EdnCollections.EdnMap::new;
     private boolean allowUTFSymbols = false;
     private boolean allowDefinitionsAndReferences = false;
-    private @NotNull Map<String, Function<?, ?>> dispatchMacros=Map.of();
+    private @NotNull Map<String, Function<?, ?>> dispatchMacros = Map.of();
     private int encoderSequenceElementLimit = 1000;
     private int encoderCollectionElementLimit = 10000;
     private int encoderMaxColumn = 80;
     private @NotNull String encoderLineIndent = "  ";
     private boolean encoderPrettyPrint = true;
-    private @NotNull Map<Symbol, Object> referenceTable =Map.of();
+    private @NotNull Map<Symbol, Object> referenceTable = Map.of();
     private boolean allowMetaData = false;
 
     public EdnOptions() {
