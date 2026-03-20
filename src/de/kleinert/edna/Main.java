@@ -3,5 +3,8 @@ import de.kleinert.edna.reader.CodePointIterator;
 import de.kleinert.edna.reader.EdnaReader;
 
 void main() {
-    IO.println(EdnaReader.read(new CodePointIterator(new StringReader("55")), new EdnOptions(), Object.class));
+
+    var o = EdnaReader.read(new CodePointIterator(new StringReader("-58_i32")), new EdnOptions().allowNumericSuffixes(true), Object.class);
+    IO.println(o);
+    IO.println(o.getClass());
 }

@@ -3,9 +3,12 @@ package de.kleinert.edna.reader;
 import de.kleinert.edna.EdnOptions;
 import de.kleinert.edna.data.Char32;
 import de.kleinert.edna.data.EdnCollections;
+import jdk.jshell.spi.ExecutionControl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +102,7 @@ public class EdnaReader {
                 }
                 case '+', '-' -> {
                     boolean isNumber = false;
-                    if (options.allowMetaData()) {
+                    if (cpi.hasNext()) {
                         int peeked = cpi.peek();
                         isNumber = peeked >= '0' && peeked <= '9';
                     }
@@ -163,39 +166,78 @@ public class EdnaReader {
         var tokenLen = token.length();
         var base = 10;
         var startIndex = 0;
-        var sign = 1L;
+        byte sign = 1;
 
-        if ((options.allowNumericSuffixes() && expandedIntRegex.matcher(token).matches()) || intRegex.matcher(token).matches()) {
-            if (token.codePointAt(0) == '+')
-            {startIndex++;
-            sign=1;}else if (token.codePointAt(0)== '-'){startIndex++;sign=-1;}
+        if ((options.allowNumericSuffixes() && expandedIntRegex.matcher(token).matches())
+                || intRegex.matcher(token).matches()) {
+            if (token.codePointAt(0) == '+') {
+                startIndex++;
+            } else if (token.codePointAt(0) == '-') {
+                startIndex++;
+                sign = -1;
+            }
 
             var first = token.codePointAt(startIndex);
-            if (first == '0' && token.length()-startIndex>1) {
-                startIndex+=2;
-                var error = new EdnReaderException(linePos, codePosIndex, "Invalid number prefix in number "+token+".");
-                switch(token.codePointAt(startIndex-1)) {
-                    case'x':
-                        if (!options.moreNumberPrefixes())
-                            throw error;
-                        base = 16;
-                        break;
-                    case'o':
-                        if (!options.moreNumberPrefixes())
-                            throw error;
-                        base = 8;
-                        break;
-                    case'b':
-                        if (!options.moreNumberPrefixes())
-                            throw error;
-                        base = 2;
-                        break;
-                    default:
-                        startIndex-=2;
-                        break;
-                }
+            if (first == '0' && token.length() - startIndex > 1) {
+                startIndex += 2;
+                var baseC = token.codePointAt(startIndex - 1);
+                if (!options.moreNumberPrefixes() && (baseC == 'x' || baseC == 'o' || baseC == 'b'))
+                    throw new EdnReaderException(linePos, codePosIndex, "Invalid number prefix in number " + token + ".");
+                base = switch (token.codePointAt(startIndex - 1)) {
+                    case 'x' -> 16;
+                    case 'o' -> 8;
+                    case 'b' -> 2;
+                    default -> {
+                        startIndex -= 2;
+                        yield base;
+                    }
+                };
             }
+
+            if (!options.allowNumericSuffixes()
+                    && tokenLen > startIndex + 1
+                    && token.codePointAt(startIndex) == '0'
+                    && token.codePointAt(startIndex + 1) >= '0'
+                    && token.codePointAt(startIndex + 1) <= '9') {
+                throw new EdnReaderException(linePos, codePosIndex, "Invalid number format: " + token + " (numbers other than 0 can not start with a 0)");
+            }
+        } else if (floatyRegex.matcher(token).matches()) {
+            if (token.endsWith("M")) {
+                return new BigDecimal(token.substring(0, tokenLen - 1));
+            }
+            return sign * Double.parseDouble(token);
+        } else if (options.allowRatios()) {
+            throw new UnsupportedOperationException(); // TODO?
+        } else {
+            throw new EdnReaderException(linePos, codePosIndex, "Invalid number format: " + token);
         }
+
+        if (token.endsWith("M"))
+            return BigDecimal.valueOf(sign).multiply(new BigDecimal(token.substring(startIndex, tokenLen - 1)));
+        if (token.endsWith("N"))
+            return BigInteger.valueOf(sign).multiply(new BigInteger(token.substring(startIndex, tokenLen - 1), base));
+
+
+        final int byteNum, offset;
+
+        if (!options.allowNumericSuffixes()){byteNum=8;offset=0;}
+        else if (token.endsWith("_i8")){byteNum=1;offset=3;}
+        else if (token.endsWith("_i16")){byteNum=2;offset=4;}
+        else if (token.endsWith("_i32")){byteNum=4;offset=4;}
+        else if (token.endsWith("_i64")){byteNum=8;offset=4;}
+        else if (token.endsWith("L")){byteNum=8;offset=1;}
+        else {byteNum=8;offset=0;}
+
+        final var tokenSubs = token.substring(startIndex, tokenLen-offset);
+        final long temp = sign * Long.valueOf(tokenSubs, base);
+
+        return switch (byteNum) {
+             case 1 -> (byte) temp;
+             case 2 -> (short) temp;
+             case 4 -> (int) temp;
+             case 8 -> temp;
+            default -> throw new IllegalStateException();
+        };
     }
 
     private final StringBuilder readTokenBuffer = new StringBuilder();

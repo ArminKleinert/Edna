@@ -35,6 +35,8 @@ public class EdnOptions {
     private boolean encoderPrettyPrint = true;
     private @NotNull Map<Symbol, Object> referenceTable = Map.of();
     private boolean allowMetaData = false;
+    private boolean allowZeroPrefix = false;
+    private boolean allowRatios = false;
 
     public EdnOptions() {
     }
@@ -235,6 +237,24 @@ public class EdnOptions {
 
     public EdnOptions allowMetaData(final boolean allowMetaData) {
         this.allowMetaData = allowMetaData;
+        return this;
+    }
+
+    public boolean allowZeroPrefix() {
+        return allowZeroPrefix;
+    }
+
+    public EdnOptions allowZeroPrefix(final boolean allowZeroPrefix) {
+        this.allowZeroPrefix = allowZeroPrefix;
+        return this;
+    }
+
+    public boolean allowRatios() {
+        return allowRatios;
+    }
+
+    public EdnOptions allowRatios(final boolean allowRatios) {
+        this.allowRatios = allowRatios;
         return this;
     }
 }
