@@ -14,15 +14,17 @@ public class EdnOptions {
     private boolean allowSchemeUTF32Codes = false;
     private boolean allowDispatchChars = false;
     private @NotNull Map<String, Function<Object, Object>> ednClassDecoders = Map.of();
-    private @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders = new EdnCollections.EdnMap<>(List.of());
+    private @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders =
+            new EdnCollections.EdnMap<>(List.of());
     private boolean moreNumberPrefixes;
     private boolean allowNumericSuffixes = false;
     private boolean allowMoreEncoderDecoderNames = false;
     private @NotNull String encodingSequenceSeparator = ", ";
     private @NotNull Function<List<?>, List<?>> listToEdnListConverter = EdnCollections.EdnList::new;
     private @NotNull Function<List<?>, List<?>> listToEdnVectorConverter = EdnCollections.EdnVector::new;
-    private @NotNull Function<List<?>, Set<?>> setToEdnSetConverter = EdnCollections.EdnSet::new;
-    private @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> mapToEdnMapConverter = EdnCollections.EdnMap::new;
+    private @NotNull Function<List<?>, Set<?>> listToEdnSetConverter = EdnCollections.EdnSet::new;
+    private @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> listToEdnMapConverter =
+            EdnCollections.EdnMap::new;
     private boolean allowUTFSymbols = false;
     private boolean allowDefinitionsAndReferences = false;
     private @NotNull Map<String, Function<?, ?>> dispatchMacros = Map.of();
@@ -37,7 +39,7 @@ public class EdnOptions {
     public EdnOptions() {
     }
 
-    public boolean isAllowSchemeUTF32Codes() {
+    public boolean allowSchemeUTF32Codes() {
         return allowSchemeUTF32Codes;
     }
 
@@ -46,7 +48,7 @@ public class EdnOptions {
         return this;
     }
 
-    public boolean isAllowDispatchChars() {
+    public boolean allowDispatchChars() {
         return allowDispatchChars;
     }
 
@@ -55,7 +57,7 @@ public class EdnOptions {
         return this;
     }
 
-    public @NotNull Map<String, Function<Object, Object>> getEdnClassDecoders() {
+    public @NotNull Map<String, Function<Object, Object>> ednClassDecoders() {
         return ednClassDecoders;
     }
 
@@ -64,16 +66,17 @@ public class EdnOptions {
         return this;
     }
 
-    public @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> getEdnClassEncoders() {
+    public @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<Object, Map.Entry<String, ?>>> ednClassEncoders() {
         return ednClassEncoders;
     }
 
-    public @NotNull EdnOptions ednClassEncoders(final @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders) {
+    public @NotNull EdnOptions ednClassEncoders(
+            final @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<Object, Map.Entry<String, ?>>> ednClassEncoders) {
         this.ednClassEncoders = ednClassEncoders;
         return this;
     }
 
-    public boolean isMoreNumberPrefixes() {
+    public boolean moreNumberPrefixes() {
         return moreNumberPrefixes;
     }
 
@@ -82,7 +85,7 @@ public class EdnOptions {
         return this;
     }
 
-    public boolean isAllowNumericSuffixes() {
+    public boolean allowNumericSuffixes() {
         return allowNumericSuffixes;
     }
 
@@ -91,7 +94,7 @@ public class EdnOptions {
         return this;
     }
 
-    public boolean isAllowMoreEncoderDecoderNames() {
+    public boolean allowMoreEncoderDecoderNames() {
         return allowMoreEncoderDecoderNames;
     }
 
@@ -100,7 +103,7 @@ public class EdnOptions {
         return this;
     }
 
-    public @NotNull String getEncodingSequenceSeparator() {
+    public @NotNull String encodingSequenceSeparator() {
         return encodingSequenceSeparator;
     }
 
@@ -109,7 +112,7 @@ public class EdnOptions {
         return this;
     }
 
-    public @NotNull Function<List<?>, List<?>> getListToEdnListConverter() {
+    public @NotNull Function<List<?>, List<?>> listToEdnListConverter() {
         return listToEdnListConverter;
     }
 
@@ -118,7 +121,7 @@ public class EdnOptions {
         return this;
     }
 
-    public @NotNull Function<List<?>, List<?>> getListToEdnVectorConverter() {
+    public @NotNull Function<List<?>, List<?>> listToEdnVectorConverter() {
         return listToEdnVectorConverter;
     }
 
@@ -127,25 +130,25 @@ public class EdnOptions {
         return this;
     }
 
-    public @NotNull Function<List<?>, Set<?>> getSetToEdnSetConverter() {
-        return setToEdnSetConverter;
+    public @NotNull Function<List<?>, Set<?>> listToEdnSetConverter() {
+        return listToEdnSetConverter;
     }
 
-    public @NotNull EdnOptions setToEdnSetConverter(final @NotNull Function<List<?>, Set<?>> setToEdnSetConverter) {
-        this.setToEdnSetConverter = setToEdnSetConverter;
+    public @NotNull EdnOptions listToEdnSetConverter(final @NotNull Function<List<?>, Set<?>> setToEdnSetConverter) {
+        this.listToEdnSetConverter = setToEdnSetConverter;
         return this;
     }
 
-    public @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> getMapToEdnMapConverter() {
-        return mapToEdnMapConverter;
+    public @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> listToEdnMapConverter() {
+        return listToEdnMapConverter;
     }
 
-    public @NotNull EdnOptions mapToEdnMapConverter(final @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> mapToEdnMapConverter) {
-        this.mapToEdnMapConverter = mapToEdnMapConverter;
+    public @NotNull EdnOptions listToEdnMapConverter(final @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> mapToEdnMapConverter) {
+        this.listToEdnMapConverter = mapToEdnMapConverter;
         return this;
     }
 
-    public boolean isAllowUTFSymbols() {
+    public boolean allowUTFSymbols() {
         return allowUTFSymbols;
     }
 
@@ -154,7 +157,7 @@ public class EdnOptions {
         return this;
     }
 
-    public boolean isAllowDefinitionsAndReferences() {
+    public boolean allowDefinitionsAndReferences() {
         return allowDefinitionsAndReferences;
     }
 
@@ -163,7 +166,7 @@ public class EdnOptions {
         return this;
     }
 
-    public @NotNull Map<String, Function<?, ?>> getDispatchMacros() {
+    public @NotNull Map<String, Function<?, ?>> dispatchMacros() {
         return dispatchMacros;
     }
 
@@ -172,7 +175,7 @@ public class EdnOptions {
         return this;
     }
 
-    public int getEncoderSequenceElementLimit() {
+    public int encoderSequenceElementLimit() {
         return encoderSequenceElementLimit;
     }
 
@@ -181,7 +184,7 @@ public class EdnOptions {
         return this;
     }
 
-    public int getEncoderCollectionElementLimit() {
+    public int encoderCollectionElementLimit() {
         return encoderCollectionElementLimit;
     }
 
@@ -190,7 +193,7 @@ public class EdnOptions {
         return this;
     }
 
-    public int getEncoderMaxColumn() {
+    public int encoderMaxColumn() {
         return encoderMaxColumn;
     }
 
@@ -199,7 +202,7 @@ public class EdnOptions {
         return this;
     }
 
-    public @NotNull String getEncoderLineIndent() {
+    public @NotNull String encoderLineIndent() {
         return encoderLineIndent;
     }
 
@@ -208,7 +211,7 @@ public class EdnOptions {
         return this;
     }
 
-    public boolean isEncoderPrettyPrint() {
+    public boolean encoderPrettyPrint() {
         return encoderPrettyPrint;
     }
 
@@ -217,7 +220,7 @@ public class EdnOptions {
         return this;
     }
 
-    public @NotNull Map<Symbol, Object> getReferenceTable() {
+    public @NotNull Map<Symbol, Object> referenceTable() {
         return referenceTable;
     }
 
@@ -226,11 +229,11 @@ public class EdnOptions {
         return this;
     }
 
-    public boolean isAllowMetaData() {
+    public boolean allowMetaData() {
         return allowMetaData;
     }
 
-    public EdnOptions allowMetaData(boolean allowMetaData) {
+    public EdnOptions allowMetaData(final boolean allowMetaData) {
         this.allowMetaData = allowMetaData;
         return this;
     }
