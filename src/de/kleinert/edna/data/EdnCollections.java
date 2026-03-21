@@ -50,6 +50,20 @@ public final class EdnCollections {
         }
     }
 
+    private static <T> String toStringHelper(Iterable<T> iterable, char startDelimiter, char endDelimiter, char separator) {
+        Iterator<T> it = iterable.iterator();
+        StringBuilder sb = new StringBuilder();
+        sb.append(startDelimiter);
+
+        while (it.hasNext()) {
+            T e = it.next();
+            sb.append(e == iterable ? "(this Collection)" : e);
+            if (!it.hasNext()) break;
+            sb.append(separator).append(' ');
+        }
+        return sb.append(endDelimiter).toString();
+    }
+
     @Unmodifiable
     public static final class EdnList<T> extends AbstractList<T> implements SequencedCollection<T> {
         private final @NotNull List<T> delegate;
@@ -87,6 +101,11 @@ public final class EdnCollections {
         @Override
         public int size() {
             return delegate.size();
+        }
+
+        @Override
+        public String toString() {
+            return toStringHelper(this, '(', ')', ',');
         }
     }
 
@@ -127,6 +146,11 @@ public final class EdnCollections {
         @Override
         public int size() {
             return delegate.size();
+        }
+
+        @Override
+        public String toString() {
+            return toStringHelper(this, '(', ')', ',');
         }
     }
 
@@ -169,6 +193,11 @@ public final class EdnCollections {
         public @NotNull SequencedSet<T> reversed() {
             return new EdnSet<>(elements.reversed());
         }
+
+        @Override
+        public String toString() {
+            return "#" + toStringHelper(this, '{', '}', ',');
+        }
     }
 
     @Unmodifiable
@@ -185,6 +214,23 @@ public final class EdnCollections {
             this.elements = delegate;
         }
 
+        public static <K, V> EdnMap<K, V> create(List<Object> kvs) {
+            if (kvs.size() % 2 != 0) {
+                throw new IllegalArgumentException();
+            }
+            final Set<K> gatheredKeys = new HashSet<>();
+            final List<Map.Entry<K, V>> kvList = new ArrayList<>();
+            final Iterator<Object> kvIter = kvs.iterator();
+            while (kvIter.hasNext()) {
+                final var k = (K) kvIter.next();
+                if (gatheredKeys.contains(k)) throw new IllegalArgumentException("Duplicate key " + k);
+                gatheredKeys.add(k);
+                final var v = (V) kvIter.next();
+                kvList.add(new AbstractMap.SimpleEntry<>(k, v));
+            }
+            return new EdnMap<>(kvList);
+        }
+
         @Override
         public int size() {
             return delegate.size();
@@ -198,6 +244,21 @@ public final class EdnCollections {
         @Override
         public SequencedMap<K, V> reversed() {
             return new EdnMap<>(elements.reversed());
+        }
+
+        @Override
+        public String toString() {
+            Iterator<Entry<K, V>> it = delegate.entrySet().iterator();
+            StringBuilder sb = new StringBuilder();
+            sb.append('{');
+
+            while (it.hasNext()) {
+                Entry<K, V> e = it.next();
+                sb.append(e.getKey()).append(' ').append(e.getValue());
+                if (!it.hasNext()) break;
+                sb.append(',').append(' ');
+            }
+            return sb.append('}').toString();
         }
     }
 }

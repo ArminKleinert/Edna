@@ -11,9 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.IntPredicate;
 import java.util.regex.Pattern;
 
@@ -119,11 +117,13 @@ public class EdnaReader {
                         res.add(readOther());
                     }
                 }
-                default->{
+                default -> {
                     cpi.unread(codePoint);
                     res.add(readOther());
                 }
             }
+
+            res.remove(NOTHING);
 
             if (stopAfterOne && !res.isEmpty()) {
                 return res.getFirst();
@@ -133,12 +133,12 @@ public class EdnaReader {
     }
 
     private @Nullable Object readOther() {
-        var linePos = cpi.getLineIdx();
-        var codePosIndex = cpi.getTextIndex();
-        var token = readToken(this::isValidSymbolChar);
+        final var linePos = cpi.getLineIdx();
+        final var codePosIndex = cpi.getTextIndex();
+        final@NotNull var token = readToken(this::isValidSymbolChar);
 
         if (token.length() > 1 && token.codePointAt(0) == ':') {
-            var temp = Keyword.parse(token, options.allowUTFSymbols());
+            final var temp = Keyword.parse(token, options.allowUTFSymbols());
             if (temp == null)
                 throw new EdnReaderException(linePos, codePosIndex, "Token starts with a colon, but is not a valid keyword: " + token);
             return temp;
@@ -153,7 +153,7 @@ public class EdnaReader {
             case "true" -> true;
             case "false" -> false;
             default -> {
-                var temp = Symbol.parse(token, options.allowUTFSymbols());
+                final var temp = Symbol.parse(token, options.allowUTFSymbols());
                 if (temp == null)
                     throw new EdnReaderException(linePos, codePosIndex, "Invalid symbol: " + token);
                 yield temp;
@@ -294,14 +294,35 @@ public class EdnaReader {
 
     private @NotNull String readToken(final int maxCount, final @NotNull IntPredicate condition) {
         cpi.takeCodePoints(readTokenBuffer, condition);
-        final var tkn = readTokenBuffer.toString();
+        final @NotNull var tkn = readTokenBuffer.toString();
         readTokenBuffer.setLength(0);
         return tkn;
     }
 
-    private @Nullable Object readVector(final int level) {
-        var it = List.of(); // TODO
+    private @NotNull Object readVector(final int level) {
+        final @NotNull var it = readVector(level, ']');
         return options.listToEdnVectorConverter().apply(it);
+    }
+
+    private @NotNull List<Object> readVector(final int level, final int separator) {
+        final var linePos = cpi.getLineIdx();
+        final var acc = new ArrayList<>();
+        do {
+            cpi.skipWhile(this::isWhitespace);
+
+            if (!cpi.hasNext()) {
+                throw new EdnReaderException(cpi.getLineIdx(), cpi.getTextIndex(), "Unclosed list started in line " + linePos + ". Expected '" + (char) separator + "', got EOF.");
+            }
+
+            if (cpi.peek() == separator) {
+                cpi.nextInt();
+                break;
+            }
+
+            final var elem = readForm(level + 1, true);
+            if (elem != NOTHING) acc.add(elem);
+        } while (true);
+        return acc;
     }
 
     private @NotNull Character readChar() {
@@ -309,19 +330,37 @@ public class EdnaReader {
     }
 
     private @NotNull Map<?, ?> readMap(final int level) {
-        var it = List.<Map.Entry<Object, Object>>of(); // TODO
-        return options.listToEdnMapConverter().apply(it);
+        final var linePos = cpi.getLineIdx();
+        final var codePosIndex = cpi.getTextIndex();
+        var kvs = readVector(level, '}');
+        var gatheredKeys = new HashSet<>();
+        var res = new ArrayList<Map.Entry<Object,Object>>();
+
+        for (int i = 0; i < kvs.size(); i += 2) {
+            var key = kvs.get(i);
+            if (gatheredKeys.contains(key)) {
+                throw new EdnReaderException(linePos, codePosIndex, "Illegal map. Duplicate key "+key+".");
+            }
+            gatheredKeys.add(key);
+            if (i+1 >= kvs.size()) {
+                throw new EdnReaderException(linePos, codePosIndex, "Odd number of elements in map. Last key was "+key+".");
+            }
+            var value = kvs.get(i+1);
+            res.add(new AbstractMap.SimpleImmutableEntry<>(key,value));
+        }
+
+        return options.listToEdnMapConverter().apply(res);
     }
 
-    private @Nullable List<?> readList(final int level) {
-        var it = List.of(); // TODO
+    private @NotNull List<?> readList(final int level) {
+        final@NotNull var it = readVector(level, ')');
         return options.listToEdnListConverter().apply(it);
     }
 
     private @NotNull String readEdnString() {
-        var currentToken = new StringBuilder();
-        var linePos = cpi.getLineIdx();
-        var codePosIndex = cpi.getTextIndex();
+        final @NotNull var currentToken = new StringBuilder();
+        final var linePos = cpi.getLineIdx();
+        final var codePosIndex = cpi.getTextIndex();
         while (cpi.hasNext()) {
             var codePoint = cpi.nextInt();
             if (codePoint == '"') {
@@ -354,9 +393,9 @@ public class EdnaReader {
     }
 
     private @NotNull Char32 readUnicodeChar(final int minLength, final int maxLength, final char initChar) {
-        var linePos = cpi.getLineIdx();
-        var codePosIndex = cpi.getTextIndex();
-        StringBuilder token = cpi.takeCodePoints(new StringBuilder(), maxLength, this::isHexNum);
+        final var linePos = cpi.getLineIdx();
+        final var codePosIndex = cpi.getTextIndex();
+        final @NotNull StringBuilder token = cpi.takeCodePoints(new StringBuilder(), maxLength, this::isHexNum);
         if (token.length() < minLength && token.length() > maxLength)
             throw new EdnReaderException(linePos, codePosIndex, "Invalid unicode sequence \\" + initChar + token);
         return readUnicodeChar(token, 16, initChar);
