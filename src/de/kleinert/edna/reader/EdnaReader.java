@@ -3,6 +3,8 @@ package de.kleinert.edna.reader;
 import de.kleinert.edna.EdnOptions;
 import de.kleinert.edna.data.Char32;
 import de.kleinert.edna.data.EdnCollections;
+import de.kleinert.edna.data.Keyword;
+import de.kleinert.edna.data.Symbol;
 import jdk.jshell.spi.ExecutionControl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -117,6 +119,10 @@ public class EdnaReader {
                         res.add(readOther());
                     }
                 }
+                default->{
+                    cpi.unread(codePoint);
+                    res.add(readOther());
+                }
             }
 
             if (stopAfterOne && !res.isEmpty()) {
@@ -127,7 +133,32 @@ public class EdnaReader {
     }
 
     private @Nullable Object readOther() {
-        return null; // TODO
+        var linePos = cpi.getLineIdx();
+        var codePosIndex = cpi.getTextIndex();
+        var token = readToken(this::isValidSymbolChar);
+
+        if (token.length() > 1 && token.codePointAt(0) == ':') {
+            var temp = Keyword.parse(token, options.allowUTFSymbols());
+            if (temp == null)
+                throw new EdnReaderException(linePos, codePosIndex, "Token starts with a colon, but is not a valid keyword: " + token);
+            return temp;
+        }
+
+        if (token.codePointAt(0) == ':') {
+            throw new EdnReaderException(linePos, codePosIndex, "Lonely colon.");
+        }
+
+        return switch (token) {
+            case "nil" -> null;
+            case "true" -> true;
+            case "false" -> false;
+            default -> {
+                var temp = Symbol.parse(token, options.allowUTFSymbols());
+                if (temp == null)
+                    throw new EdnReaderException(linePos, codePosIndex, "Invalid symbol: " + token);
+                yield temp;
+            }
+        };
     }
 
     private @Nullable Object readDispatch(final int level) {
@@ -220,22 +251,37 @@ public class EdnaReader {
 
         final int byteNum, offset;
 
-        if (!options.allowNumericSuffixes()){byteNum=8;offset=0;}
-        else if (token.endsWith("_i8")){byteNum=1;offset=3;}
-        else if (token.endsWith("_i16")){byteNum=2;offset=4;}
-        else if (token.endsWith("_i32")){byteNum=4;offset=4;}
-        else if (token.endsWith("_i64")){byteNum=8;offset=4;}
-        else if (token.endsWith("L")){byteNum=8;offset=1;}
-        else {byteNum=8;offset=0;}
+        if (!options.allowNumericSuffixes()) {
+            byteNum = 8;
+            offset = 0;
+        } else if (token.endsWith("_i8")) {
+            byteNum = 1;
+            offset = 3;
+        } else if (token.endsWith("_i16")) {
+            byteNum = 2;
+            offset = 4;
+        } else if (token.endsWith("_i32")) {
+            byteNum = 4;
+            offset = 4;
+        } else if (token.endsWith("_i64")) {
+            byteNum = 8;
+            offset = 4;
+        } else if (token.endsWith("L")) {
+            byteNum = 8;
+            offset = 1;
+        } else {
+            byteNum = 8;
+            offset = 0;
+        }
 
-        final var tokenSubs = token.substring(startIndex, tokenLen-offset);
+        final var tokenSubs = token.substring(startIndex, tokenLen - offset);
         final long temp = sign * Long.valueOf(tokenSubs, base);
 
         return switch (byteNum) {
-             case 1 -> (byte) temp;
-             case 2 -> (short) temp;
-             case 4 -> (int) temp;
-             case 8 -> temp;
+            case 1 -> (byte) temp;
+            case 2 -> (short) temp;
+            case 4 -> (int) temp;
+            case 8 -> temp;
             default -> throw new IllegalStateException();
         };
     }
@@ -353,5 +399,11 @@ public class EdnaReader {
         };
     }
 
-
+    private boolean isValidSymbolChar(final int codepoint) {
+        return switch (codepoint) {
+            case ' ', '\t', '\n', '\r', '[', ']', '(', ')', '{', '}',
+                 '"' -> false;
+            default -> true;
+        };
+    }
 }
