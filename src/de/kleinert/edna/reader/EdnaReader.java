@@ -5,7 +5,6 @@ import de.kleinert.edna.data.Char32;
 import de.kleinert.edna.data.EdnCollections;
 import de.kleinert.edna.data.Keyword;
 import de.kleinert.edna.data.Symbol;
-import jdk.jshell.spi.ExecutionControl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -135,7 +134,7 @@ public class EdnaReader {
     private @Nullable Object readOther() {
         final var linePos = cpi.getLineIdx();
         final var codePosIndex = cpi.getTextIndex();
-        final@NotNull var token = readToken(this::isValidSymbolChar);
+        final @NotNull var token = readToken(this::isValidSymbolChar);
 
         if (token.length() > 1 && token.codePointAt(0) == ':') {
             final var temp = Keyword.parse(token, options.allowUTFSymbols());
@@ -161,12 +160,36 @@ public class EdnaReader {
         };
     }
 
-    private @Nullable Object readDispatch(final int level) {
-        return null; // TODO
+    private @NotNull Object readDispatch(final int level) { // TODO
+        return NOTHING;
     }
 
     private @NotNull EdnCollections.IObj readMeta(final int level) {
-        return new EdnCollections.IObj.Wrapper<>(Map.of(), null); // TODO
+        var linePos = cpi.getLineIdx();
+        var codePosIndex = cpi.getTextIndex();
+
+        if (!options.allowMetaData())
+            throw new EdnReaderException(
+                    linePos, codePosIndex,
+                    "Metadata is turned off.");
+
+        final Map<Object, Object> meta = switch (readForm(level, true)) {
+            case String v -> EdnCollections.EdnMap.create(List.of(Keyword.keyword("tag"), v));
+            case Symbol v -> EdnCollections.EdnMap.create(List.of(Keyword.keyword("tag"), v));
+            case Keyword v -> EdnCollections.EdnMap.create(List.of(v, true));
+            case Map<?, ?> tempMap -> (Map<Object, Object>) tempMap;
+            default -> throw new EdnReaderException(
+                    linePos, codePosIndex,
+                    "Metadata must be a Symbol, Keyword, String or Map.");
+        };
+
+        var obj = readForm(level, true);
+        if (obj == NOTHING)
+            throw new EdnReaderException(
+                    linePos, codePosIndex,
+                    "Required object for metadata, but got nothing.");
+
+        return new EdnCollections.IObj.Wrapper<>(meta, obj);
     }
 
     private @NotNull Number readNumber() {
@@ -326,34 +349,84 @@ public class EdnaReader {
     }
 
     private @NotNull Character readChar() {
-        return (char) -1; // TODO
+        final var linePos = cpi.getLineIdx();
+        final var codePosIndex = cpi.getTextIndex();
+        var token = readToken(this::isNotBreakingSymbol);
+        return readDispatchUnicodeChar(linePos, codePosIndex, token, false).toChar();
+    }
+
+    private Char32 readDispatchUnicodeChar(final int linePos, final int codePosIndex, final @NotNull String initialToken, final boolean isDispatch) {
+        var token = (initialToken.isEmpty() && cpi.hasNext())
+                ? readToken(1, this::isValidCharSingle).trim()
+                : initialToken.trim();
+
+        if (token.isEmpty())
+            throw new EdnReaderException(linePos, codePosIndex, "Invalid char literal. Single backslash or or ");
+
+        if (token.length() == 1)
+            return Char32.valueOf(token.codePointAt(0));
+
+        final int maybeReturn = switch (token) {
+            case "newline" -> '\n';
+            case "space" -> ' ';
+            case "tab" -> '\t';
+            case "backspace" -> '\b';
+            case "formfeed" -> '\f';
+            case "return" -> '\r';
+            default -> 0;
+        };
+
+        if (maybeReturn != 0) return Char32.valueOf(maybeReturn);
+
+        final var reducedToken = token.subSequence(1, token.length());
+        final var errorTokenText = (isDispatch ? "#" : "") + '\\' + token;
+        final var c0 = token.codePointAt(0);
+        if (c0 == 'o') {
+            if (reducedToken.length() < 2 || reducedToken.length() > 3)
+                throw new EdnReaderException(linePos, codePosIndex, "Invalid length of unicode sequence " + reducedToken.length() + " in char literal " + errorTokenText + " (should be 2 or 3).");
+            return readUnicodeChar(reducedToken, 8, 'o');
+        }
+        if (c0 == 'u') {
+            if (reducedToken.length() == 4 || (isDispatch && reducedToken.length() == 8))
+                return readUnicodeChar(reducedToken, 16, 'u');
+            throw new EdnReaderException(linePos, codePosIndex, "Invalid length of unicode sequence " + reducedToken.length() + " in char literal " + errorTokenText + " (should be 4 or 8 if used in a dispatch literal).");
+        }
+        if (c0 == 'x') {
+            if (!options.allowSchemeUTF32Codes())
+                throw new EdnReaderException(linePos, codePosIndex, "Invalid char literal: " + errorTokenText);
+            if (reducedToken.length() == 8)
+                return readUnicodeChar(reducedToken, 16, 'x');
+            throw new EdnReaderException(linePos, codePosIndex, "Invalid length of unicode sequence " + reducedToken.length() + " in char literal " + errorTokenText + " (should be 8).");
+        } else {
+            throw new EdnReaderException(linePos, codePosIndex, "Invalid char literal " + errorTokenText);
+        }
     }
 
     private @NotNull Map<?, ?> readMap(final int level) {
         final var linePos = cpi.getLineIdx();
         final var codePosIndex = cpi.getTextIndex();
-        var kvs = readVector(level, '}');
-        var gatheredKeys = new HashSet<>();
-        var res = new ArrayList<Map.Entry<Object,Object>>();
+        final var kvs = readVector(level, '}');
+        final var gatheredKeys = new HashSet<>();
+        final var res = new ArrayList<Map.Entry<Object, Object>>();
 
         for (int i = 0; i < kvs.size(); i += 2) {
             var key = kvs.get(i);
             if (gatheredKeys.contains(key)) {
-                throw new EdnReaderException(linePos, codePosIndex, "Illegal map. Duplicate key "+key+".");
+                throw new EdnReaderException(linePos, codePosIndex, "Illegal map. Duplicate key " + key + ".");
             }
             gatheredKeys.add(key);
-            if (i+1 >= kvs.size()) {
-                throw new EdnReaderException(linePos, codePosIndex, "Odd number of elements in map. Last key was "+key+".");
+            if (i + 1 >= kvs.size()) {
+                throw new EdnReaderException(linePos, codePosIndex, "Odd number of elements in map. Last key was " + key + ".");
             }
-            var value = kvs.get(i+1);
-            res.add(new AbstractMap.SimpleImmutableEntry<>(key,value));
+            var value = kvs.get(i + 1);
+            res.add(new AbstractMap.SimpleImmutableEntry<>(key, value));
         }
 
         return options.listToEdnMapConverter().apply(res);
     }
 
     private @NotNull List<?> readList(final int level) {
-        final@NotNull var it = readVector(level, ')');
+        final @NotNull var it = readVector(level, ')');
         return options.listToEdnListConverter().apply(it);
     }
 
@@ -444,5 +517,11 @@ public class EdnaReader {
                  '"' -> false;
             default -> true;
         };
+    }
+
+    private boolean isValidCharSingle(final int codepoint) {
+        if (codepoint < Character.MIN_VALUE || codepoint > Character.MAX_VALUE)
+            return false;
+        return !Character.isWhitespace(codepoint);
     }
 }
