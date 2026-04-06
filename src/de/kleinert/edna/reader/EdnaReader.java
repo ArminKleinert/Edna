@@ -11,18 +11,22 @@ import org.jetbrains.annotations.Nullable;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.IntPredicate;
 import java.util.regex.Pattern;
 
 public class EdnaReader {
     private final @NotNull EdnOptions options;
-    private final @NotNull CodePointIterator cpi;
+    private final @NotNull CodePointIterator cpi;final @NotNull Map<@NotNull Symbol, @Nullable Object> references;
 
     EdnaReader(final @NotNull EdnOptions options,
-               final @NotNull CodePointIterator cpi) {
+               final @NotNull CodePointIterator cpi,
+               final @NotNull Map<@NotNull Symbol, @Nullable Object> references) {
         this.options = options;
         this.cpi = cpi;
+        this.references = references;
         ensureValidDecoderNames();
     }
 
@@ -43,7 +47,7 @@ public class EdnaReader {
     public static <T> T read(final @NotNull CodePointIterator cpi,
                              final @NotNull EdnOptions options,
                              final @NotNull Class<T> castClass) {
-        var temp = new EdnaReader(options, cpi).readString();
+        var temp = new EdnaReader(options, cpi, options.referenceTable()).readString();
         return castClass.cast(temp);
     }
 
@@ -169,7 +173,7 @@ public class EdnaReader {
         };
     }
 
-    private @NotNull Object readDispatch(final int level) { // TODO
+    private @Nullable Object readDispatch(final int level) {
         final var linePos = cpi.getLineIdx();
         final var codePosIndex = cpi.getTextIndex();
         final @NotNull var token = cpi.takeCodePoints(new StringBuilder(), this::isNotBreakingSymbolOrDispatch);
@@ -195,7 +199,7 @@ public class EdnaReader {
                 }
             }
             case '{' -> {
-                return readSet(level + 1);
+                return readSet(level + 1, '}');
             }
             case '#' -> {
                 cpi.takeCodePoints(token, this::isNotBreakingSymbolOrDispatch);
@@ -213,10 +217,69 @@ public class EdnaReader {
         return readDecode(level + 1, token.toString());
     }
 
-    private @NotNull Object readDecode(final int level, final @NotNull String string) {throw new UnsupportedOperationException("");
+    private @Nullable Object readDecode(final int level, final @NotNull String token) {
+        final var linePos = cpi.getLineIdx();
+        final var codePosIndex = cpi.getTextIndex();
+        final var form = readForm(level + 1, true);
+        try {
+            if (token.equals("uuid")) {
+                if (!(form instanceof CharSequence)) {
+                    var msg = "Dispatch decoder $token requires a string as input but got "+form+".";
+                    throw new EdnReaderException(linePos, codePosIndex, msg);
+                }
+                return UUID.fromString(form.toString());
+            } else if (token.equals("inst")) {
+                if (!(form instanceof CharSequence)) {
+                    var msg = "Dispatch decoder $token requires a string as input but got "+form+".";
+                    throw new EdnReaderException(linePos, codePosIndex, msg);
+                }
+                return Instant.parse((CharSequence) form);
+            } else if (options.allowDefinitionsAndReferences() && token.equals("ref")) {
+                return readRef(token, form);
+            } else {
+                final var decoder = options.ednClassDecoders().get(token);
+                if (decoder != null) return decoder.apply(form);
+            }
+        } catch (IllegalArgumentException ex) {
+            // For UUID.fromString
+            throw new EdnReaderException.EdnClassConversionError(linePos, codePosIndex, null, ex);
+        } catch (DateTimeParseException ex) {
+            // For Instant.parse.
+            throw new EdnReaderException.EdnClassConversionError(linePos, codePosIndex, null, ex);
+        }
+        throw new EdnReaderException(linePos, codePosIndex, "Invalid dispatch expression #"+token+".");
     }
 
-    private @NotNull Set<Object> readSet(final int level) {throw new UnsupportedOperationException("");
+    private @Nullable Object readRef(@NotNull String token, @Nullable Object form) {
+        if (token.equals("ref")) {
+            if (!(form instanceof Symbol)) throw new EdnReaderException(
+                    cpi.getLineIdx(), cpi.getTextIndex(),
+                    "#" + token + " requires a symbol for the reference, but got $form of type "+ (form ==null?"null":form.getClass())+")"
+            );
+            if (!references.containsKey(form)) throw new EdnReaderException(
+                    cpi.getLineIdx(), cpi.getTextIndex(),
+                    "#" + token + ": $form not found in the lookup. (lookup contains "+references.keySet()+")"
+            );
+            return references.get((Symbol) form);
+        }
+
+        throw new EdnReaderException(cpi.getLineIdx(), cpi.getTextIndex(), "Unsupported reference macro: "+token);
+    }
+
+    private @NotNull Set<Object> readSet(final int level, final int separator) {
+        final var linePos = cpi.getLineIdx();
+        final var codePosIndex = cpi.getTextIndex();
+        final Set<Object> result = new HashSet<>();
+        final var lst = readVector(level, separator);
+        var i = 0;
+        while (i < lst.size()) {
+            Object key = lst.get(i);
+            if (result.contains(key))
+                throw new EdnReaderException(linePos, codePosIndex, "Illegal set. Duplicate value " + key + ".");
+            result.add(key);
+            i++;
+        }
+        return (Set<Object>) options.listToEdnSetConverter().apply(lst);
     }
 
     private @NotNull EdnCollections.IObj readMeta(final int level) {
