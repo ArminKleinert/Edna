@@ -8,6 +8,7 @@ import de.kleinert.edna.data.Symbol;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -30,6 +31,14 @@ public class EdnaReader {
     }
 
     private final @NotNull Object NOTHING = new Object();
+
+    public static Object read(String s) {
+        return read(new CodePointIterator(new StringReader(s)), new EdnOptions(), Object.class);
+    }
+
+    public static Object read(String s, EdnOptions options) {
+        return read(new CodePointIterator(new StringReader(s)), options, Object.class);
+    }
 
     public static <T> T read(final @NotNull CodePointIterator cpi,
                              final @NotNull EdnOptions options,
@@ -161,7 +170,53 @@ public class EdnaReader {
     }
 
     private @NotNull Object readDispatch(final int level) { // TODO
-        return NOTHING;
+        final var linePos = cpi.getLineIdx();
+        final var codePosIndex = cpi.getTextIndex();
+        final @NotNull var token = cpi.takeCodePoints(new StringBuilder(), this::isNotBreakingSymbolOrDispatch);
+
+        if (token.isEmpty()) {
+            if (!cpi.hasNext())
+                throw new EdnReaderException(linePos, codePosIndex, "Invalid dispatch expression #"+token);
+
+            final var code = cpi.nextInt();
+            switch (code) {
+                case '{', '#' -> token.appendCodePoint(code);
+                default -> throw new EdnReaderException(linePos, codePosIndex, "Invalid dispatch expression "+token);
+            }
+        }
+
+        switch (token.codePointAt(0)) {
+            case '\\'-> {
+                if (options.allowDispatchChars()) {
+                    final var linePos1 = cpi.getLineIdx();
+                    final var codePosIndex1 = cpi.getTextIndex();
+                    var subToken = token.substring(1);
+                    return readDispatchUnicodeChar(linePos1, codePosIndex1, subToken, true);
+                }
+            }
+            case '{' -> {
+                return readSet(level + 1);
+            }
+            case '#' -> {
+                cpi.takeCodePoints(token, this::isNotBreakingSymbolOrDispatch);
+
+                return switch(token.toString()) {
+                    case "#NaN" -> Double.NaN;
+                    case "#-NaN"->-Double.NaN;
+                    case "#INF"-> Double.POSITIVE_INFINITY;
+                    case "#-INF"->Double.NEGATIVE_INFINITY;
+                    default -> throw new EdnReaderException(linePos, codePosIndex, "Unknown symbolic value #"+token);
+                };
+            }
+        }
+
+        return readDecode(level + 1, token.toString());
+    }
+
+    private @NotNull Object readDecode(final int level, final @NotNull String string) {throw new UnsupportedOperationException("");
+    }
+
+    private @NotNull Set<Object> readSet(final int level) {throw new UnsupportedOperationException("");
     }
 
     private @NotNull EdnCollections.IObj readMeta(final int level) {
@@ -355,7 +410,10 @@ public class EdnaReader {
         return readDispatchUnicodeChar(linePos, codePosIndex, token, false).toChar();
     }
 
-    private Char32 readDispatchUnicodeChar(final int linePos, final int codePosIndex, final @NotNull String initialToken, final boolean isDispatch) {
+    private Char32 readDispatchUnicodeChar(final int linePos,
+                                           final int codePosIndex,
+                                           final @NotNull String initialToken,
+                                           final boolean isDispatch) {
         var token = (initialToken.isEmpty() && cpi.hasNext())
                 ? readToken(1, this::isValidCharSingle).trim()
                 : initialToken.trim();
@@ -386,12 +444,12 @@ public class EdnaReader {
                 throw new EdnReaderException(linePos, codePosIndex, "Invalid length of unicode sequence " + reducedToken.length() + " in char literal " + errorTokenText + " (should be 2 or 3).");
             return readUnicodeChar(reducedToken, 8, 'o');
         }
-        if (c0 == 'u') {
+        if (c0 == 'u') { // UTF-16 or UTF-32 code
             if (reducedToken.length() == 4 || (isDispatch && reducedToken.length() == 8))
                 return readUnicodeChar(reducedToken, 16, 'u');
             throw new EdnReaderException(linePos, codePosIndex, "Invalid length of unicode sequence " + reducedToken.length() + " in char literal " + errorTokenText + " (should be 4 or 8 if used in a dispatch literal).");
         }
-        if (c0 == 'x') {
+        if (c0 == 'x') { // UTF-32 code
             if (!options.allowSchemeUTF32Codes())
                 throw new EdnReaderException(linePos, codePosIndex, "Invalid char literal: " + errorTokenText);
             if (reducedToken.length() == 8)
@@ -477,7 +535,18 @@ public class EdnaReader {
     private @NotNull Char32 readUnicodeChar(final @NotNull CharSequence token,
                                             final int base,
                                             final char initChar) {
-        return Char32.valueOf(0); // TODO
+        var linePos = cpi.getLineIdx();
+        var codePosIndex = cpi.getTextIndex();
+        try {
+            var code = token.chars().reduce(0, (res, elem) ->
+                    res * base + Character.digit(elem, base)
+            );
+            return Char32.valueOf(code);
+        } catch (NumberFormatException nfe) {
+            throw new EdnReaderException(
+                    linePos, codePosIndex,
+                    (nfe.getMessage() == null ? nfe.getMessage() : ("Invalid unicode sequence \\" + initChar + token)));
+        }
     }
 
     private void readComment() {
@@ -509,6 +578,10 @@ public class EdnaReader {
             case ' ', '\t', '\n', '\r', '[', ']', '(', ')', '{', '}', '\'', '"', ';', ',' -> false;
             default -> true;
         };
+    }
+
+    private boolean isNotBreakingSymbolOrDispatch(final int codepoint) {
+        return isNotBreakingSymbol(codepoint) && codepoint != '#';
     }
 
     private boolean isValidSymbolChar(final int codepoint) {
