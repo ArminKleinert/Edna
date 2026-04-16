@@ -38,6 +38,49 @@ public class EdnOptions {
     private boolean allowZeroPrefix = false;
     private boolean allowRatios = false;
 
+    private static EdnOptions defaultOptions;
+
+    public static EdnOptions defaultOptions() {
+        if (defaultOptions == null) defaultOptions = new EdnOptions();
+        return defaultOptions;
+    }
+
+    private static EdnOptions extendedOptions;
+
+    public static EdnOptions extendedOptions() {
+        if (extendedOptions == null)
+            extendedOptions = new EdnOptions(
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true,
+                    true);
+        return extendedOptions;
+    }
+
+    private EdnOptions(
+            final boolean allowSchemeUTF32Codes,
+            final boolean allowDispatchChars,
+            final boolean moreNumberPrefixes,
+            final boolean allowNumericSuffixes,
+            final boolean allowMoreEncoderDecoderNames,
+            final boolean allowUTFSymbols,
+            final boolean allowRatios,
+            final boolean allowMetaData
+    ) {
+        this.allowSchemeUTF32Codes = allowSchemeUTF32Codes;
+        this.allowDispatchChars = allowDispatchChars;
+        this.moreNumberPrefixes = moreNumberPrefixes;
+        this.allowNumericSuffixes = allowNumericSuffixes;
+        this.allowMoreEncoderDecoderNames = allowMoreEncoderDecoderNames;
+        this.allowUTFSymbols = allowUTFSymbols;
+        this.allowMetaData = allowMetaData;
+        this.allowRatios = allowRatios;
+    }
+
     public EdnOptions() {
     }
 
