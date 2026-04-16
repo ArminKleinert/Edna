@@ -2,7 +2,7 @@ package de.kleinert.edna.reader;
 
 import de.kleinert.edna.EdnaOptions;
 import de.kleinert.edna.data.Char32;
-import de.kleinert.edna.data.EdnCollections;
+import de.kleinert.edna.data.EdnaCollections;
 import de.kleinert.edna.data.Keyword;
 import de.kleinert.edna.data.Symbol;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +19,8 @@ import java.util.regex.Pattern;
 
 public class EdnaReader {
     private final @NotNull EdnaOptions options;
-    private final @NotNull CodePointIterator cpi;final @NotNull Map<@NotNull Symbol, @Nullable Object> references;
+    private final @NotNull CodePointIterator cpi;
+    final @NotNull Map<@NotNull Symbol, @Nullable Object> references;
 
     EdnaReader(final @NotNull EdnaOptions options,
                final @NotNull CodePointIterator cpi,
@@ -54,7 +55,9 @@ public class EdnaReader {
     private @Nullable Object readString() {
         var data = (List<?>) readForm(0, false);
         if (data.size() != 1)
-            throw new EdnReaderException(cpi.getLineIdx(), cpi.getTextIndex(), "The input should only contain one expression, but there are none or multiple.");
+            throw new EdnaReaderException(
+                    cpi.getLineIdx(), cpi.getTextIndex(),
+                    "The input should only contain one expression, but there are none or multiple.");
         return data.getFirst();
     }
 
@@ -108,7 +111,9 @@ public class EdnaReader {
                 }
                 case ')', ']', '}' -> {
                     if (level == 0)
-                        throw new EdnReaderException(linePos, codePosIndex, "Unexpected character " + (char) codePoint);
+                        throw new EdnaReaderException(
+                                linePos, codePosIndex,
+                                "Unexpected character " + (char) codePoint);
                     cpi.unread(codePoint);
                     return NOTHING;
                 }
@@ -152,12 +157,14 @@ public class EdnaReader {
         if (token.length() > 1 && token.codePointAt(0) == ':') {
             final var temp = Keyword.parse(token, options.allowUTFSymbols());
             if (temp == null)
-                throw new EdnReaderException(linePos, codePosIndex, "Token starts with a colon, but is not a valid keyword: " + token);
+                throw new EdnaReaderException(
+                        linePos, codePosIndex,
+                        "Token starts with a colon, but is not a valid keyword: " + token);
             return temp;
         }
 
         if (token.codePointAt(0) == ':') {
-            throw new EdnReaderException(linePos, codePosIndex, "Lonely colon.");
+            throw new EdnaReaderException(linePos, codePosIndex, "Lonely colon.");
         }
 
         return switch (token) {
@@ -167,7 +174,7 @@ public class EdnaReader {
             default -> {
                 final var temp = Symbol.parse(token, options.allowUTFSymbols());
                 if (temp == null)
-                    throw new EdnReaderException(linePos, codePosIndex, "Invalid symbol: " + token);
+                    throw new EdnaReaderException(linePos, codePosIndex, "Invalid symbol: " + token);
                 yield temp;
             }
         };
@@ -180,17 +187,17 @@ public class EdnaReader {
 
         if (token.isEmpty()) {
             if (!cpi.hasNext())
-                throw new EdnReaderException(linePos, codePosIndex, "Invalid dispatch expression #"+token);
+                throw new EdnaReaderException(linePos, codePosIndex, "Invalid dispatch expression #" + token);
 
             final var code = cpi.nextInt();
             switch (code) {
                 case '{', '#' -> token.appendCodePoint(code);
-                default -> throw new EdnReaderException(linePos, codePosIndex, "Invalid dispatch expression "+token);
+                default -> throw new EdnaReaderException(linePos, codePosIndex, "Invalid dispatch expression " + token);
             }
         }
 
         switch (token.codePointAt(0)) {
-            case '\\'-> {
+            case '\\' -> {
                 if (options.allowDispatchChars()) {
                     final var linePos1 = cpi.getLineIdx();
                     final var codePosIndex1 = cpi.getTextIndex();
@@ -204,12 +211,12 @@ public class EdnaReader {
             case '#' -> {
                 cpi.takeCodePoints(token, this::isNotBreakingSymbolOrDispatch);
 
-                return switch(token.toString()) {
+                return switch (token.toString()) {
                     case "#NaN" -> Double.NaN;
-                    case "#-NaN"->-Double.NaN;
-                    case "#INF"-> Double.POSITIVE_INFINITY;
-                    case "#-INF"->Double.NEGATIVE_INFINITY;
-                    default -> throw new EdnReaderException(linePos, codePosIndex, "Unknown symbolic value #"+token);
+                    case "#-NaN" -> -Double.NaN;
+                    case "#INF" -> Double.POSITIVE_INFINITY;
+                    case "#-INF" -> Double.NEGATIVE_INFINITY;
+                    default -> throw new EdnaReaderException(linePos, codePosIndex, "Unknown symbolic value #" + token);
                 };
             }
         }
@@ -224,14 +231,14 @@ public class EdnaReader {
         try {
             if (token.equals("uuid")) {
                 if (!(form instanceof CharSequence)) {
-                    var msg = "Dispatch decoder $token requires a string as input but got "+form+".";
-                    throw new EdnReaderException(linePos, codePosIndex, msg);
+                    var msg = "Dispatch decoder $token requires a string as input but got " + form + ".";
+                    throw new EdnaReaderException(linePos, codePosIndex, msg);
                 }
                 return UUID.fromString(form.toString());
             } else if (token.equals("inst")) {
                 if (!(form instanceof CharSequence)) {
-                    var msg = "Dispatch decoder $token requires a string as input but got "+form+".";
-                    throw new EdnReaderException(linePos, codePosIndex, msg);
+                    var msg = "Dispatch decoder $token requires a string as input but got " + form + ".";
+                    throw new EdnaReaderException(linePos, codePosIndex, msg);
                 }
                 return Instant.parse((CharSequence) form);
             } else if (options.allowReferences() && token.equals("ref")) {
@@ -242,28 +249,29 @@ public class EdnaReader {
             }
         } catch (IllegalArgumentException ex) {
             // For UUID.fromString
-            throw new EdnReaderException.EdnClassConversionError(linePos, codePosIndex, null, ex);
+            throw new EdnaReaderException.EdnClassConversionError(linePos, codePosIndex, null, ex);
         } catch (DateTimeParseException ex) {
             // For Instant.parse.
-            throw new EdnReaderException.EdnClassConversionError(linePos, codePosIndex, null, ex);
+            throw new EdnaReaderException.EdnClassConversionError(linePos, codePosIndex, null, ex);
         }
-        throw new EdnReaderException(linePos, codePosIndex, "Invalid dispatch expression #"+token+".");
+        throw new EdnaReaderException(linePos, codePosIndex, "Invalid dispatch expression #" + token + ".");
     }
 
     private @Nullable Object readRef(@NotNull String token, @Nullable Object form) {
         if (token.equals("ref")) {
-            if (!(form instanceof Symbol)) throw new EdnReaderException(
+            if (!(form instanceof Symbol)) throw new EdnaReaderException(
                     cpi.getLineIdx(), cpi.getTextIndex(),
-                    "#" + token + " requires a symbol for the reference, but got $form of type "+ (form ==null?"null":form.getClass())+")"
+                    "#" + token + " requires a symbol for the reference, but got $form of type "
+                            + (form == null ? "null" : form.getClass()) + ")"
             );
-            if (!references.containsKey(form)) throw new EdnReaderException(
+            if (!references.containsKey(form)) throw new EdnaReaderException(
                     cpi.getLineIdx(), cpi.getTextIndex(),
-                    "#" + token + ": $form not found in the lookup. (lookup contains "+references.keySet()+")"
+                    "#" + token + ": $form not found in the lookup. (lookup contains " + references.keySet() + ")"
             );
             return references.get((Symbol) form);
         }
 
-        throw new EdnReaderException(cpi.getLineIdx(), cpi.getTextIndex(), "Unsupported reference macro: "+token);
+        throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), "Unsupported reference macro: " + token);
     }
 
     private @NotNull Set<Object> readSet(final int level, final int separator) {
@@ -275,39 +283,39 @@ public class EdnaReader {
         while (i < lst.size()) {
             Object key = lst.get(i);
             if (result.contains(key))
-                throw new EdnReaderException(linePos, codePosIndex, "Illegal set. Duplicate value " + key + ".");
+                throw new EdnaReaderException(linePos, codePosIndex, "Illegal set. Duplicate value " + key + ".");
             result.add(key);
             i++;
         }
         return (Set<Object>) options.listToEdnSetConverter().apply(lst);
     }
 
-    private @NotNull EdnCollections.IObj readMeta(final int level) {
+    private @NotNull EdnaCollections.IObj readMeta(final int level) {
         var linePos = cpi.getLineIdx();
         var codePosIndex = cpi.getTextIndex();
 
         if (!options.allowMetaData())
-            throw new EdnReaderException(
+            throw new EdnaReaderException(
                     linePos, codePosIndex,
                     "Metadata is turned off.");
 
         final Map<Object, Object> meta = switch (readForm(level, true)) {
-            case String v -> EdnCollections.EdnMap.create(List.of(Keyword.keyword("tag"), v));
-            case Symbol v -> EdnCollections.EdnMap.create(List.of(Keyword.keyword("tag"), v));
-            case Keyword v -> EdnCollections.EdnMap.create(List.of(v, true));
+            case String v -> EdnaCollections.EdnaMap.create(List.of(Keyword.keyword("tag"), v));
+            case Symbol v -> EdnaCollections.EdnaMap.create(List.of(Keyword.keyword("tag"), v));
+            case Keyword v -> EdnaCollections.EdnaMap.create(List.of(v, true));
             case Map<?, ?> tempMap -> (Map<Object, Object>) tempMap;
-            default -> throw new EdnReaderException(
+            default -> throw new EdnaReaderException(
                     linePos, codePosIndex,
                     "Metadata must be a Symbol, Keyword, String or Map.");
         };
 
         var obj = readForm(level, true);
         if (obj == NOTHING)
-            throw new EdnReaderException(
+            throw new EdnaReaderException(
                     linePos, codePosIndex,
                     "Required object for metadata, but got nothing.");
 
-        return new EdnCollections.IObj.Wrapper<>(meta, obj);
+        return new EdnaCollections.IObj.Wrapper<>(meta, obj);
     }
 
     private @NotNull Number readNumber() {
@@ -316,7 +324,7 @@ public class EdnaReader {
         try {
             return readNumberHelper(linePos, codePosIndex);
         } catch (NumberFormatException ex) {
-            throw new EdnReaderException(linePos, codePosIndex, null, ex);
+            throw new EdnaReaderException(linePos, codePosIndex, null, ex);
         }
     }
 
@@ -354,7 +362,9 @@ public class EdnaReader {
                 startIndex += 2;
                 var baseC = token.codePointAt(startIndex - 1);
                 if (!options.moreNumberPrefixes() && (baseC == 'x' || baseC == 'o' || baseC == 'b'))
-                    throw new EdnReaderException(linePos, codePosIndex, "Invalid number prefix in number " + token + ".");
+                    throw new EdnaReaderException(
+                            linePos, codePosIndex,
+                            "Invalid number prefix in number " + token + ".");
                 base = switch (token.codePointAt(startIndex - 1)) {
                     case 'x' -> 16;
                     case 'o' -> 8;
@@ -371,7 +381,9 @@ public class EdnaReader {
                     && token.codePointAt(startIndex) == '0'
                     && token.codePointAt(startIndex + 1) >= '0'
                     && token.codePointAt(startIndex + 1) <= '9') {
-                throw new EdnReaderException(linePos, codePosIndex, "Invalid number format: " + token + " (numbers other than 0 can not start with a 0)");
+                throw new EdnaReaderException(
+                        linePos, codePosIndex,
+                        "Invalid number format: " + token + " (numbers other than 0 can not start with a 0)");
             }
         } else if (floatyRegex.matcher(token).matches()) {
             if (token.endsWith("M")) {
@@ -381,7 +393,7 @@ public class EdnaReader {
         } else if (options.allowRatios()) {
             throw new UnsupportedOperationException(); // TODO?
         } else {
-            throw new EdnReaderException(linePos, codePosIndex, "Invalid number format: " + token);
+            throw new EdnaReaderException(linePos, codePosIndex, "Invalid number format: " + token);
         }
 
         if (token.endsWith("M"))
@@ -452,7 +464,10 @@ public class EdnaReader {
             cpi.skipWhile(this::isWhitespace);
 
             if (!cpi.hasNext()) {
-                throw new EdnReaderException(cpi.getLineIdx(), cpi.getTextIndex(), "Unclosed list started in line " + linePos + ". Expected '" + (char) separator + "', got EOF.");
+                throw new EdnaReaderException(
+                        cpi.getLineIdx(), cpi.getTextIndex(),
+                        "Unclosed list started in line " + linePos
+                                + ". Expected '" + (char) separator + "', got EOF.");
             }
 
             if (cpi.peek() == separator) {
@@ -482,7 +497,9 @@ public class EdnaReader {
                 : initialToken.trim();
 
         if (token.isEmpty())
-            throw new EdnReaderException(linePos, codePosIndex, "Invalid char literal. Single backslash or or ");
+            throw new EdnaReaderException(
+                    linePos, codePosIndex,
+                    "Invalid char literal. Single backslash or or ");
 
         if (token.length() == 1)
             return Char32.valueOf(token.codePointAt(0));
@@ -504,22 +521,34 @@ public class EdnaReader {
         final var c0 = token.codePointAt(0);
         if (c0 == 'o') {
             if (reducedToken.length() < 2 || reducedToken.length() > 3)
-                throw new EdnReaderException(linePos, codePosIndex, "Invalid length of unicode sequence " + reducedToken.length() + " in char literal " + errorTokenText + " (should be 2 or 3).");
+                throw new EdnaReaderException(
+                        linePos, codePosIndex,
+                        "Invalid length of unicode sequence " + reducedToken.length() + " in char literal "
+                                + errorTokenText + " (should be 2 or 3).");
             return readUnicodeChar(reducedToken, 8, 'o');
         }
         if (c0 == 'u') { // UTF-16 or UTF-32 code
             if (reducedToken.length() == 4 || (isDispatch && reducedToken.length() == 8))
                 return readUnicodeChar(reducedToken, 16, 'u');
-            throw new EdnReaderException(linePos, codePosIndex, "Invalid length of unicode sequence " + reducedToken.length() + " in char literal " + errorTokenText + " (should be 4 or 8 if used in a dispatch literal).");
+            throw new EdnaReaderException(
+                    linePos, codePosIndex,
+                    "Invalid length of unicode sequence " + reducedToken.length()
+                            + " in char literal " + errorTokenText
+                            + " (should be 4 or 8 if used in a dispatch literal).");
         }
         if (c0 == 'x') { // UTF-32 code
             if (!options.allowSchemeUTF32Codes())
-                throw new EdnReaderException(linePos, codePosIndex, "Invalid char literal: " + errorTokenText);
+                throw new EdnaReaderException(
+                        linePos, codePosIndex,
+                        "Invalid char literal: " + errorTokenText);
             if (reducedToken.length() == 8)
                 return readUnicodeChar(reducedToken, 16, 'x');
-            throw new EdnReaderException(linePos, codePosIndex, "Invalid length of unicode sequence " + reducedToken.length() + " in char literal " + errorTokenText + " (should be 8).");
+            throw new EdnaReaderException(
+                    linePos, codePosIndex,
+                    "Invalid length of unicode sequence " + reducedToken.length()
+                            + " in char literal " + errorTokenText + " (should be 8).");
         } else {
-            throw new EdnReaderException(linePos, codePosIndex, "Invalid char literal " + errorTokenText);
+            throw new EdnaReaderException(linePos, codePosIndex, "Invalid char literal " + errorTokenText);
         }
     }
 
@@ -533,11 +562,15 @@ public class EdnaReader {
         for (int i = 0; i < kvs.size(); i += 2) {
             var key = kvs.get(i);
             if (gatheredKeys.contains(key)) {
-                throw new EdnReaderException(linePos, codePosIndex, "Illegal map. Duplicate key " + key + ".");
+                throw new EdnaReaderException(
+                        linePos, codePosIndex,
+                        "Illegal map. Duplicate key " + key + ".");
             }
             gatheredKeys.add(key);
             if (i + 1 >= kvs.size()) {
-                throw new EdnReaderException(linePos, codePosIndex, "Odd number of elements in map. Last key was " + key + ".");
+                throw new EdnaReaderException(
+                        linePos, codePosIndex,
+                        "Odd number of elements in map. Last key was " + key + ".");
             }
             var value = kvs.get(i + 1);
             res.add(new AbstractMap.SimpleImmutableEntry<>(key, value));
@@ -574,8 +607,9 @@ public class EdnaReader {
                     case 'u' -> readUnicodeChar(4, 4, 'u').toChar(); // UTF-16 code
                     case 'x' -> readUnicodeChar(8, 8, 'x').code(); // UTF-32 code
                     default -> {
-                        var message = "Invalid escape sequence: \\${escapeCodePt.toChar()} in string $currentToken";
-                        throw new EdnReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
+                        var message =
+                                "Invalid escape sequence: \\" + escapeCodePt + "in string " + currentToken;
+                        throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
                     }
                 };
                 currentToken.appendCodePoint(temp);
@@ -583,15 +617,20 @@ public class EdnaReader {
                 currentToken.appendCodePoint(codePoint);
             }
         }
-        throw new EdnReaderException(linePos, codePosIndex, "Unclosed String literal " + currentToken + ".");
+        throw new EdnaReaderException(linePos, codePosIndex, "Unclosed String literal " + currentToken + ".");
     }
 
-    private @NotNull Char32 readUnicodeChar(final int minLength, final int maxLength, final char initChar) {
+    private @NotNull Char32 readUnicodeChar(final int minLength,
+                                            final int maxLength,
+                                            final char initChar) {
         final var linePos = cpi.getLineIdx();
         final var codePosIndex = cpi.getTextIndex();
-        final @NotNull StringBuilder token = cpi.takeCodePoints(new StringBuilder(), maxLength, this::isHexNum);
+        final @NotNull StringBuilder token =
+                cpi.takeCodePoints(new StringBuilder(), maxLength, this::isHexNum);
         if (token.length() < minLength && token.length() > maxLength)
-            throw new EdnReaderException(linePos, codePosIndex, "Invalid unicode sequence \\" + initChar + token);
+            throw new EdnaReaderException(
+                    linePos, codePosIndex,
+                    "Invalid unicode sequence \\" + initChar + token);
         return readUnicodeChar(token, 16, initChar);
     }
 
@@ -606,9 +645,11 @@ public class EdnaReader {
             );
             return Char32.valueOf(code);
         } catch (NumberFormatException nfe) {
-            throw new EdnReaderException(
+            throw new EdnaReaderException(
                     linePos, codePosIndex,
-                    (nfe.getMessage() == null ? nfe.getMessage() : ("Invalid unicode sequence \\" + initChar + token)));
+                    (nfe.getMessage() == null
+                            ? nfe.getMessage()
+                            : ("Invalid unicode sequence \\" + initChar + token)));
         }
     }
 

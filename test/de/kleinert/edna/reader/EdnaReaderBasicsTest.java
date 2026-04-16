@@ -51,9 +51,9 @@ class EdnaReaderBasicsTest {
 
     @Test
     public void parseStringUnclosedTest() {
-        Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("\""));
-        Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("\"abc"));
-        Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("\"\"\""));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\""));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\"abc"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\"\"\""));
     }
 
     @Test

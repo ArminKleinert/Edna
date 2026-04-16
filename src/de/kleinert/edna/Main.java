@@ -1,12 +1,12 @@
 import de.kleinert.edna.EdnaOptions;
-import de.kleinert.edna.data.EdnCollections;
+import de.kleinert.edna.data.EdnaCollections;
 import de.kleinert.edna.reader.CodePointIterator;
 import de.kleinert.edna.reader.EdnaReader;
 
 void main() {
     {
         var options = EdnaOptions.defaultOptions().copy((b)->b.allowMetaData(true));
-        var o = (EdnCollections.IObj.Wrapper<?>)EdnaReader.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
+        var o = (EdnaCollections.IObj.Wrapper<?>)EdnaReader.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
         IO.println(o.meta());
         IO.println(o.element());
         IO.println(o.getClass());
@@ -18,7 +18,7 @@ void main() {
         IO.println(o.getClass());
     }
     {
-        var o = new EdnCollections.EdnMap<>(Map.of("r", 1, "a", 3).entrySet().stream().toList());
+        var o = new EdnaCollections.EdnaMap<>(Map.of("r", 1, "a", 3).entrySet().stream().toList());
         IO.println(o);
         IO.println(o.getClass());
     }

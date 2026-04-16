@@ -1,6 +1,6 @@
 package de.kleinert.edna;
 
-import de.kleinert.edna.data.EdnCollections;
+import de.kleinert.edna.data.EdnaCollections;
 import de.kleinert.edna.data.Symbol;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,15 +42,15 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 false,
                 false,
                 Map.of(),
-                new EdnCollections.EdnMap<>(List.of()),
+                new EdnaCollections.EdnaMap<>(List.of()),
                 false,
                 false,
                 false,
                 " ",
-                EdnCollections.EdnList::new,
-                EdnCollections.EdnVector::new,
-                EdnCollections.EdnSet::new,
-                EdnCollections.EdnMap::new,
+                EdnaCollections.EdnaList::new,
+                EdnaCollections.EdnaVector::new,
+                EdnaCollections.EdnaSet::new,
+                EdnaCollections.EdnaMap::new,
                 false,
                 false,
                 Map.of(),
@@ -73,15 +73,15 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 true,
                 true,
                 Map.of(),
-                new EdnCollections.EdnMap<>(List.of()),
+                new EdnaCollections.EdnaMap<>(List.of()),
                 true,
                 true,
                 true,
                 " ",
-                EdnCollections.EdnList::new,
-                EdnCollections.EdnVector::new,
-                EdnCollections.EdnSet::new,
-                EdnCollections.EdnMap::new,
+                EdnaCollections.EdnaList::new,
+                EdnaCollections.EdnaVector::new,
+                EdnaCollections.EdnaSet::new,
+                EdnaCollections.EdnaMap::new,
                 true,
                 true,
                 Map.of(),
@@ -98,38 +98,38 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
     }
 
 
-    public @NotNull EdnaOptions copy(@NotNull UnaryOperator<Builder> f) {
-        Builder b = new Builder(this);
+    public @NotNull EdnaOptions copy(final @NotNull UnaryOperator<Builder> f) {
+        final @NotNull Builder b = new Builder(this);
         return f.apply(b).build();
     }
 
     public static final class Builder {
         private boolean allowSchemeUTF32Codes;
         private boolean allowDispatchChars;
-        private Map<String, Function<Object, Object>> ednClassDecoders;
-        private SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders;
+        private @NotNull Map<String, Function<Object, Object>> ednClassDecoders;
+        private @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders;
         private boolean moreNumberPrefixes;
         private boolean allowNumericSuffixes;
         private boolean allowMoreEncoderDecoderNames;
-        private String encodingSequenceSeparator;
-        private Function<List<?>, List<?>> listToEdnListConverter;
-        private Function<List<?>, List<?>> listToEdnVectorConverter;
-        private Function<List<?>, Set<?>> listToEdnSetConverter;
-        private Function<List<Map.Entry<Object, Object>>, Map<?, ?>> listToEdnMapConverter;
+        private @NotNull String encodingSequenceSeparator;
+        private @NotNull Function<List<?>, List<?>> listToEdnListConverter;
+        private @NotNull Function<List<?>, List<?>> listToEdnVectorConverter;
+        private @NotNull Function<List<?>, Set<?>> listToEdnSetConverter;
+        private @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> listToEdnMapConverter;
         private boolean allowUTFSymbols;
         private boolean allowReferences;
-        private Map<String, Function<?, ?>> dispatchMacros;
+        private @NotNull Map<String, Function<?, ?>> dispatchMacros;
         private int encoderSequenceElementLimit;
         private int encoderCollectionElementLimit;
         private int encoderMaxColumn;
-        private String encoderLineIndent;
+        private @NotNull String encoderLineIndent;
         private boolean encoderPrettyPrint;
-        private Map<Symbol, Object> referenceTable;
+        private @NotNull Map<Symbol, Object> referenceTable;
         private boolean allowMetaData;
         private boolean allowZeroPrefix;
         private boolean allowRatios;
 
-        public Builder(EdnaOptions o) {
+        public Builder(final @NotNull EdnaOptions o) {
             this.allowSchemeUTF32Codes = o.allowSchemeUTF32Codes();
             this.allowDispatchChars = o.allowDispatchChars();
             this.ednClassDecoders = o.ednClassDecoders();
@@ -156,32 +156,127 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             this.allowRatios = o.allowRatios();
         }
 
-        public Builder allowSchemeUTF32Codes(boolean v) { this.allowSchemeUTF32Codes = v; return this; }
-        public Builder allowDispatchChars(boolean v) { this.allowDispatchChars = v; return this; }
-        public Builder ednClassDecoders(Map<String, Function<Object, Object>> v) { this.ednClassDecoders = v; return this; }
-        public Builder ednClassEncoders(SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> v) { this.ednClassEncoders = v; return this; }
-        public Builder moreNumberPrefixes(boolean v) { this.moreNumberPrefixes = v; return this; }
-        public Builder allowNumericSuffixes(boolean v) { this.allowNumericSuffixes = v; return this; }
-        public Builder allowMoreEncoderDecoderNames(boolean v) { this.allowMoreEncoderDecoderNames = v; return this; }
-        public Builder encodingSequenceSeparator(String v) { this.encodingSequenceSeparator = v; return this; }
-        public Builder listToEdnListConverter(Function<List<?>, List<?>> v) { this.listToEdnListConverter = v; return this; }
-        public Builder listToEdnVectorConverter(Function<List<?>, List<?>> v) { this.listToEdnVectorConverter = v; return this; }
-        public Builder listToEdnSetConverter(Function<List<?>, Set<?>> v) { this.listToEdnSetConverter = v; return this; }
-        public Builder listToEdnMapConverter(Function<List<Map.Entry<Object, Object>>, Map<?, ?>> v) { this.listToEdnMapConverter = v; return this; }
-        public Builder allowUTFSymbols(boolean v) { this.allowUTFSymbols = v; return this; }
-        public Builder allowReferences(boolean v) { this.allowReferences = v; return this; }
-        public Builder dispatchMacros(Map<String, Function<?, ?>> v) { this.dispatchMacros = v; return this; }
-        public Builder encoderSequenceElementLimit(int v) { this.encoderSequenceElementLimit = v; return this; }
-        public Builder encoderCollectionElementLimit(int v) { this.encoderCollectionElementLimit = v; return this; }
-        public Builder encoderMaxColumn(int v) { this.encoderMaxColumn = v; return this; }
-        public Builder encoderLineIndent(String v) { this.encoderLineIndent = v; return this; }
-        public Builder encoderPrettyPrint(boolean v) { this.encoderPrettyPrint = v; return this; }
-        public Builder referenceTable(Map<Symbol, Object> v) { this.referenceTable = v; return this; }
-        public Builder allowMetaData(boolean v) { this.allowMetaData = v; return this; }
-        public Builder allowZeroPrefix(boolean v) { this.allowZeroPrefix = v; return this; }
-        public Builder allowRatios(boolean v) { this.allowRatios = v; return this; }
+        public Builder allowSchemeUTF32Codes(final boolean v) {
+            this.allowSchemeUTF32Codes = v;
+            return this;
+        }
 
-        public EdnaOptions build() {
+        public Builder allowDispatchChars(final boolean v) {
+            this.allowDispatchChars = v;
+            return this;
+        }
+
+        public Builder ednClassDecoders(final @NotNull Map<String, Function<Object, Object>> v) {
+            this.ednClassDecoders = v;
+            return this;
+        }
+
+        public Builder ednClassEncoders(final @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> v) {
+            this.ednClassEncoders = v;
+            return this;
+        }
+
+        public Builder moreNumberPrefixes(final boolean v) {
+            this.moreNumberPrefixes = v;
+            return this;
+        }
+
+        public Builder allowNumericSuffixes(final boolean v) {
+            this.allowNumericSuffixes = v;
+            return this;
+        }
+
+        public Builder allowMoreEncoderDecoderNames(boolean v) {
+            this.allowMoreEncoderDecoderNames = v;
+            return this;
+        }
+
+        public Builder encodingSequenceSeparator(final @NotNull String v) {
+            this.encodingSequenceSeparator = v;
+            return this;
+        }
+
+        public Builder listToEdnListConverter(final @NotNull Function<List<?>, List<?>> v) {
+            this.listToEdnListConverter = v;
+            return this;
+        }
+
+        public Builder listToEdnVectorConverter(final @NotNull Function<List<?>, List<?>> v) {
+            this.listToEdnVectorConverter = v;
+            return this;
+        }
+
+        public Builder listToEdnSetConverter(final @NotNull Function<List<?>, Set<?>> v) {
+            this.listToEdnSetConverter = v;
+            return this;
+        }
+
+        public Builder listToEdnMapConverter(final @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> v) {
+            this.listToEdnMapConverter = v;
+            return this;
+        }
+
+        public Builder allowUTFSymbols(final boolean v) {
+            this.allowUTFSymbols = v;
+            return this;
+        }
+
+        public Builder allowReferences(final boolean v) {
+            this.allowReferences = v;
+            return this;
+        }
+
+        public Builder dispatchMacros(final @NotNull Map<String, Function<?, ?>> v) {
+            this.dispatchMacros = v;
+            return this;
+        }
+
+        public Builder encoderSequenceElementLimit(final int v) {
+            this.encoderSequenceElementLimit = v;
+            return this;
+        }
+
+        public Builder encoderCollectionElementLimit(final int v) {
+            this.encoderCollectionElementLimit = v;
+            return this;
+        }
+
+        public Builder encoderMaxColumn(final int v) {
+            this.encoderMaxColumn = v;
+            return this;
+        }
+
+        public Builder encoderLineIndent(final @NotNull String v) {
+            this.encoderLineIndent = v;
+            return this;
+        }
+
+        public Builder encoderPrettyPrint(final boolean v) {
+            this.encoderPrettyPrint = v;
+            return this;
+        }
+
+        public Builder referenceTable(final @NotNull Map<Symbol, Object> v) {
+            this.referenceTable = v;
+            return this;
+        }
+
+        public Builder allowMetaData(final boolean v) {
+            this.allowMetaData = v;
+            return this;
+        }
+
+        public Builder allowZeroPrefix(final boolean v) {
+            this.allowZeroPrefix = v;
+            return this;
+        }
+
+        public Builder allowRatios(final boolean v) {
+            this.allowRatios = v;
+            return this;
+        }
+
+        public @NotNull EdnaOptions build() {
             return new EdnaOptions(
                     allowSchemeUTF32Codes,
                     allowDispatchChars,

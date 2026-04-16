@@ -8,7 +8,8 @@ public record Char32(int code) implements Comparable<Char32> {
 
     public Char32 {
         if (!(code >= 0 && code <= 0x10ffff)) {
-            throw new IllegalArgumentException("Char code must be between 0 and 0x10ffff (inclusive)");
+            throw new IllegalArgumentException(
+                    "Char code must be between 0 and 0x10ffff (inclusive)");
         }
     }
 
@@ -23,10 +24,12 @@ public record Char32(int code) implements Comparable<Char32> {
     public static @NotNull Char32 valueOf(final @NotNull String s) {
         var codePointIterator = s.codePoints().iterator();
         if (!codePointIterator.hasNext())
-            throw new IllegalArgumentException("Can not get first char code from empty string.");
+            throw new IllegalArgumentException(
+                    "Can not get first char code from empty string.");
         codePointIterator.nextInt();
         if (codePointIterator.hasNext())
-            throw new IllegalArgumentException("Can not get Char32 from string which has more than one code point.");
+            throw new IllegalArgumentException(
+                    "Can not get Char32 from string which has more than one code point.");
         return new Char32(s.codePointAt(0));
     }
 
@@ -63,20 +66,24 @@ public record Char32(int code) implements Comparable<Char32> {
     }
 
     public char toChar() {
-        if (code > Character.MAX_VALUE)
-            throw new IllegalArgumentException("Cannot convert Char32 to Char because the char code $code is too big.");
+        if (code > Character.MAX_VALUE) {
+            throw new IllegalArgumentException(
+                    "Cannot convert Char32 to Char because the char code $code is too big.");
+        }
         return (char) code;
     }
 
     public byte toByte() {
         if (code > Byte.MAX_VALUE)
-            throw new IllegalArgumentException("Cannot convert Char32 to Byte because the char code $code is too big.");
+            throw new IllegalArgumentException(
+                    "Cannot convert Char32 to Byte because the char code $code is too big.");
         return (byte) code;
     }
 
     public short toShort() {
         if (code > Short.MAX_VALUE)
-            throw new IllegalArgumentException("Cannot convert Char32 to Short because the char code $code is too big.");
+            throw new IllegalArgumentException(
+                    "Cannot convert Char32 to Short because the char code $code is too big.");
         return (short) code;
     }
 

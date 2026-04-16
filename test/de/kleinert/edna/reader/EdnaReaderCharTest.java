@@ -8,16 +8,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 public class EdnaReaderCharTest {    @Test
 public void parseSlashWhitespaceIsInvalid() {
-    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read(""));
-    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("\\") );
-    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("#\\"));
-    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("\\ ") );
-    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("#\\ ") );
-    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("\\\n "));
-    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("#\\\n "));
+    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read(""));
+    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\") );
+    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\"));
+    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\ ") );
+    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\ ") );
+    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\\n "));
+    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\\n "));
 
-    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("[\\ ]"));
-    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("[#\\ ]"));
+    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("[\\ ]"));
+    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("[#\\ ]"));
 }
 
     @Test

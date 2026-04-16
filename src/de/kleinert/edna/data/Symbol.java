@@ -3,23 +3,17 @@ package de.kleinert.edna.data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.OptionalInt;
 
-public class Symbol implements Comparable<Symbol> {
-    private final @Nullable String namespace;
-    private final @NotNull String name;
+public record Symbol(@Nullable String namespace,
+                     @NotNull String name) implements Comparable<Symbol> {
 
-    private Symbol(@Nullable String namespace, @NotNull String name) {
-        this.namespace = namespace;
-        this.name = name;
-    }
-
-    public static @NotNull Symbol symbol(@Nullable String namespace, @NotNull String name) {
+    public static @NotNull Symbol symbol(final @Nullable String namespace,
+                                         final @NotNull String name) {
         return new Symbol(namespace, name);
     }
 
-    public static @NotNull Symbol symbol(@NotNull String name) {
+    public static @NotNull Symbol symbol(final @NotNull String name) {
         return new Symbol(null, name);
     }
 
@@ -36,7 +30,7 @@ public class Symbol implements Comparable<Symbol> {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return namespace == null || namespace.isEmpty()
                 ? name
                 : namespace + '/' + name;
@@ -60,20 +54,9 @@ public class Symbol implements Comparable<Symbol> {
         return name.compareTo(symbol.name);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Symbol symbol)) return false;
-        return Objects.equals(namespace, symbol.namespace)
-                && Objects.equals(name, symbol.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(namespace, name);
-    }
-
-    private static @NotNull OptionalInt dividerIndexIfValid(final @NotNull String s, final boolean allowUTF) {
+    private static @NotNull OptionalInt dividerIndexIfValid(
+            final @NotNull String s,
+            final boolean allowUTF) {
         if (s.isEmpty()) return OptionalInt.empty();
         if (s.length() == 1 && s.charAt(0) == '/') return OptionalInt.of(-1);
 
@@ -84,7 +67,9 @@ public class Symbol implements Comparable<Symbol> {
         for (int chr : codepoints) {
             index++;
 
-            if ((chr >= 'a' && chr <= 'z') || (chr >= 'A' && chr <= 'Z') || (chr >= '0' && chr <= '9')) {
+            if ((chr >= 'a' && chr <= 'z')
+                    || (chr >= 'A' && chr <= 'Z')
+                    || (chr >= '0' && chr <= '9')) {
                 continue;
             }
 
@@ -99,9 +84,12 @@ public class Symbol implements Comparable<Symbol> {
                         return OptionalInt.empty();
                     break;
                 case '/':
-                    if (index == 0) return OptionalInt.empty();
-                    if (codepoints.length <= index + 1) return OptionalInt.empty();
-                    if (dividerIndex == -1) dividerIndex = index;
+                    if (index == 0)
+                        return OptionalInt.empty();
+                    if (codepoints.length <= index + 1)
+                        return OptionalInt.empty();
+                    if (dividerIndex == -1)
+                        dividerIndex = index;
                     break;
                 default:
                     if (Character.isWhitespace(chr))
@@ -118,7 +106,8 @@ public class Symbol implements Comparable<Symbol> {
         return isValidSymbol(s, false);
     }
 
-    public static boolean isValidSymbol(final @NotNull String s, final boolean allowUTF) {
+    public static boolean isValidSymbol(final @NotNull String s,
+                                        final boolean allowUTF) {
         return dividerIndexIfValid(s, allowUTF).isPresent();
     }
 
@@ -126,7 +115,8 @@ public class Symbol implements Comparable<Symbol> {
         return parse(s, false);
     }
 
-    public static @Nullable Symbol parse(final @NotNull String s, final boolean allowUTF) {
+    public static @Nullable Symbol parse(final @NotNull String s,
+                                         final boolean allowUTF) {
         if (s.equals("/"))
             return symbol("/");
 
@@ -142,7 +132,8 @@ public class Symbol implements Comparable<Symbol> {
         return symbol(null, s);
     }
 
-    public static @NotNull Symbol parseChecked(final @NotNull String s, final boolean allowUTF) {
+    public static @NotNull Symbol parseChecked(final @NotNull String s,
+                                               final boolean allowUTF) {
         var temp = parse(s, allowUTF);
         if (temp == null)
             throw new IllegalArgumentException("Illegal symbol format: " + s);

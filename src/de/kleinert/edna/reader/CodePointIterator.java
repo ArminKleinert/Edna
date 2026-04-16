@@ -72,6 +72,7 @@ public final class CodePointIterator implements PrimitiveIterator.OfInt, AutoClo
             memory = Arrays.copyOf(memory, memory.length + Integer.min(memory.length / 2, 8));
         }
         memory[memoryIndex] = v;
+        textIndex--;
         if (v == (int) '\n') {
             lineIdx--;
         }
