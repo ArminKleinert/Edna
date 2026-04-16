@@ -1,6 +1,6 @@
 package de.kleinert.edna.reader;
 
-import de.kleinert.edna.EdnOptions;
+import de.kleinert.edna.EdnaOptions;
 import de.kleinert.edna.Edna;
 import de.kleinert.edna.data.Char32;
 import org.junit.jupiter.api.Test;
@@ -66,7 +66,7 @@ public void parseSlashWhitespaceIsInvalid() {
         Assertions.assertEquals('\u2626', Edna.read("\\u2626")); // Orthodox cross
         Assertions.assertEquals('\u271D', Edna.read("\\u271D")); // Latin cross
 
-        var options = EdnOptions.extendedOptions();
+        var options = EdnaOptions.extendedOptions();
         Assertions.assertEquals(new Char32('\n'), Edna.read("#\\newline", options));
         Assertions.assertEquals(new Char32(' '), Edna.read("#\\space", options));
         Assertions.assertEquals(new Char32('\t'), Edna.read("#\\tab", options));

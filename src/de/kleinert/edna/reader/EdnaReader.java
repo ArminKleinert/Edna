@@ -1,6 +1,6 @@
 package de.kleinert.edna.reader;
 
-import de.kleinert.edna.EdnOptions;
+import de.kleinert.edna.EdnaOptions;
 import de.kleinert.edna.data.Char32;
 import de.kleinert.edna.data.EdnCollections;
 import de.kleinert.edna.data.Keyword;
@@ -18,10 +18,10 @@ import java.util.function.IntPredicate;
 import java.util.regex.Pattern;
 
 public class EdnaReader {
-    private final @NotNull EdnOptions options;
+    private final @NotNull EdnaOptions options;
     private final @NotNull CodePointIterator cpi;final @NotNull Map<@NotNull Symbol, @Nullable Object> references;
 
-    EdnaReader(final @NotNull EdnOptions options,
+    EdnaReader(final @NotNull EdnaOptions options,
                final @NotNull CodePointIterator cpi,
                final @NotNull Map<@NotNull Symbol, @Nullable Object> references) {
         this.options = options;
@@ -37,15 +37,15 @@ public class EdnaReader {
     private final @NotNull Object NOTHING = new Object();
 
     public static Object read(String s) {
-        return read(new CodePointIterator(new StringReader(s)), new EdnOptions(), Object.class);
+        return read(new CodePointIterator(new StringReader(s)), EdnaOptions.defaultOptions(), Object.class);
     }
 
-    public static Object read(String s, EdnOptions options) {
+    public static Object read(String s, EdnaOptions options) {
         return read(new CodePointIterator(new StringReader(s)), options, Object.class);
     }
 
     public static <T> T read(final @NotNull CodePointIterator cpi,
-                             final @NotNull EdnOptions options,
+                             final @NotNull EdnaOptions options,
                              final @NotNull Class<T> castClass) {
         var temp = new EdnaReader(options, cpi, options.referenceTable()).readString();
         return castClass.cast(temp);
@@ -234,7 +234,7 @@ public class EdnaReader {
                     throw new EdnReaderException(linePos, codePosIndex, msg);
                 }
                 return Instant.parse((CharSequence) form);
-            } else if (options.allowDefinitionsAndReferences() && token.equals("ref")) {
+            } else if (options.allowReferences() && token.equals("ref")) {
                 return readRef(token, form);
             } else {
                 final var decoder = options.ednClassDecoders().get(token);
