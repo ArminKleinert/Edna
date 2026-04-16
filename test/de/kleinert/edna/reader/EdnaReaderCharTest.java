@@ -1,32 +1,33 @@
 package de.kleinert.edna.reader;
 
 import de.kleinert.edna.EdnOptions;
+import de.kleinert.edna.Edna;
 import de.kleinert.edna.data.Char32;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
 public class EdnaReaderCharTest {    @Test
 public void parseSlashWhitespaceIsInvalid() {
-    Assertions.assertThrows(EdnReaderException.class, () -> EdnaReader.read(""));
-    Assertions.assertThrows(EdnReaderException.class, () -> EdnaReader.read("\\") );
-    Assertions.assertThrows(EdnReaderException.class, () -> EdnaReader.read("#\\"));
-    Assertions.assertThrows(EdnReaderException.class, () -> EdnaReader.read("\\ ") );
-    Assertions.assertThrows(EdnReaderException.class, () -> EdnaReader.read("#\\ ") );
-    Assertions.assertThrows(EdnReaderException.class, () -> EdnaReader.read("\\\n "));
-    Assertions.assertThrows(EdnReaderException.class, () -> EdnaReader.read("#\\\n "));
+    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read(""));
+    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("\\") );
+    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("#\\"));
+    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("\\ ") );
+    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("#\\ ") );
+    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("\\\n "));
+    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("#\\\n "));
 
-    Assertions.assertThrows(EdnReaderException.class, () -> EdnaReader.read("[\\ ]"));
-    Assertions.assertThrows(EdnReaderException.class, () -> EdnaReader.read("[#\\ ]"));
+    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("[\\ ]"));
+    Assertions.assertThrows(EdnReaderException.class, () -> Edna.read("[#\\ ]"));
 }
 
     @Test
     public void parseSpecialCharsTest() {
-        Assertions.assertEquals('\n', EdnaReader.read("\\newline"));
-        Assertions.assertEquals(' ', EdnaReader.read("\\space"));
-        Assertions.assertEquals('\t', EdnaReader.read("\\tab"));
-        Assertions.assertEquals('\b', EdnaReader.read("\\backspace"));
-        Assertions.assertEquals((char)12, EdnaReader.read("\\formfeed"));
-        Assertions.assertEquals('\r', EdnaReader.read("\\return"));
+        Assertions.assertEquals('\n', Edna.read("\\newline"));
+        Assertions.assertEquals(' ', Edna.read("\\space"));
+        Assertions.assertEquals('\t', Edna.read("\\tab"));
+        Assertions.assertEquals('\b', Edna.read("\\backspace"));
+        Assertions.assertEquals((char)12, Edna.read("\\formfeed"));
+        Assertions.assertEquals('\r', Edna.read("\\return"));
     }
 
     @Test
@@ -35,7 +36,7 @@ public void parseSlashWhitespaceIsInvalid() {
     str += str.toUpperCase();
     str += "0123456789";
         for (int i = 0; i < str.length(); i++) {
-            Assertions.assertEquals(str.charAt(i), EdnaReader.read("\\"+str.charAt(i)));
+            Assertions.assertEquals(str.charAt(i), Edna.read("\\"+str.charAt(i)));
         }
     }
 
@@ -44,42 +45,42 @@ public void parseSlashWhitespaceIsInvalid() {
     var chars =  "!\"§$%&/()=?*+~^°'#-_.:,<>|€@`´λ";
         for (int i = 0; i < chars.length(); i++) {
             var chr = chars.charAt(i);
-            Assertions.assertEquals(chr, EdnaReader.read("\\"+chr));
+            Assertions.assertEquals(chr, Edna.read("\\"+chr));
         }
     }
 
     @Test
     public void parseOctCharsTest() {
-        Assertions.assertEquals('!', EdnaReader.read("\\o41"));
-        Assertions.assertEquals('!', EdnaReader.read("\\o041"));
-        Assertions.assertEquals('ǂ', EdnaReader.read("\\o702"));
+        Assertions.assertEquals('!', Edna.read("\\o41"));
+        Assertions.assertEquals('!', Edna.read("\\o041"));
+        Assertions.assertEquals('ǂ', Edna.read("\\o702"));
     }
 
     @Test
     public void parseUniCharsTest() {
-        Assertions.assertEquals('λ', EdnaReader.read("\\u03BB"));
-        Assertions.assertEquals('λ', EdnaReader.read("\\u03bb"));
-        Assertions.assertEquals('ῷ', EdnaReader.read("\\u1ff7"));
-        Assertions.assertEquals('\u8183', EdnaReader.read("\\u8183"));
+        Assertions.assertEquals('λ', Edna.read("\\u03BB"));
+        Assertions.assertEquals('λ', Edna.read("\\u03bb"));
+        Assertions.assertEquals('ῷ', Edna.read("\\u1ff7"));
+        Assertions.assertEquals('\u8183', Edna.read("\\u8183"));
 
-        Assertions.assertEquals('\u2626', EdnaReader.read("\\u2626")); // Orthodox cross
-        Assertions.assertEquals('\u271D', EdnaReader.read("\\u271D")); // Latin cross
+        Assertions.assertEquals('\u2626', Edna.read("\\u2626")); // Orthodox cross
+        Assertions.assertEquals('\u271D', Edna.read("\\u271D")); // Latin cross
 
         var options = EdnOptions.extendedOptions();
-        Assertions.assertEquals(new Char32('\n'), EdnaReader.read("#\\newline", options));
-        Assertions.assertEquals(new Char32(' '), EdnaReader.read("#\\space", options));
-        Assertions.assertEquals(new Char32('\t'), EdnaReader.read("#\\tab", options));
-        Assertions.assertEquals(new Char32('\b'), EdnaReader.read("#\\backspace", options));
-        Assertions.assertEquals(new Char32(12), EdnaReader.read("#\\formfeed", options));
-        Assertions.assertEquals(new Char32('\r'), EdnaReader.read("#\\return", options));
+        Assertions.assertEquals(new Char32('\n'), Edna.read("#\\newline", options));
+        Assertions.assertEquals(new Char32(' '), Edna.read("#\\space", options));
+        Assertions.assertEquals(new Char32('\t'), Edna.read("#\\tab", options));
+        Assertions.assertEquals(new Char32('\b'), Edna.read("#\\backspace", options));
+        Assertions.assertEquals(new Char32(12), Edna.read("#\\formfeed", options));
+        Assertions.assertEquals(new Char32('\r'), Edna.read("#\\return", options));
 
         Assertions.assertEquals(
                 Char32.valueOf("\uD83D\uDD46"),
-                EdnaReader.read("#\\u0001F546", options)
+                Edna.read("#\\u0001F546", options)
         ); // White latin cross
         Assertions.assertEquals(
                 Char32.valueOf("\uD83D\uDD47"),
-                EdnaReader.read("#\\u0001F547", options)
+                Edna.read("#\\u0001F547", options)
         ); // Heavy latin cross
     }
 }
