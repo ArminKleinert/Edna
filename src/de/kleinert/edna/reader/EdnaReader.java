@@ -376,7 +376,7 @@ public class EdnaReader {
                 };
             }
 
-            if (!options.allowNumericSuffixes()
+            if (!options.allowZeroPrefix()
                     && tokenLen > startIndex + 1
                     && token.codePointAt(startIndex) == '0'
                     && token.codePointAt(startIndex + 1) >= '0'
