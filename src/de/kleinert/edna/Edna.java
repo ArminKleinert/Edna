@@ -8,6 +8,14 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 
 public class Edna {
+    public static @NotNull EdnaOptions defaultOptions() {
+        return EdnaOptions.defaultOptions();
+    }
+
+    public static @NotNull EdnaOptions extendedOptions() {
+        return EdnaOptions.extendedOptions();
+    }
+
     public static <T> @Nullable T read(final @NotNull String s,
                                        final @Nullable EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
@@ -31,8 +39,13 @@ public class Edna {
             final @NotNull File file,
             final @Nullable EdnaOptions options,
             final @NotNull Class<T> castClass) throws FileNotFoundException {
-        var cpi = new CodePointIterator(new FileReader(file));
-        return EdnaReader.read(cpi, optsOrDefault(options), castClass);
+        T result;
+        try (CodePointIterator cpi = new CodePointIterator(new FileReader(file))) {
+            result= EdnaReader.read(cpi, optsOrDefault(options), castClass);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return result;
     }
 
     public static @Nullable Object read(final @NotNull File reader,
@@ -45,7 +58,6 @@ public class Edna {
             throws FileNotFoundException {
         return read(reader, null, Object.class);
     }
-
 
     public static <T> @Nullable T read(final @NotNull InputStream reader,
                                        final @Nullable EdnaOptions options,
@@ -80,7 +92,7 @@ public class Edna {
     }
 
     private static @NotNull EdnaOptions optsOrDefault(
-            final @Nullable EdnaOptions options){
+            final @Nullable EdnaOptions options) {
         return options == null ? EdnaOptions.defaultOptions() : options;
     }
 }

@@ -11,7 +11,7 @@ public class EdnaReaderNumberWithSuffixTest {
 
     @Test
     public void parseIntegerDecimal() {
-        var options = EdnaOptions.defaultOptions().copy((b) -> b.allowNumericSuffixes(true));
+        var options = Edna.defaultOptions().copy((b) -> b.allowNumericSuffixes(true));
 
         Map<Number, String> numbers = Map.of(
                 (byte) 0, "0_i8", (short) 0, "0_i16", 0, "0_i32", 0L, "0_i64",
