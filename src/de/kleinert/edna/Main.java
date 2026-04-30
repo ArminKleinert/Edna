@@ -8,7 +8,7 @@ void main() {
         var options = EdnaOptions.defaultOptions().copy((b)->b.allowMetaData(true));
         var o = (EdnaCollections.IObj.Wrapper<?>)EdnaReader.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
         IO.println(o.meta());
-        IO.println(o.element());
+        IO.println(o.obj());
         IO.println(o.getClass());
     }
     {

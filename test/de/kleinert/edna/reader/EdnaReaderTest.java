@@ -1,248 +1,253 @@
 package de.kleinert.edna.reader;
 
+import de.kleinert.edna.Edna;
+
+import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.Assertions;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 class EdnaReaderTest {
-}
-/*
-class EDNReaderTest {
     @Test
-    fun parseStringBasicTest() {
-        Assertions.assertTrue(EDN.read("\"\"") is String)
-        Assertions.assertEquals("", EDN.read("\"\""))
-        Assertions.assertEquals("abc", EDN.read("\"abc\""))
+    void parseStringBasicTest() {
+        Assertions.assertInstanceOf(String.class, Edna.read("\"\""));
+        Assertions.assertEquals("", Edna.read("\"\""));
+        Assertions.assertEquals("abc", Edna.read("\"abc\""));
     }
 
     @Test
-    fun parseStringEscapeSequenceTest() {
-        Assertions.assertEquals("\n", EDN.read("\"\\n\""))
-        Assertions.assertEquals(listOf("", ""), (EDN.read("\"\\n\"") as String).lines())
-        Assertions.assertEquals("\t", EDN.read("\"\\t\""))
+    void parseStringEscapeSequenceTest() {
+        Assertions.assertEquals("\n", Edna.read("\"\\n\""));
+        Assertions.assertEquals(List.of("", ""), Arrays.asList(((String) Edna.read("\"\n\"")).split("\n", -1)));
+        Assertions.assertEquals("\t", Edna.read("\"\\t\""));
 
-        Assertions.assertEquals("\t", EDN.read("\"\\t\""))
-        Assertions.assertEquals("\b", EDN.read("\"\\b\""))
-        Assertions.assertEquals("\r", EDN.read("\"\\r\""))
-        Assertions.assertEquals("\"", EDN.read("\"\\\"\""))
+        Assertions.assertEquals("\t", Edna.read("\"\\t\""));
+        Assertions.assertEquals("\b", Edna.read("\"\\b\""));
+        Assertions.assertEquals("\r", Edna.read("\"\\r\""));
+        Assertions.assertEquals("\"", Edna.read("\"\\\"\""));
 
-        Assertions.assertEquals("\\", EDN.read("\"\\\\\""))
-        Assertions.assertEquals("\\\\", EDN.read("\"\\\\\\\\\""))
-        run {
-            val it = EDN.read(
-                """
-            "\\"
-        """.trimMargin()
-            )
-            Assertions.assertEquals("\\", it)
+        Assertions.assertEquals("\\", Edna.read("\"\\\\\""));
+        Assertions.assertEquals("\\\\", Edna.read("\"\\\\\\\\\""));
+        {
+            var it = Edna.read(
+                    """
+                                 "\\\\"
+                            """);
+            Assertions.assertEquals("\\", it);
         }
 
-        run {
-            val it = EDN.read(
-                """
-            "\\\\"
-        """.trimMargin()
-            )
-            Assertions.assertEquals("\\\\", it)
+        {
+            var it = Edna.read(
+                    """
+                                "\\\\\\\\"
+                            """);
+            Assertions.assertEquals("\\\\", it);
         }
 
-        Assertions.assertEquals("\t\t", EDN.read("\"\\t\\t\""))
+        Assertions.assertEquals("\t\t", Edna.read("\"\\t\\t\""));
     }
 
     @Test
-    fun parseStringUnicodeSequenceTest() {
-        Assertions.assertEquals("🎁", EDN.read("\"🎁\""))
-        Assertions.assertEquals("🎁", EDN.read("\"\\uD83C\\uDF81\""))
-        Assertions.assertEquals("🎁", EDN.read("\"\\uD83C\\uDF81\""))
-        Assertions.assertEquals("🎁", EDN.read("\"\\x0001F381\""))
+    void parseStringUnicodeSequenceTest() {
+        Assertions.assertEquals("🎁", Edna.read("\"🎁\""));
+        Assertions.assertEquals("🎁", Edna.read("\"\\uD83C\\uDF81\""));
+        Assertions.assertEquals("🎁", Edna.read("\"\\uD83C\\uDF81\""));
+        Assertions.assertEquals("🎁", Edna.read("\"\\x0001F381\""));
     }
 
     @Test
-    fun parseStringUnclosedTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("\"") }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("\"abc") }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("\"\"\"") }
+    void parseStringUnclosedTest() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\""));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\"abc"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\"\"\""));
     }
 
     @Test
-    fun parseDiscardSimpleTest() {
-        Assertions.assertEquals(2L, EDN.read("#_1 2"))
+    void parseDiscardSimpleTest() {
+        Assertions.assertEquals(2L, Edna.read("#_1 2"));
     }
 
     @Test
-    fun parseDiscardTest() {
-        Assertions.assertEquals(2L, EDN.read("#_1 2"))
+    void parseDiscardTest() {
+        Assertions.assertEquals(2L, Edna.read("#_1 2"));
 
         // Discard tags ignore spaces.
-        Assertions.assertEquals(2L, EDN.read("#_ 1 2"))
-        Assertions.assertEquals(2L, EDN.read("#_      1 2"))
+        Assertions.assertEquals(2L, Edna.read("#_ 1 2"));
+        Assertions.assertEquals(2L, Edna.read("#_      1 2"));
 
         // Discard ignores newlines
-        Assertions.assertEquals(2L, EDN.read("#_\n1 2"))
+        Assertions.assertEquals(2L, Edna.read("#_\n1 2"));
 
         // Discard ignores comments
-        Assertions.assertEquals(2L, EDN.read("#_ ; abc\n 1 2"))
+        Assertions.assertEquals(2L, Edna.read("#_ ; abc\n 1 2"));
 
         // Discard in strings does nothing
-        Assertions.assertEquals("#_", EDN.read("\"#_\""))
-        Assertions.assertEquals("#_1", EDN.read("\"#_1\""))
+        Assertions.assertEquals("#_", Edna.read("\"#_\""));
+        Assertions.assertEquals("#_1", Edna.read("\"#_1\""));
     }
 
     @Test
-    fun parseDiscardAssociativityTest() {
-        // Discard is right-associative
-        Assertions.assertEquals(3L, EDN.read("#_ #_ 1 2 3"))
+    void parseDiscardAssociativityTest() {
+        // Discard instanceof right-associative
+        Assertions.assertEquals(3L, Edna.read("#_ #_ 1 2 3"));
     }
 
     @Test
-    fun parseDiscardInCollectionTest() {
-        // Discard is nothing. When discard appears in a list, vector, set, or map, it does nothing
-        run {
-            val it = EDN.read("( #_ 1 #_ 2 #_ 3 )")
-            Assertions.assertTrue(it is Iterable<*>)
-            Assertions.assertTrue((it as Iterable<*>).toList().isEmpty())
+    void parseDiscardInCollectionTest() {
+        // Discard instanceof nothing. When discard appears in a list, vector, set, or map, it does nothing
+        {
+            var it = Edna.read("( #_ 1 #_ 2 #_ 3 )");
+            Assertions.assertInstanceOf(Iterable.class, it);
+            Assertions.assertTrue(((List<?>) it).isEmpty());
         }
-        run {
-            val it = EDN.read("[#_1 #_2 #_3]")
-            Assertions.assertTrue(it is List<*>)
-            Assertions.assertTrue((it as List<*>).isEmpty())
+        {
+            var it = Edna.read("[#_1 #_2 #_3]");
+            Assertions.assertInstanceOf(List.class, it);
+            Assertions.assertTrue(((List<?>) it).isEmpty());
         }
-        run {
-            val it = EDN.read("#{#_1 #_1 #_1}")
-            Assertions.assertTrue(it is Set<*>)
-            Assertions.assertTrue((it as Set<*>).isEmpty())
+        {
+            var it = Edna.read("#{#_1 #_1 #_1}");
+            Assertions.assertInstanceOf(Set.class, it);
+            Assertions.assertTrue(((Set<?>) it).isEmpty());
         }
-        run {
-            val it = EDN.read("{#_1 #_1 #_1}")
-            Assertions.assertTrue(it is Map<*, *>)
-            Assertions.assertTrue((it as Map<*, *>).isEmpty())
+        {
+            var it = Edna.read("{#_1 #_1 #_1}");
+            Assertions.assertInstanceOf(Map.class, it);
+            Assertions.assertTrue(((Map<?, ?>) it).isEmpty());
         }
     }
 
     @Test
-    fun parseEmptySet() {
+    void parseEmptySet() {
         // Normal
-        run {
-            val it = EDN.read("#{}")
-            Assertions.assertTrue(it is Set<*>)
-            Assertions.assertTrue((it as Set<*>).isEmpty())
+        {
+            var it = Edna.read("#{}");
+            Assertions.assertInstanceOf(Set.class, it);
+            Assertions.assertTrue(((Set<?>) it).isEmpty());
         }
 
         // Whitespace does not matter
-        run {
-            val it = EDN.read("#{  }")
-            Assertions.assertTrue(it is Set<*>)
-            Assertions.assertTrue((it as Set<*>).isEmpty())
+        {
+            var it = Edna.read("#{  }");
+            Assertions.assertInstanceOf(Set.class, it);
+            Assertions.assertTrue(((Set<?>) it).isEmpty());
         }
-        run {
-            val it = EDN.read("#{\t \n}")
-            Assertions.assertTrue(it is Set<*>)
-            Assertions.assertTrue((it as Set<*>).isEmpty())
+        {
+            var it = Edna.read("#{\t \n}");
+            Assertions.assertInstanceOf(Set.class, it);
+            Assertions.assertTrue(((Set<?>) it).isEmpty());
         }
-        run {
-            val it = EDN.read("#{\n}")
-            Assertions.assertTrue(it is Set<*>)
-            Assertions.assertTrue((it as Set<*>).isEmpty())
+        {
+            var it = Edna.read("#{\n}");
+            Assertions.assertInstanceOf(Set.class, it);
+            Assertions.assertTrue(((Set<?>) it).isEmpty());
         }
     }
 
     @Test
-    fun parseEmptyMap() {
+    void parseEmptyMap() {
         // Normal
-        run {
-            val it = EDN.read("{}")
-            Assertions.assertTrue(it is Map<*, *>)
-            Assertions.assertTrue((it as Map<*, *>).isEmpty())
+        {
+            var it = Edna.read("{}");
+            Assertions.assertInstanceOf(Map.class, it);
+            Assertions.assertTrue(((Map<?, ?>) it).isEmpty());
         }
 
         // Whitespace does not matter
-        run {
-            val it = EDN.read("{  }")
-            Assertions.assertTrue(it is Map<*, *>)
-            Assertions.assertTrue((it as Map<*, *>).isEmpty())
+        {
+            var it = Edna.read("{  }");
+            Assertions.assertInstanceOf(Map.class, it);
+            Assertions.assertTrue(((Map<?, ?>) it).isEmpty());
         }
-        run {
-            val it = EDN.read("{\t \n}")
-            Assertions.assertTrue(it is Map<*, *>)
-            Assertions.assertTrue((it as Map<*, *>).isEmpty())
+        {
+            var it = Edna.read("{\t \n}");
+            Assertions.assertInstanceOf(Map.class, it);
+            Assertions.assertTrue(((Map<?, ?>) it).isEmpty());
         }
-        run {
-            val it = EDN.read("{\n}")
-            Assertions.assertTrue(it is Map<*, *>)
-            Assertions.assertTrue((it as Map<*, *>).isEmpty())
-        }
-    }
-
-    @Test
-    fun parseListSimple() {
-        run {
-            val it = EDN.read("(\\a)")
-            Assertions.assertTrue(it is Iterable<*>)
-            Assertions.assertEquals(listOf<Any?>('a'), (it as Iterable<*>).toList())
-        }
-        run {
-            val it = EDN.read("(\\a \\b)")
-            Assertions.assertTrue(it is Iterable<*>)
-            Assertions.assertEquals(listOf('a', 'b'), (it as Iterable<*>).toList())
-        }
-        run {
-            val it = EDN.read("(())")
-            Assertions.assertTrue(it is Iterable<*>)
-            Assertions.assertEquals(listOf(listOf<Any?>()), (it as Iterable<*>).toList())
+        {
+            var it = Edna.read("{\n}");
+            Assertions.assertInstanceOf(Map.class, it);
+            Assertions.assertTrue(((Map<?, ?>) it).isEmpty());
         }
     }
 
     @Test
-    fun parseVectorSimple() {
-        run {
-            val it = EDN.read("[\\a]")
-            Assertions.assertTrue(it is List<*>)
-            Assertions.assertEquals(listOf('a'), (it as List<*>))
+    void parseListSimple() {
+        {
+            var it = Edna.read("(\\a)");
+            Assertions.assertInstanceOf(Iterable.class, it);
+            Assertions.assertEquals(List.of('a'), (List<?>) it);
         }
-        run {
-            val it = EDN.read("[\\a \\b]")
-            Assertions.assertTrue(it is Iterable<*>)
-            Assertions.assertEquals(listOf('a', 'b'), (it as List<*>))
+        {
+            var it = Edna.read("(\\a \\b)");
+            Assertions.assertInstanceOf(Iterable.class, it);
+            Assertions.assertEquals(List.of('a', 'b'), (List<?>) it);
         }
-        run {
-            val it = EDN.read("[[]]")
-            Assertions.assertTrue(it is Iterable<*>)
-            Assertions.assertEquals(listOf(listOf<Any?>()), (it as List<*>))
-        }
-    }
-
-    @Test
-    fun parseSetSimple() {
-        run {
-            val it = EDN.read("#{\\a \\b}")
-            Assertions.assertTrue(it is Set<*>)
-            Assertions.assertEquals(setOf('a', 'b'), (it as Set<*>))
-        }
-        run {
-            val it = EDN.read("#{ \\a }")
-            Assertions.assertTrue(it is Set<*>)
-            Assertions.assertEquals(setOf('a'), (it as Set<*>))
-        }
-        run {
-            val it = EDN.read("#{\\a #{}}")
-            Assertions.assertTrue(it is Set<*>)
-            Assertions.assertEquals(setOf('a', setOf<Any?>()), (it as Set<*>))
+        {
+            var it = Edna.read("(())");
+            Assertions.assertInstanceOf(Iterable.class, it);
+            Assertions.assertEquals(List.of(List.of()), (List<?>) it);
         }
     }
 
     @Test
-    fun parseMapSimple() {
-        run {
-            val it = EDN.read("{\\a \\b}")
-            Assertions.assertTrue(it is Map<*, *>)
-            Assertions.assertEquals(mapOf('a' to 'b').entries, (it as Map<*, *>).entries)
+    void parseVectorSimple() {
+        {
+            var it = Edna.read("[\\a]");
+            Assertions.assertInstanceOf(List.class, it);
+            Assertions.assertEquals(List.of('a'), ((List<?>) it));
         }
-        run {
-            val it = EDN.read("{\\a {}}")
-            Assertions.assertTrue(it is Map<*, *>)
-            Assertions.assertEquals(mapOf('a' to mapOf<Any?, Any?>()).entries, (it as Map<*, *>).entries)
+        {
+            var it = Edna.read("[\\a \\b]");
+            Assertions.assertInstanceOf(Iterable.class, it);
+            Assertions.assertEquals(List.of('a', 'b'), ((List<?>) it));
         }
-        run {
-            val it = EDN.read("{{} {}}")
-            Assertions.assertTrue(it is Map<*, *>)
-            Assertions.assertEquals(mapOf<Any?, Any?>(mapOf<Any?, Any?>() to mapOf<Any?, Any?>()), (it as Map<*, *>))
+        {
+            var it = Edna.read("[[]]");
+            Assertions.assertInstanceOf(Iterable.class, it);
+            Assertions.assertEquals(List.of(List.of()), ((List<?>) it));
+        }
+    }
+
+    @Test
+    void parseSetSimple() {
+        {
+            var it = Edna.read("#{\\a \\b}");
+            Assertions.assertInstanceOf(Set.class, it);
+            Assertions.assertEquals(Set.of('a', 'b'), ((Set<?>) it));
+        }
+        {
+            var it = Edna.read("#{ \\a }");
+            Assertions.assertInstanceOf(Set.class, it);
+            Assertions.assertEquals(Set.of('a'), ((Set<?>) it));
+        }
+        {
+            var it = Edna.read("#{\\a #{}}");
+            Assertions.assertInstanceOf(Set.class, it);
+            Assertions.assertEquals(Set.of('a', Set.of()), ((Set<?>) it));
+        }
+    }
+
+    @Test
+    void parseMapSimple() {
+        {
+            var it = Edna.read("{\\a \\b}");
+            Assertions.assertInstanceOf(Map.class, it);
+            Assertions.assertEquals(Map.of('a', 'b').entrySet(), ((Map<?, ?>) it).entrySet());
+        }
+        {
+            var it = Edna.read("{\\a {}}");
+            Assertions.assertInstanceOf(Map.class, it);
+            Assertions.assertEquals(Map.of('a', Map.of()).entrySet(), ((Map<?, ?>) it).entrySet());
+        }
+        {
+            var it = Edna.read("{{} {}}");
+            Assertions.assertInstanceOf(Map.class, it);
+            Assertions.assertEquals(Map.of(Map.of(), Map.of()), ((Map<?, ?>) it));
         }
     }
 }
- */

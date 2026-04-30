@@ -1,135 +1,134 @@
 package de.kleinert.edna.reader;
 
- class EdnaReaderMetaTest {
+import de.kleinert.edna.Edna;
+import de.kleinert.edna.EdnaOptions;
+
+import de.kleinert.edna.data.EdnaCollections;
+import de.kleinert.edna.data.Keyword;
+import de.kleinert.edna.data.Symbol;
+import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.Assertions;
+
+import java.util.Map;
+
+class EdnaReaderMetaTest {
+    private final EdnaOptions opts = Edna.defaultOptions().copy(b -> b.allowMetaData(true));
+
+    @Test
+    void parseMetaErrors() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^", opts));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^abc", opts));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^[]", opts));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^[] abc", opts));
+    }
+
+    @Test
+    void parseDispatchMetaErrors() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^abc"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^[]"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^[] abc"));
+
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^", opts));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^abc", opts));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^[]", opts));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^[] abc", opts));
+    }
+
+    @Test
+    void parseMetaSymbolTest() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^a b"));
+
+        {
+            var it = Edna.read("^a b", opts);
+            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("tag"), Symbol.symbol("a")), ((EdnaCollections.IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+        }
+    }
+
+    @Test
+    void parseMetaStringTest() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^\"a\" b"));
+
+        {
+            var it = Edna.read("^\"a\" b", opts);
+            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("tag"), "a"), ((EdnaCollections.IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+        }
+    }
+
+    @Test
+    void parseMetaKeywordTest() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^:a b"));
+
+        {
+            var it = Edna.read("^:a b", opts);
+            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("a"), true), ((EdnaCollections.IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+        }
+    }
+
+    @Test
+    void parseMetaMapTest() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^{\"a\" \"c\"} b"));
+
+        {
+            var it = Edna.read("^{\"a\" \"c\"} b", opts);
+            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
+            Assertions.assertEquals(Map.of("a", "c"), ((EdnaCollections.IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+        }
+    }
+
+    @Test
+    void parseDispatchMetaSymbolTest() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^a b"));
+
+        {
+            var it = Edna.read("#^a b", opts);
+            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("tag"), Symbol.symbol("a")), ((EdnaCollections.IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+        }
+    }
+
+    @Test
+    void parseDispatchMetaStringTest() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^\"a\" b"));
+
+        {
+            var it = Edna.read("#^\"a\" b", opts);
+            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("tag"), "a"), ((EdnaCollections.IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+        }
+    }
+
+    @Test
+    void parseDispatchMetaKeywordTest() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^:a b"));
+
+        {
+            var it = Edna.read("#^:a b", opts);
+            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("a"), true), ((EdnaCollections.IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+        }
+    }
+
+    @Test
+    void parseDispatchMetaMapTest() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#^{\"a\" \"c\"} b"));
+
+        {
+            var it = Edna.read("#^{\"a\" \"c\"} b", opts);
+            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
+            Assertions.assertEquals(Map.of("a", "c"), ((EdnaCollections.IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+        }
+    }
 }
-/*
-
-class EDNReaderMetaTest {
-    private val opts = EDN.defaultOptions.copy(allowMetadata = true)
-
-    @Test
-    fun parseMetaErrors() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^", opts) }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^abc", opts) }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^[]", opts) }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^[] abc", opts) }
-    }
-
-    @Test
-    fun parseDispatchMetaErrors() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^") }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^abc") }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^[]") }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^[] abc") }
-
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^", opts) }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^abc", opts) }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^[]", opts) }
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^[] abc", opts) }
-    }
-
-    @Test
-    fun parseMetaSymbolTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^a b") }
-
-        run {
-            val it = EDN.read("^a b", opts)
-            Assertions.assertTrue(it is IObj<*>)
-            it as IObj<*>
-            Assertions.assertEquals(mapOf(Keyword["tag"] to Symbol.symbol("a")), it.meta)
-            Assertions.assertEquals(Symbol.symbol("b"), it.obj)
-        }
-    }
-
-    @Test
-    fun parseMetaStringTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^\"a\" b") }
-
-        run {
-            val it = EDN.read("^\"a\" b", opts)
-            Assertions.assertTrue(it is IObj<*>)
-            it as IObj<*>
-            Assertions.assertEquals(mapOf(Keyword["tag"] to "a"), it.meta)
-            Assertions.assertEquals(Symbol.symbol("b"), it.obj)
-        }
-    }
-
-    @Test
-    fun parseMetaKeywordTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^:a b") }
-
-        run {
-            val it = EDN.read("^:a b", opts)
-            Assertions.assertTrue(it is IObj<*>)
-            it as IObj<*>
-            Assertions.assertEquals(mapOf(Keyword["a"] to true), it.meta)
-            Assertions.assertEquals(Symbol.symbol("b"), it.obj)
-        }
-    }
-
-    @Test
-    fun parseMetaMapTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("^{\"a\" \"c\"} b") }
-
-        run {
-            val it = EDN.read("^{\"a\" \"c\"} b", opts)
-            Assertions.assertTrue(it is IObj<*>)
-            it as IObj<*>
-            Assertions.assertEquals(mapOf("a" to "c"), it.meta)
-            Assertions.assertEquals(Symbol.symbol("b"), it.obj)
-        }
-    }
-
-    @Test
-    fun parseDispatchMetaSymbolTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^a b") }
-
-        run {
-            val it = EDN.read("#^a b", opts)
-            Assertions.assertTrue(it is IObj<*>)
-            it as IObj<*>
-            Assertions.assertEquals(mapOf(Keyword["tag"] to Symbol.symbol("a")), it.meta)
-            Assertions.assertEquals(Symbol.symbol("b"), it.obj)
-        }
-    }
-
-    @Test
-    fun parseDispatchMetaStringTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^\"a\" b") }
-
-        run {
-            val it = EDN.read("#^\"a\" b", opts)
-            Assertions.assertTrue(it is IObj<*>)
-            it as IObj<*>
-            Assertions.assertEquals(mapOf(Keyword["tag"] to "a"), it.meta)
-            Assertions.assertEquals(Symbol.symbol("b"), it.obj)
-        }
-    }
-
-    @Test
-    fun parseDispatchMetaKeywordTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^:a b") }
-
-        run {
-            val it = EDN.read("#^:a b", opts)
-            Assertions.assertTrue(it is IObj<*>)
-            it as IObj<*>
-            Assertions.assertEquals(mapOf(Keyword["a"] to true), it.meta)
-            Assertions.assertEquals(Symbol.symbol("b"), it.obj)
-        }
-    }
-
-    @Test
-    fun parseDispatchMetaMapTest() {
-        Assertions.assertThrows(EdnReaderException::class.java) { EDN.read("#^{\"a\" \"c\"} b") }
-
-        run {
-            val it = EDN.read("#^{\"a\" \"c\"} b", opts)
-            Assertions.assertTrue(it is IObj<*>)
-            it as IObj<*>
-            Assertions.assertEquals(mapOf("a" to "c"), it.meta)
-            Assertions.assertEquals(Symbol.symbol("b"), it.obj)
-        }
-    }
-}
- */

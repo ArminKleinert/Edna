@@ -10,6 +10,9 @@ public final class EdnaCollections {
         @Unmodifiable
         @NotNull Map<Object, Object> meta();
 
+        @Unmodifiable
+        Object obj();
+
         @NotNull IObj withMeta(@NotNull Map<Object, Object> newMeta);
 
         default <T> @NotNull IObj of(final @NotNull Map<Object, Object> meta,
@@ -26,31 +29,31 @@ public final class EdnaCollections {
         }
 
         @Unmodifiable
-        record Wrapper<T>(@NotNull Map<Object, Object> meta, T element)
+        record Wrapper<T>(@NotNull Map<Object, Object> meta, T obj)
                 implements IObj {
             @Override
             public boolean equals(Object o) {
                 if (!(o instanceof Wrapper<?>(
                         Map<Object, Object> meta1, Object element1)))
                     return false;
-                return Objects.equals(element, element1)
+                return Objects.equals(obj, element1)
                         && Objects.equals(meta, meta1);
             }
 
             @Override
             public int hashCode() {
-                return Objects.hash(element);
+                return Objects.hash(obj);
             }
 
             @Override
             public @NotNull IObj withMeta(
                     final @NotNull Map<Object, Object> newMeta) {
-                return new Wrapper<>(newMeta, element);
+                return new Wrapper<>(newMeta, obj);
             }
 
             @Override
             public @NotNull String toString() {
-                return element.toString();
+                return obj.toString();
             }
         }
     }

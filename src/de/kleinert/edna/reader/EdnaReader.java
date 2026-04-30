@@ -35,36 +35,18 @@ public class EdnaReader {
         for (String key : options.ednClassDecoders().keySet()) {
             var name = Symbol.parse(key);
             if (name == null) {
-                var message = "Decoder name \"" + key+"\" is not a valid symbol.";
+                var message = "Decoder name \"" + key + "\" is not a valid symbol.";
                 throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
             }
             if (!options.allowMoreEncoderDecoderNames() && name.namespace() == null) {
                 var message = "Decoder without namespace: " + name;
-                throw new EdnaReaderException(cpi.getLineIdx(),cpi.getTextIndex(), message);
+                throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
             }
             if (key.equals("inst") || key.equals("uuid") || key.equals("ref")) {
-                var message = "Decoder name "+name+" is not allowed.";
+                var message = "Decoder name " + name + " is not allowed.";
                 throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
             }
         }
-
-        /*
-        for (key in options.ednClassDecoders.keys) {
-            val name = Symbol.parse(key)
-            if (name == null) {
-                val message = "Decoder name \"$key\" is not a valid symbol."
-                throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
-            }
-            if (!options.allowMoreEncoderDecoderNames && name.namespace == null) {
-                val message = "Decoder without namespace: $name"
-                throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
-            }
-            if (key == "inst" || key == "uuid" || key == "ref") {
-                val message = "Decoder name $name is not allowed."
-                throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
-            }
-        }
-         */
     }
 
     private final @NotNull Object NOTHING = new Object();
@@ -86,18 +68,19 @@ public class EdnaReader {
 
     private @Nullable Object readString() {
         var data = (List<?>) readForm(0, false);
-        if (data.size() != 1)
+        if (data.size() != 1) {
             throw new EdnaReaderException(
                     cpi.getLineIdx(), cpi.getTextIndex(),
-                    "The input should only contain one expression, but there are none or multiple.");
+                    "The input should only contain one expression, but there are " + data.size() + ".");
+        }
         return data.getFirst();
     }
 
 
     private Object readForm(final int level, final boolean stopAfterOne) {
         @NotNull List<@Nullable Object> res = new ArrayList<>();
-        int linePos;
-        int codePosIndex;
+        int linePos = 0;
+        int codePosIndex = 0;
 
         do {
             cpi.skipWhile(this::isWhitespace);
@@ -178,6 +161,13 @@ public class EdnaReader {
                 return res.getFirst();
             }
         } while (true);
+
+        if (res.size() != 1) {
+            throw new EdnaReaderException(
+                    linePos, codePosIndex, "Reader requires exactly one expression, but got " + res.size() + "."
+            );
+        }
+
         return res;
     }
 
@@ -342,10 +332,11 @@ public class EdnaReader {
         };
 
         var obj = readForm(level, true);
-        if (obj == NOTHING)
+        if (obj == NOTHING) {
             throw new EdnaReaderException(
                     linePos, codePosIndex,
                     "Required object for metadata, but got nothing.");
+        }
 
         return new EdnaCollections.IObj.Wrapper<>(meta, obj);
     }

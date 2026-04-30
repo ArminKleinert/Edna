@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 class EdnaReaderDispatchTaggedUserDefTest {
-
     @Test
     void parseDecoderNameErrorTest() {
         // invalid name
@@ -33,8 +32,8 @@ class EdnaReaderDispatchTaggedUserDefTest {
 
     @Test
     void parseDecoderTest() {
-        Function<Object, Object> mapOrListToPair = (o)-> switch (o) {
-            case Map<?, ?> m ->List.of(m.get("first"), m.get("second"));
+        Function<Object, Object> mapOrListToPair = (o) -> switch (o) {
+            case Map<?, ?> m -> List.of(m.get("first"), m.get("second"));
             case List<?> l -> List.of(l.get(0), l.get(1));
             default -> throw new IllegalArgumentException();
         };
