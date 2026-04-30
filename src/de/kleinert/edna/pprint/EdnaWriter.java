@@ -9,12 +9,14 @@ import de.kleinert.edna.data.Symbol;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ListFormat;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 public class EdnaWriter {
     private final EdnaOptions options;
@@ -49,7 +51,7 @@ public class EdnaWriter {
         pprint(obj, EdnaOptions.defaultOptions());
     }
 
-    private Appendable appendIfPrettyEnabled(CharSequence cs, Appendable writer) throws IOException {
+    private Appendable appendIfPrettyEnabled(Appendable writer, CharSequence cs) throws IOException {
         if (options.encoderPrettyPrint()) writer.append(cs);
         return writer;
     }
@@ -80,77 +82,91 @@ public class EdnaWriter {
         indent = options.encoderPrettyPrint() ? indent : 0;
         int finalIndent = indent;
 
-        
-        if (obj == null)
-            encodeNull(writer);
-        else if (obj instanceof Boolean b)
-            encodeBool(b, writer);
-        else if (obj instanceof String s)
-            encodeString(s, writer);
-        else if (obj instanceof Keyword k) {
-            if (!tryEncoder(k, writer, indent))
-                encodeKeyword(k, writer);
-        } else if (obj instanceof Symbol s) {
-            if (!tryEncoder(s, writer, indent))
-                encodeSymbol(s, writer);
-        } else if (obj instanceof EdnaCollections.EdnaList<?> l) {
-            if (!tryEncoder(l, writer, indent))
-                encodePersistentList(l, writer);
-        } else if (obj instanceof List<?> l) {
-            if (!tryEncoder(l, writer, indent))
-                encodeVector(l, writer);
-        } else if (obj instanceof Set<?> s) {
-            if (!tryEncoder(s, writer, indent))
-                encodeSet(s, writer);
-        } else if (obj instanceof Map<?, ?> m) {
-            if (!tryEncoder(m, writer, indent))
-                encodeMap(m, writer);
-        } else if (obj instanceof Iterable<?> i) {
-            if (!tryEncoder(i, writer, indent))
-                encodeOtherIterable(i, writer);
-        } else if (obj instanceof Character c)
-            encodeChar(c, writer);
-        else if (obj instanceof Char32 c)
-            encodeChar32(c, writer);
-        else if (obj instanceof Byte n)
-            encodePredefinedNumberType(n, writer);
-        else if (obj instanceof Short n)
-            encodePredefinedNumberType(n, writer);
-        else if (obj instanceof Integer n)
-            encodePredefinedNumberType(n, writer);
-        else if (obj instanceof Long n)
-            encodePredefinedNumberType(n, writer);
-        else if (obj instanceof Float n)
-            encodeFloat(n, writer);
-        else if (obj instanceof Double n)
-            encodeDouble(n, writer);
-        else if (obj instanceof BigInteger n)
-            encodePredefinedNumberType(n, writer);
-        else if (obj instanceof BigDecimal n)
-            encodePredefinedNumberType(n, writer);
+        switch (obj) {
+            case null -> encodeNull(writer);
+            case Boolean b -> encodeBool(b, writer);
+            case String s -> encodeString(s, writer);
 
-        else if (obj instanceof UUID u)
-            encodeUuid(u, writer);
-        else if (obj instanceof Instant i)
-            encodeInstant(i, writer);
+            case Keyword k -> {
+                if (!tryEncoder(k, writer, indent))
+                    encodeKeyword(k, writer);
+            }
+            case Symbol s -> {
+                if (!tryEncoder(s, writer, indent))
+                    encodeSymbol(s, writer);
+            }
+            case EdnaCollections.EdnaList<?> l -> {
+                if (!tryEncoder(l, writer, indent))
+                    encodePersistentList(l, writer, indent);
+            }
+            case List<?> l -> {
+                if (!tryEncoder(l, writer, indent))
+                    encodeVector(l, writer, indent);
+            }
+            case Set<?> s -> {
+                if (!tryEncoder(s, writer, indent))
+                    encodeSet(s, writer, indent);
+            }
+            case Map<?, ?> m -> {
+                if (!tryEncoder(m, writer, indent))
+                    encodeMap(m, writer, indent);
+            }
+            case Iterable<?> i -> {
+                if (!tryEncoder(i, writer, indent))
+                    encodeOtherIterable(i, writer, indent);
+            }
 
-        else if (obj instanceof byte[] a) {
-            if (!tryEncoder(a, writer, indent))
-                encode(Arrays.stream(byteArrayToLongArray(a)).boxed().toList(), writer, finalIndent);
-        } else if (obj instanceof short[] a) {
-            if (!tryEncoder(a, writer, indent))
-                encode(Arrays.stream(shortArrayToLongArray(a)).boxed().toList(), writer, finalIndent);
-        } else if (obj instanceof int[] a) {
-            if (!tryEncoder(a, writer, indent)) encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
-        } else if (obj instanceof long[] a) {
-            if (!tryEncoder(a, writer, indent)) encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
-        } else if (obj instanceof float[] a) {
-            if (!tryEncoder(a, writer, indent))
-                encode(Arrays.stream(floatArrayToDoubleArray(a)).boxed().toList(), writer, finalIndent);
-        } else if (obj instanceof double[] a) {
-            if (!tryEncoder(a, writer, indent)) encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
-        } else if (!tryEncoder(obj, writer, indent))
-            encodeAnything(obj.toString(), writer);
+            case Character c -> encodeChar(c, writer);
+            case Char32 c -> encodeChar32(c, writer);
+            case Byte n -> encodePredefinedNumberType(n, writer);
+            case Short n -> encodePredefinedNumberType(n, writer);
+            case Integer n -> encodePredefinedNumberType(n, writer);
+            case Long n -> encodePredefinedNumberType(n, writer);
+            case Float n -> encodeFloat(n, writer); // TODO
+            case Double n -> encodeDouble(n, writer); // TODO
+            case BigInteger n -> encodePredefinedNumberType(n, writer);
+            case BigDecimal n -> encodePredefinedNumberType(n, writer);
+
+            case EdnaCollections.IObj o -> encodeIObj(o, writer, finalIndent); // TODO
+            case UUID u -> encodeUuid(u, writer); // TODO
+            case Instant i -> encodeInstant(i, writer); // TODO
+
+            case byte[] a -> { // TODO
+                if (!tryEncoder(a, writer, indent))
+                    encode(Arrays.stream(byteArrayToLongArray(a)).boxed().toList(), writer, finalIndent);
+            }
+            case short[] a -> { // TODO
+                if (!tryEncoder(a, writer, indent))
+                    encode(Arrays.stream(shortArrayToLongArray(a)).boxed().toList(), writer, finalIndent);
+            }
+            case int[] a -> { // TODO
+                if (!tryEncoder(a, writer, indent))
+                    encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
+            }
+            case long[] a -> { // TODO
+                if (!tryEncoder(a, writer, indent))
+                    encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
+            }
+            case float[] a -> { // TODO
+                if (!tryEncoder(a, writer, indent))
+                    encode(Arrays.stream(floatArrayToDoubleArray(a)).boxed().toList(), writer, finalIndent);
+            }
+            case double[] a -> { // TODO
+                if (!tryEncoder(a, writer, indent))
+                    encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
+            }
+            default -> { // TODO
+                if (!tryEncoder(obj, writer, indent))
+                    encodeAnything(obj.toString(), writer);
+            }
+        }
+    }
+
+    private void encodeIObj(EdnaCollections.IObj obj, Appendable writer, int indent) throws IOException {
+        writer.append('^');
+        encode(obj.meta(), writer, indent);
+        writer.append(' ');
+        encode(obj.obj(), writer, indent);
     }
 
     private long[] byteArrayToLongArray(byte[] a) {
@@ -165,174 +181,237 @@ public class EdnaWriter {
         return IntStream.range(0, a.length).mapToDouble(i -> a[i]).toArray();
     }
 
-    private Object encodeAnything(String string, Appendable writer) {
-        return writerAppend(writer, string);
+    private void encodeAnything(String string, Appendable writer) throws IOException {
+         writerAppend(writer, string);
     }
 
-    private String encodeInstant(Instant i, Appendable writer) {
+    private void encodeInstant(Instant i, Appendable writer)throws IOException {
         throw new UnsupportedOperationException();
         //var res =       ;
         //return writerAppend(writer, res);
     }
 
-    private String encodeUuid(UUID u, Appendable writer) {
+    private void encodeUuid(UUID u, Appendable writer)throws IOException {
         throw new UnsupportedOperationException();
         //var res =       ;
         //return writerAppend(writer, res);
     }
 
-    private String encodeDouble(Double n, Appendable writer) {
+    private void encodeDouble(Double n, Appendable writer)throws IOException {
         throw new UnsupportedOperationException();
         //var res =       ;
         //return writerAppend(writer, res);
     }
 
-    private String encodeFloat(Float n, Appendable writer) {
+    private void encodeFloat(Float n, Appendable writer)throws IOException {
         throw new UnsupportedOperationException();
         //var res =       ;
         //return writerAppend(writer, res);
     }
 
-    private String encodePredefinedNumberType(Number n, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodePredefinedNumberType(Number n, Appendable writer)throws IOException {
+        StringBuilder sb = new StringBuilder();
+        switch(n) {
+            case Byte ignored -> sb.append(n.toString());
+            case Short ignored -> sb.append(n.toString());
+            case Integer ignored -> sb.append(n.toString());
+            case Long ignored -> sb.append(n.toString());
+            case BigInteger ignored -> {
+                sb.append(n.toString());
+                sb.append('N');
+            }
+            case BigDecimal ignored -> {
+                sb.append(n.toString());
+                sb.append('M');
+            }
+            default -> sb.append(n.toString());}
+        if (options.allowNumericSuffixes()) {
+            switch(n) {
+                case Byte  b->sb.append("_i8");
+                case Short ignored->sb.append("_i16");
+                case Integer ignored->sb.append("_i32");
+                default -> {}
+            }
+        }
+        writerAppend(writer, sb.toString());
     }
 
-    private String encodeChar32(Char32 c, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeChar32(Char32 c, Appendable writer) throws IOException{
+        if (!options.allowDispatchChars()) {
+            writerAppend(writer, '"' + c.toString() + '"');
+        }
+        int code = c.code();
+        String s = switch (code) {
+            case '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4',
+                 '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+                 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '\\', '^',
+                 '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+                 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '|', '~', '§', '°', '´', '€' -> "#\\"+ code;
+            case '\n' -> "#\\newline";
+            case ' ' -> "#\\space";
+            case '\t' -> "#\\tab";
+            case '\b' -> "#\\backspace";
+            case 12 -> "#\\formfeed";
+            case '\r' -> "#\\return";
+            default -> String.format("#\\u%08x", code);
+        };
+        writerAppend(writer, s);
     }
 
-    private String encodeChar(Character c, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeChar(Character code, Appendable writer)throws IOException {
+        String s = switch (code) {
+            case '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4',
+                 '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+                 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '\\', '^',
+                 '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+                 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '|', '~', '§', '°', '´', '€' -> "\\"+ code;
+            case '\n' -> "\\newline";
+            case ' ' -> "\\space";
+            case '\t' -> "\\tab";
+            case '\b' -> "\\backspace";
+            case 12 -> "\\formfeed";
+            case '\r' -> "\\return";
+            default -> String.format("\\u%04x", (int) code);
+        };
+        writerAppend(writer, s);
     }
 
-    private String encodeOtherIterable(Iterable<?> i, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeOtherIterable(Iterable<?> i, Appendable writer, int indent) throws IOException{
+        var list = new ArrayList<>();
+        for (var e : i)
+            list.add(i);
+        formatCollectionTo(list, "(", ")", writer, indent);
     }
 
-    private String encodeMap(Map<?, ?> m, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeMap(Map<?, ?> m, Appendable writer, int indent)throws IOException {
+        formatCollectionTo(m.entrySet().stream().toList(), "{", "}", writer, indent, true);
     }
 
-    private String encodeSet(Set<?> s, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeSet(Set<?> s, Appendable writer, int indent)throws IOException {
+        formatCollectionTo(s.stream().toList(), "#{", "}", writer, indent);
     }
 
-    private String encodeVector(List<?> l, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeVector(List<?> l, Appendable writer, int indent)throws IOException {
+        formatCollectionTo(l, "[", "]", writer, indent);
     }
 
-    private String encodePersistentList(EdnaCollections.EdnaList<?> l, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodePersistentList(EdnaCollections.EdnaList<?> l, Appendable writer, int indent)throws IOException {
+        formatCollectionTo(l, "(", ")", writer, indent);
     }
 
-    private String encodeSymbol(Symbol s, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeSymbol(Symbol s, Appendable writer) throws IOException {
+        writerAppend(writer, s.toString());
     }
 
-    private String encodeKeyword(Keyword k, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeKeyword(Keyword k, Appendable writer) throws IOException {
+        writerAppend(writer, k.toString());
     }
 
-    private String encodeString(String s, Appendable writer) {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeString(String s, Appendable writer) throws IOException {
+        var sb = new StringBuilder();
+        sb.append('"');
+        for (int code : s.chars().toArray()) {
+            switch (code) {
+                case '\t' -> sb.append("\\t");
+                case '\b' -> sb.append("\\b");
+                case '\n' -> sb.append("\\n");
+                case '\r' -> sb.append("\\r");
+                case '\"' -> sb.append("\\\"");
+                case '\\' -> sb.append("\\\\");
+                default -> sb.appendCodePoint(code);
+            }
+        }
+
+        sb.append('"');
+        var newString = sb.toString();
+        writerAppend(writer, newString);
     }
 
     private void orIfNullDo(Object v, Supplier<Object> lazy) {
         if (v == null) lazy.get();
     }
 
-    private String encodeNull(Appendable writer) {
-        return writerAppend(writer, "null");
+    private void encodeNull(Appendable writer) throws IOException {
+         writerAppend(writer, "nil");
     }
 
-    private String encodeBool(boolean b, Appendable writer) throws IOException {
-        return writerAppend(writer, String.valueOf(b));
+    private void encodeBool(boolean b, Appendable writer) throws IOException {
+         writerAppend(writer, String.valueOf(b));
     }
 
-    private static String writerAppend(Appendable writer, String s) {
-        try {
-            writer.append(s);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private static void writerAppend(Appendable writer, String s) throws IOException {
+        writer.append(s);
+    }
+
+    private void formatCollectionTo(List<?> l, String open, String close, Appendable writer, int indent, boolean isMap) throws IOException {
+        indent = options.encoderPrettyPrint() ? indent : 0;
+
+        // Try inline first (dry-run)
+        var tmp = new StringBuilder();
+        tmp.append(open);
+        if (isMap) {
+            var entryIterator = l.iterator();
+            for (int i = 0; i < l.size(); i++) {
+                var e = (Map.Entry<?,?>) entryIterator.next();
+                encode(e.getKey(), tmp, indent+1);
+                tmp.append(' ');
+                encode(e.getValue(), tmp, indent+1);
+                if (i != l.size()) tmp.append(options.encodingSequenceSeparator());
+            }
+        } else {
+            var entryIterator = l.iterator();
+            for (int i = 0; i < l.size(); i++) {
+                var e = entryIterator.next();
+                encode(e, tmp, indent+1);
+                if (i != l.size()) tmp.append(options.encodingSequenceSeparator());
+            }
         }
-        return s;
+        tmp.append(close);
+
+        if (tmp.length() + indent <= options.encoderMaxColumn()) {
+            writer.append(tmp);
+            return;
+        }
+
+        // Multi-line formatting
+        writer.append(open);
+        appendIfPrettyEnabled(writer, "\n");
+        var childIndent = indent +1 ;
+        var pad = options.encoderLineIndent().repeat(childIndent);
+        if (isMap) {
+            var entryIterator = l.iterator();
+            for (int i = 0; i < l.size(); i++) {
+                var e = (Map.Entry<?,?>) entryIterator.next();
+                appendIfPrettyEnabled(writer, pad);
+                encode(e.getKey(), tmp, indent+1);
+                tmp.append(' ');
+                encode(e.getValue(), tmp, indent+1);
+                if (i != l.size()) {
+                    tmp.append(options.encodingSequenceSeparator());
+                    appendIfPrettyEnabled(writer, "\n");
+                }
+            }
+        } else {
+            var entryIterator = l.iterator();
+            for (int i = 0; i < l.size(); i++) {
+                var e = entryIterator.next();
+                appendIfPrettyEnabled(writer, pad);
+                encode(e, tmp, indent+1);
+                if (i != l.size()) {
+                    tmp.append(options.encodingSequenceSeparator());
+                    appendIfPrettyEnabled(writer, "\n");
+                }
+            }
+        }
+        appendIfPrettyEnabled(writer, "\n");
+        appendIfPrettyEnabled(writer, options.encoderLineIndent().repeat(indent)).append(close);
+    }
+
+    private void formatCollectionTo(List<?> l, String open, String close, Appendable writer, int indent) throws IOException { formatCollectionTo(l,open,close, writer, indent, false);
     }
 }
 
 /*
-    fun encode(
-        obj: Any?,
-        writer: Appendable,
-        indent: Int = 0
-    ) {
-        val indent =
-            if (options.encoderPrettyPrint) indent else 0
-        when (obj) {
-            null -> encodeNull())
-            true -> encodeBool(true))
-            false -> encodeBool(false))
-
-            is String -> encodeString(obj))
-            is Keyword -> tryEncoder(obj, writer, indent) ?: encodeKeyword(obj))
-            is Symbol -> tryEncoder(obj, writer, indent) ?: encodeSymbol(obj))
-
-            is EdnList<*> ->
-                tryEncoder(obj, writer, indent) ?: encodePersistentList(obj, writer, indent) // List, not vector
-
-            is List<*> -> tryEncoder(obj, writer, indent) ?: encodeVector(obj, writer, indent) // Vector
-            is Array<*> -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-
-            is Set<*> -> tryEncoder(obj, writer, indent) ?: encodeSet(obj, writer, indent)
-            is Map<*, *> -> tryEncoder(obj, writer, indent) ?: encodeMap(obj, writer, indent)
-
-            is Iterable<*> -> tryEncoder(obj, writer, indent) ?: encodeOtherIterable(obj, writer, indent)
-            is Sequence<*> -> tryEncoder(obj, writer, indent) ?: encodeSequence(obj, writer, indent)
-
-            is Char -> encodeChar(obj))
-            is Char32 -> encodeChar32(obj))
-            is Byte, is Short, is Int, is Long, is Ratio -> encodePredefinedNumberType(obj as Number))
-            is Float -> encodeFloat(obj))
-            is Double -> encodeDouble(obj))
-            is BigInteger, is BigDecimal -> encodePredefinedNumberType(obj as Number))
-
-            is IObj<*> -> encodeIObj(obj, writer, indent)
-
-            is UUID -> encodeUuid(obj))
-            is Instant -> encodeInstant(obj))
-
-            is ByteArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is ShortArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is IntArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is LongArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is FloatArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-            is DoubleArray -> tryEncoder(obj, writer, indent) ?: encode(obj.toList(), writer, indent) // as vector
-
-            else -> tryEncoder(obj, writer, indent) ?: writer.append(obj.toString())
-        }
-    }
-
     @Suppress("NOTHING_TO_INLINE")
     private inline fun encodePersistentList(obj: EdnList<*>, writer: Appendable, indent: Int) {
         formatCollectionTo(obj, "(", ")", writer, indent)
