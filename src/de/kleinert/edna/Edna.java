@@ -116,6 +116,9 @@ public class Edna {
         }
     }
 
+    public static void pprint(Object obj, Appendable w) {pprint(obj,w, defaultOptions());
+    }
+
     public static void pprintln(Object obj, Appendable w, EdnaOptions options) {
         try {
             if (w == null) {
@@ -129,13 +132,19 @@ public class Edna {
             throw new EdnaWriterException(e);
         }
     }
+    public static void pprintln(Object obj, Appendable w) {pprintln(obj, w, defaultOptions());}
 
-    public static void pprintToString(Object obj, EdnaOptions options) {
+    public static String pprintToString(Object obj, EdnaOptions options) {
         try {
-            EdnaWriter.pprint(obj, options, new StringBuilder());
-        } catch (Exception e) {
+            StringBuilder sb = new StringBuilder();
+            EdnaWriter.pprint(obj, options, sb);
+        return sb.toString();} catch (Exception e) {
             throw new EdnaWriterException(e);
         }
+    }
+
+    public static String pprintToString(Object obj) {
+        return pprintToString(obj, defaultOptions());
     }
 
 

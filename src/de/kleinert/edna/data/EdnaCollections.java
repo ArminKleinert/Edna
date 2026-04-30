@@ -15,11 +15,16 @@ public final class EdnaCollections {
 
         @NotNull IObj withMeta(@NotNull Map<Object, Object> newMeta);
 
-        default <T> @NotNull IObj of(final @NotNull Map<Object, Object> meta,
-                                     final T element) {
-            if (element instanceof IObj)
-                return ((IObj) element).withMeta(meta);
-            return new Wrapper<>(meta, element);
+        static <T> @NotNull IObj of(final @NotNull Object meta,
+                                    final T element) {
+            var newMeta = switch(meta) {
+                case String v -> EdnaCollections.EdnaMap.create(List.of(Keyword.keyword("tag"), v));
+                case Symbol v -> EdnaCollections.EdnaMap.create(List.of(Keyword.keyword("tag"), v));
+                case Keyword v -> EdnaCollections.EdnaMap.create(List.of(v, true));
+                case Map<?, ?> tempMap -> (Map<Object, Object>) tempMap;
+                default -> throw new IllegalArgumentException();
+            };
+            return new Wrapper<>(newMeta, element);
         }
 
         default <T> @NotNull IObj of(final T element) {

@@ -103,6 +103,10 @@ public class EdnaWriter {
                 if (!tryEncoder(l, writer, indent))
                     encodeVector(l, writer, indent);
             }
+            case Object[] l -> {
+                if (!tryEncoder(l, writer, indent))
+                    encodeVector(Arrays.stream(l).toList(), writer, indent);
+            }
             case Set<?> s -> {
                 if (!tryEncoder(s, writer, indent))
                     encodeSet(s, writer, indent);
@@ -236,7 +240,7 @@ public class EdnaWriter {
 
     private void encodeChar32(Char32 c, Appendable writer) throws IOException{
         if (!options.allowDispatchChars()) {
-            writerAppend(writer, '"' + c.toString() + '"');
+            writerAppend(writer, '"' + c.toString() + '"');return;
         }
         int code = c.code();
         String s = switch (code) {
@@ -244,7 +248,8 @@ public class EdnaWriter {
                  '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
                  'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '\\', '^',
                  '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-                 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '|', '~', '§', '°', '´', '€' -> "#\\"+ code;
+                 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '|', '~', '§', '°', '´', '€' ->
+                    (new StringBuilder("#\\")).appendCodePoint(code).toString();
             case '\n' -> "#\\newline";
             case ' ' -> "#\\space";
             case '\t' -> "#\\tab";
@@ -354,14 +359,14 @@ public class EdnaWriter {
                 encode(e.getKey(), tmp, indent+1);
                 tmp.append(' ');
                 encode(e.getValue(), tmp, indent+1);
-                if (i != l.size()) tmp.append(options.encodingSequenceSeparator());
+                if (i != l.size()-1) tmp.append(options.encodingSequenceSeparator());
             }
         } else {
             var entryIterator = l.iterator();
             for (int i = 0; i < l.size(); i++) {
                 var e = entryIterator.next();
                 encode(e, tmp, indent+1);
-                if (i != l.size()) tmp.append(options.encodingSequenceSeparator());
+                if (i != l.size()-1) tmp.append(options.encodingSequenceSeparator());
             }
         }
         tmp.append(close);
