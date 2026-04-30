@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-import de.kleinert.edna.data.EdnaCollections.EdnaSet;
-
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.SequencedSet;

@@ -1,43 +1,24 @@
 package de.kleinert.edna.pprint;
 
 import de.kleinert.edna.EdnaOptions;
-import de.kleinert.edna.data.Char32;
-import de.kleinert.edna.data.EdnaCollections;
-import de.kleinert.edna.data.Keyword;
-import de.kleinert.edna.data.Symbol;
+import de.kleinert.edna.data.*;
 
 import java.io.Flushable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.ListFormat;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-import java.util.stream.StreamSupport;
 
 public class EdnaWriter {
     private final EdnaOptions options;
 
     private EdnaWriter(EdnaOptions options) {
         this.options = options;
-    }
-
-    public static String pprintToString(Object obj, EdnaOptions options) {
-        var writer = new StringBuilder();
-        try {
-            new EdnaWriter(options).encode(obj, writer, 0);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return writer.toString();
-    }
-
-    public static String pprintToString(Object obj) {
-        return pprintToString(obj, EdnaOptions.defaultOptions());
     }
 
     public static void pprint(Object obj, EdnaOptions options, Appendable writer) throws IOException {
@@ -95,7 +76,7 @@ public class EdnaWriter {
                 if (!tryEncoder(s, writer, indent))
                     encodeSymbol(s, writer);
             }
-            case EdnaCollections.EdnaList<?> l -> {
+            case EdnaList<?> l -> {
                 if (!tryEncoder(l, writer, indent))
                     encodePersistentList(l, writer, indent);
             }
@@ -131,7 +112,7 @@ public class EdnaWriter {
             case BigInteger n -> encodePredefinedNumberType(n, writer);
             case BigDecimal n -> encodePredefinedNumberType(n, writer);
 
-            case EdnaCollections.IObj o -> encodeIObj(o, writer, finalIndent);
+            case IObj o -> encodeIObj(o, writer, finalIndent);
             case UUID u -> encodeUuid(u, writer, finalIndent);
             case Instant i -> encodeInstant(i, writer, finalIndent);
 
@@ -166,7 +147,7 @@ public class EdnaWriter {
         }
     }
 
-    private void encodeIObj(EdnaCollections.IObj obj, Appendable writer, int indent) throws IOException {
+    private void encodeIObj(IObj obj, Appendable writer, int indent) throws IOException {
         writer.append('^');
         encode(obj.meta(), writer, indent);
         writer.append(' ');
@@ -298,7 +279,7 @@ public class EdnaWriter {
         formatCollectionTo(l, "[", "]", writer, indent);
     }
 
-    private void encodePersistentList(EdnaCollections.EdnaList<?> l, Appendable writer, int indent)throws IOException {
+    private void encodePersistentList(EdnaList<?> l, Appendable writer, int indent)throws IOException {
         formatCollectionTo(l, "(", ")", writer, indent);
     }
 

@@ -3,7 +3,7 @@ package de.kleinert.edna.reader;
 import de.kleinert.edna.Edna;
 import de.kleinert.edna.EdnaOptions;
 
-import de.kleinert.edna.data.EdnaCollections;
+import de.kleinert.edna.data.IObj;
 import de.kleinert.edna.data.Keyword;
 import de.kleinert.edna.data.Symbol;
 import org.junit.jupiter.api.Test;
@@ -42,9 +42,9 @@ class EdnaReaderMetaTest {
 
         {
             var it = Edna.read("^a b", opts);
-            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
-            Assertions.assertEquals(Map.of(Keyword.get("tag"), Symbol.symbol("a")), ((EdnaCollections.IObj) it).meta());
-            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("tag"), Symbol.symbol("a")), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((IObj) it).obj());
         }
     }
 
@@ -54,9 +54,9 @@ class EdnaReaderMetaTest {
 
         {
             var it = Edna.read("^\"a\" b", opts);
-            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
-            Assertions.assertEquals(Map.of(Keyword.get("tag"), "a"), ((EdnaCollections.IObj) it).meta());
-            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("tag"), "a"), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((IObj) it).obj());
         }
     }
 
@@ -66,9 +66,9 @@ class EdnaReaderMetaTest {
 
         {
             var it = Edna.read("^:a b", opts);
-            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
-            Assertions.assertEquals(Map.of(Keyword.get("a"), true), ((EdnaCollections.IObj) it).meta());
-            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("a"), true), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((IObj) it).obj());
         }
     }
 
@@ -78,9 +78,9 @@ class EdnaReaderMetaTest {
 
         {
             var it = Edna.read("^{\"a\" \"c\"} b", opts);
-            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
-            Assertions.assertEquals(Map.of("a", "c"), ((EdnaCollections.IObj) it).meta());
-            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of("a", "c"), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((IObj) it).obj());
         }
     }
 
@@ -90,9 +90,9 @@ class EdnaReaderMetaTest {
 
         {
             var it = Edna.read("#^a b", opts);
-            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
-            Assertions.assertEquals(Map.of(Keyword.get("tag"), Symbol.symbol("a")), ((EdnaCollections.IObj) it).meta());
-            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("tag"), Symbol.symbol("a")), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((IObj) it).obj());
         }
     }
 
@@ -102,9 +102,9 @@ class EdnaReaderMetaTest {
 
         {
             var it = Edna.read("#^\"a\" b", opts);
-            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
-            Assertions.assertEquals(Map.of(Keyword.get("tag"), "a"), ((EdnaCollections.IObj) it).meta());
-            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("tag"), "a"), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((IObj) it).obj());
         }
     }
 
@@ -114,9 +114,9 @@ class EdnaReaderMetaTest {
 
         {
             var it = Edna.read("#^:a b", opts);
-            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
-            Assertions.assertEquals(Map.of(Keyword.get("a"), true), ((EdnaCollections.IObj) it).meta());
-            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of(Keyword.get("a"), true), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((IObj) it).obj());
         }
     }
 
@@ -126,9 +126,9 @@ class EdnaReaderMetaTest {
 
         {
             var it = Edna.read("#^{\"a\" \"c\"} b", opts);
-            Assertions.assertInstanceOf(EdnaCollections.IObj.class, it);
-            Assertions.assertEquals(Map.of("a", "c"), ((EdnaCollections.IObj) it).meta());
-            Assertions.assertEquals(Symbol.symbol("b"), ((EdnaCollections.IObj) it).obj());
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of("a", "c"), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("b"), ((IObj) it).obj());
         }
     }
 }

@@ -1,10 +1,7 @@
 package de.kleinert.edna.pprint;
 
 import de.kleinert.edna.Edna;
-import de.kleinert.edna.data.Char32;
-import de.kleinert.edna.data.EdnaCollections;
-import de.kleinert.edna.data.Keyword;
-import de.kleinert.edna.data.Symbol;
+import de.kleinert.edna.data.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
@@ -170,16 +167,16 @@ public class EdnaWriterTest {
 
     @Test
     void encodeIObj() {
-        Assertions.assertEquals("^{:tag \"abc\"} :a", Edna.pprintToString(EdnaCollections.IObj.of("abc", Keyword.get("a"))));
-        Assertions.assertEquals("^{:abc true} :a", Edna.pprintToString(EdnaCollections.IObj.of(Keyword.get("abc"), Keyword.get("a"))));
-        Assertions.assertEquals("^{:tag abc} :a", Edna.pprintToString(EdnaCollections.IObj.of(Symbol.symbol("abc"), Keyword.get("a"))));
-        Assertions.assertEquals("^{\"b\" \"c\"} :a", Edna.pprintToString(EdnaCollections.IObj.of(Map.of("b", "c"), Keyword.get("a"))));
+        Assertions.assertEquals("^{:tag \"abc\"} :a", Edna.pprintToString(IObj.of("abc", Keyword.get("a"))));
+        Assertions.assertEquals("^{:abc true} :a", Edna.pprintToString(IObj.of(Keyword.get("abc"), Keyword.get("a"))));
+        Assertions.assertEquals("^{:tag abc} :a", Edna.pprintToString(IObj.of(Symbol.symbol("abc"), Keyword.get("a"))));
+        Assertions.assertEquals("^{\"b\" \"c\"} :a", Edna.pprintToString(IObj.of(Map.of("b", "c"), Keyword.get("a"))));
     }
 
     @Test
     void encodePersistentList() {
-        Assertions.assertEquals("()", Edna.pprintToString(EdnaCollections.EdnaList.<Keyword>of()));
-        Assertions.assertEquals("(:a, :b)", Edna.pprintToString(EdnaCollections.EdnaList.of(Keyword.get("a"), Keyword.get("b"))));
+        Assertions.assertEquals("()", Edna.pprintToString(EdnaList.<Keyword>of()));
+        Assertions.assertEquals("(:a, :b)", Edna.pprintToString(EdnaList.of(Keyword.get("a"), Keyword.get("b"))));
     }
 
     private List<Byte> bytesToList(byte[] bytes) {
@@ -280,15 +277,15 @@ public class EdnaWriterTest {
 
     @Test
     void encodeVector() {
-        Assertions.assertEquals("[]", Edna.pprintToString(EdnaCollections.EdnaVector.of()));
-        Assertions.assertEquals("[:a, :b]", Edna.pprintToString(EdnaCollections.EdnaVector.of(Keyword.get("a"), Keyword.get("b"))));
+        Assertions.assertEquals("[]", Edna.pprintToString(EdnaVector.of()));
+        Assertions.assertEquals("[:a, :b]", Edna.pprintToString(EdnaVector.of(Keyword.get("a"), Keyword.get("b"))));
         Assertions.assertEquals("[:a, :b]", Edna.pprintToString(List.of(Keyword.get("a"), Keyword.get("b"))));
     }
 
     @Test
     void encodeSet() {
-        Assertions.assertEquals("#{}", Edna.pprintToString(EdnaCollections.EdnaSet.of()));
-        Assertions.assertEquals("#{:a, :b}", Edna.pprintToString(EdnaCollections.EdnaSet.of(Keyword.get("a"), Keyword.get("b"))));
+        Assertions.assertEquals("#{}", Edna.pprintToString(EdnaSet.of()));
+        Assertions.assertEquals("#{:a, :b}", Edna.pprintToString(EdnaSet.of(Keyword.get("a"), Keyword.get("b"))));
 
         var encoders = new LinkedHashMap<Class<?>, Function<Object, Map.Entry<String, ?>>>(Map.of(
                 Set.class, (it) -> new AbstractMap.SimpleEntry<>("set", ((Set<?>) it).stream().toList())
@@ -296,16 +293,16 @@ public class EdnaWriterTest {
         var options = Edna.defaultOptions().copy(b -> b.ednClassEncoders(encoders));
         Assertions.assertEquals(
                 "#set [:a, :b]",
-                Edna.pprintToString(EdnaCollections.EdnaSet.of(Keyword.get("a"), Keyword.get("b")), options)
+                Edna.pprintToString(EdnaSet.of(Keyword.get("a"), Keyword.get("b")), options)
         );
     }
 
     @Test
     void encodeMap() {
-        Assertions.assertEquals("{}", Edna.pprintToString(EdnaCollections.EdnaMap.of()));
+        Assertions.assertEquals("{}", Edna.pprintToString(EdnaMap.of()));
         Assertions.assertEquals(
                 "{:a :b, :c :d}",
-                Edna.pprintToString(EdnaCollections.EdnaMap.of(Keyword.get("a"), Keyword.get("b"), Keyword.get("c"), Keyword.get("d")))
+                Edna.pprintToString(EdnaMap.of(Keyword.get("a"), Keyword.get("b"), Keyword.get("c"), Keyword.get("d")))
         );
     }
 
@@ -362,9 +359,9 @@ public class EdnaWriterTest {
 
     @Test
     void encodeCustom() {
-        var encoders = new LinkedHashMap<Class<?>, Function<Object, Map.Entry<String, ?>>>(Map.of(
+        var encoders = EdnaMap.<Class<?>, Function<Object, Map.Entry<String, ?>>>of(
                 File.class, (it) -> new AbstractMap.SimpleEntry<>("file", ((File) it).getName())
-        ));
+        );
         var options = Edna.defaultOptions().copy(b -> b.ednClassEncoders(encoders));
         Assertions.assertEquals(
                 "#file \"filename.here\"",

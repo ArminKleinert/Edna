@@ -1,10 +1,7 @@
 package de.kleinert.edna.reader;
 
 import de.kleinert.edna.EdnaOptions;
-import de.kleinert.edna.data.Char32;
-import de.kleinert.edna.data.EdnaCollections;
-import de.kleinert.edna.data.Keyword;
-import de.kleinert.edna.data.Symbol;
+import de.kleinert.edna.data.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -316,7 +313,7 @@ public class EdnaReader {
         return (Set<Object>) options.listToEdnSetConverter().apply(lst);
     }
 
-    private @NotNull EdnaCollections.IObj readMeta(final int level) {
+    private @NotNull IObj readMeta(final int level) {
         var linePos = cpi.getLineIdx();
         var codePosIndex = cpi.getTextIndex();
 
@@ -326,9 +323,9 @@ public class EdnaReader {
                     "Metadata is turned off.");
 
         final Map<Object, Object> meta = switch (readForm(level, true)) {
-            case String v -> EdnaCollections.EdnaMap.create(List.of(Keyword.keyword("tag"), v));
-            case Symbol v -> EdnaCollections.EdnaMap.create(List.of(Keyword.keyword("tag"), v));
-            case Keyword v -> EdnaCollections.EdnaMap.create(List.of(v, true));
+            case String v -> EdnaMap.create(List.of(Keyword.keyword("tag"), v));
+            case Symbol v -> EdnaMap.create(List.of(Keyword.keyword("tag"), v));
+            case Keyword v -> EdnaMap.create(List.of(v, true));
             case Map<?, ?> tempMap -> (Map<Object, Object>) tempMap;
             default -> throw new EdnaReaderException(
                     linePos, codePosIndex,
@@ -342,7 +339,7 @@ public class EdnaReader {
                     "Required object for metadata, but got nothing.");
         }
 
-        return new EdnaCollections.IObj.Wrapper<>(meta, obj);
+        return new IObj.Wrapper<>(meta, obj);
     }
 
     private @NotNull Number readNumber() {

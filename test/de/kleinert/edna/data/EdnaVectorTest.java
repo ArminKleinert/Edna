@@ -6,13 +6,11 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import de.kleinert.edna.data.EdnaCollections.EdnaVector;
-
 public class EdnaVectorTest {
     @Test
     void fromSequencedCollection() {
-        Assertions.assertEquals(List.of(1, 2, 3), EdnaVector.create(EdnaCollections.EdnaSet.of(1, 2, 3)));
-        Assertions.assertEquals(List.of(2, 3, 1), EdnaVector.create(EdnaCollections.EdnaSet.of(2, 3, 1)));
+        Assertions.assertEquals(List.of(1, 2, 3), EdnaVector.create(EdnaSet.of(1, 2, 3)));
+        Assertions.assertEquals(List.of(2, 3, 1), EdnaVector.create(EdnaSet.of(2, 3, 1)));
 
         final var lhs = new LinkedHashSet<Integer>(32);
         lhs.addAll(List.of(9, 8, 7, 6, 5, 4, 3, 2, 1));
