@@ -17,7 +17,7 @@ public final class EdnaCollections {
 
         static <T> @NotNull IObj of(final @NotNull Object meta,
                                     final T element) {
-            var newMeta = switch(meta) {
+            var newMeta = switch (meta) {
                 case String v -> EdnaCollections.EdnaMap.create(List.of(Keyword.keyword("tag"), v));
                 case Symbol v -> EdnaCollections.EdnaMap.create(List.of(Keyword.keyword("tag"), v));
                 case Keyword v -> EdnaCollections.EdnaMap.create(List.of(v, true));
@@ -39,7 +39,8 @@ public final class EdnaCollections {
             @Override
             public boolean equals(Object o) {
                 if (!(o instanceof Wrapper<?>(
-                        Map<Object, Object> meta1, Object element1)))
+                        Map<Object, Object> meta1, Object element1
+                )))
                     return false;
                 return Objects.equals(obj, element1)
                         && Objects.equals(meta, meta1);
@@ -249,6 +250,10 @@ public final class EdnaCollections {
 
         public EdnaMap(final @NotNull SequencedMap<K, V> delegate) {
             this.delegate = delegate;
+        }
+
+        public static <K, V> @NotNull EdnaMap<K, V> of(final Object... kvs) {
+            return create(Arrays.stream(kvs).toList());
         }
 
         public static <K, V> @NotNull EdnaMap<K, V> create(

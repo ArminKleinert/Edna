@@ -5,10 +5,12 @@ import de.kleinert.edna.data.Char32;
 import de.kleinert.edna.data.EdnaCollections;
 import de.kleinert.edna.data.Keyword;
 import de.kleinert.edna.data.Symbol;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -156,11 +158,6 @@ public class EdnaWriterTest {
         Assertions.assertEquals("-1.5", Edna.pprintToString(-1.5));
     }
 
-//    @Test
-//   void encodeRatio() {
-//        Assertions.assertEquals("123/8", Edna.pprintToString(Ratio.valueOf(123, 8)))
-//    }
-
     @Test
     void encodeBigInteger() {
         Assertions.assertEquals("123N", Edna.pprintToString(BigInteger.valueOf(123L)));
@@ -210,7 +207,7 @@ public class EdnaWriterTest {
     }
 
     @Test
-   void encodeShortArray() {
+    void encodeShortArray() {
         Assertions.assertEquals("[]", Edna.pprintToString(new short[0]));
         Assertions.assertEquals("[0, 0]", Edna.pprintToString(new short[2]));
 
@@ -222,31 +219,31 @@ public class EdnaWriterTest {
     }
 
     @Test
-   void encodeIntArray() {
+    void encodeIntArray() {
         Assertions.assertEquals("[]", Edna.pprintToString(new int[0]));
         Assertions.assertEquals("[0, 0]", Edna.pprintToString(new int[2]));
 
         var encoders = new LinkedHashMap<Class<?>, Function<Object, Map.Entry<String, ?>>>(Map.of(
-                int[].class, (it) -> new AbstractMap.SimpleEntry<>("intarray", Arrays.stream(((int[])it)).boxed().toList())
+                int[].class, (it) -> new AbstractMap.SimpleEntry<>("intarray", Arrays.stream(((int[]) it)).boxed().toList())
         ));
         var options = Edna.defaultOptions().copy(b -> b.ednClassEncoders(encoders));
         Assertions.assertEquals("#intarray [0, 0]", Edna.pprintToString(new int[2], options));
     }
 
     @Test
-   void encodeLongArray() {
+    void encodeLongArray() {
         Assertions.assertEquals("[]", Edna.pprintToString(new long[0]));
         Assertions.assertEquals("[0, 0]", Edna.pprintToString(new long[2]));
 
         var encoders = new LinkedHashMap<Class<?>, Function<Object, Map.Entry<String, ?>>>(Map.of(
-                long[].class, (it) -> new AbstractMap.SimpleEntry<>("longarray", Arrays.stream(((long[])it)).boxed().toList())
+                long[].class, (it) -> new AbstractMap.SimpleEntry<>("longarray", Arrays.stream(((long[]) it)).boxed().toList())
         ));
         var options = Edna.defaultOptions().copy(b -> b.ednClassEncoders(encoders));
         Assertions.assertEquals("#longarray [0, 0]", Edna.pprintToString(new long[2], options));
     }
 
     @Test
-   void encodeFloatArray() {
+    void encodeFloatArray() {
         Assertions.assertEquals("[]", Edna.pprintToString(new float[0]));
         Assertions.assertEquals("[0.0, 0.0]", Edna.pprintToString(new float[2]));
 
@@ -258,24 +255,24 @@ public class EdnaWriterTest {
     }
 
     @Test
-   void encodeDoubleArray() {
+    void encodeDoubleArray() {
         Assertions.assertEquals("[]", Edna.pprintToString(new double[0]));
         Assertions.assertEquals("[0.0, 0.0]", Edna.pprintToString(new double[2]));
 
         var encoders = new LinkedHashMap<Class<?>, Function<Object, Map.Entry<String, ?>>>(Map.of(
-                double[].class, (it) -> new AbstractMap.SimpleEntry<>("doublearray", Arrays.stream(((double[])it)).boxed().toList())
+                double[].class, (it) -> new AbstractMap.SimpleEntry<>("doublearray", Arrays.stream(((double[]) it)).boxed().toList())
         ));
         var options = Edna.defaultOptions().copy(b -> b.ednClassEncoders(encoders));
         Assertions.assertEquals("#doublearray [0.0, 0.0]", Edna.pprintToString(new double[2], options));
     }
 
     @Test
-   void encodeArray() {
+    void encodeArray() {
         Assertions.assertEquals("[]", Edna.pprintToString(new Keyword[0]));
         Assertions.assertEquals("[:a, :b]", Edna.pprintToString(new Keyword[]{Keyword.get("a"), Keyword.get("b")}));
 
         var encoders = new LinkedHashMap<Class<?>, Function<Object, Map.Entry<String, ?>>>(Map.of(
-                Keyword[].class, (it) -> new AbstractMap.SimpleEntry<>("array", Arrays.stream(((Keyword[])it)).toList())
+                Keyword[].class, (it) -> new AbstractMap.SimpleEntry<>("array", Arrays.stream(((Keyword[]) it)).toList())
         ));
         var options = Edna.defaultOptions().copy(b -> b.ednClassEncoders(encoders));
         Assertions.assertEquals("#array [:a, :b]", Edna.pprintToString(new Keyword[]{Keyword.get("a"), Keyword.get("b")}, options));
@@ -289,12 +286,12 @@ public class EdnaWriterTest {
     }
 
     @Test
-   void encodeSet() {
+    void encodeSet() {
         Assertions.assertEquals("#{}", Edna.pprintToString(EdnaCollections.EdnaSet.of()));
         Assertions.assertEquals("#{:a, :b}", Edna.pprintToString(EdnaCollections.EdnaSet.of(Keyword.get("a"), Keyword.get("b"))));
 
         var encoders = new LinkedHashMap<Class<?>, Function<Object, Map.Entry<String, ?>>>(Map.of(
-                Set.class, (it) -> new AbstractMap.SimpleEntry<>("set", ((Set<?>)it).stream().toList())
+                Set.class, (it) -> new AbstractMap.SimpleEntry<>("set", ((Set<?>) it).stream().toList())
         ));
         var options = Edna.defaultOptions().copy(b -> b.ednClassEncoders(encoders));
         Assertions.assertEquals(
@@ -303,26 +300,27 @@ public class EdnaWriterTest {
         );
     }
 
-//    @Test
-//   void encodeMap() {
-//        Assertions.assertEquals("{}", Edna.pprintToString(EdnMap.of<Keyword, Keyword>()))
-//        Assertions.assertEquals(
-//                "{:a :b, :c :d}",
-//                Edna.pprintToString(EdnMap.of(Keyword["a"] to Keyword["b"], Keyword["c"] to Keyword["d"]))
-//        )
-//    }
-//
-//    @Test
-//   void encodeIterable() {
-//        Assertions.assertEquals("()", Edna.pprintToString(IntProgression.fromClosedRange(0, -1, step = 2)))
-//        Assertions.assertEquals("(0, 1)", Edna.pprintToString(0..1))
-//    }
-//
-//    @Test
-//   void encodeSequence() {
-//        Assertions.assertEquals("()", Edna.pprintToString(sequenceOf<Keyword>()))
-//        Assertions.assertEquals("(:a, :b)", Edna.pprintToString(sequenceOf(Keyword["a"], Keyword["b"])))
-//    }
+    @Test
+    void encodeMap() {
+        Assertions.assertEquals("{}", Edna.pprintToString(EdnaCollections.EdnaMap.of()));
+        Assertions.assertEquals(
+                "{:a :b, :c :d}",
+                Edna.pprintToString(EdnaCollections.EdnaMap.of(Keyword.get("a"), Keyword.get("b"), Keyword.get("c"), Keyword.get("d")))
+        );
+    }
+
+    private record TestIterableNotList(int @NotNull [] arr) implements Iterable<Integer> {
+        @Override
+        public @NotNull Iterator<Integer> iterator() {
+            return Arrays.stream(arr).boxed().iterator();
+        }
+    }
+
+    @Test
+    void encodeIterable() {
+        Assertions.assertEquals("()", Edna.pprintToString(new TestIterableNotList(new int[0])));
+        Assertions.assertEquals("(0, 1)", Edna.pprintToString(new TestIterableNotList(new int[]{0, 1})));
+    }
 
     @Test
     void encodeUUID() {
@@ -362,16 +360,15 @@ public class EdnaWriterTest {
         Assertions.assertEquals("abc", Edna.pprintToString(Symbol.symbol("abc")));
     }
 
-//    @Test
-//   void encodeCustom() {
-//       var encoders = List.of(
-//                Pair::class.java to { it: Any? -> "pair" to (it as Pair<*, *>).toList() }
-//        )
-//       var options =
-//                EDNSoupOptions.defaultOptions.copy(ednClassEncoders = encoders)
-//        Assertions.assertEquals(
-//                "#pair [:a, :b]",
-//                Edna.pprintToString((Keyword["a"] to Keyword["b"]), options)
-//        )
-//    }
+    @Test
+    void encodeCustom() {
+        var encoders = new LinkedHashMap<Class<?>, Function<Object, Map.Entry<String, ?>>>(Map.of(
+                File.class, (it) -> new AbstractMap.SimpleEntry<>("file", ((File) it).getName())
+        ));
+        var options = Edna.defaultOptions().copy(b -> b.ednClassEncoders(encoders));
+        Assertions.assertEquals(
+                "#file \"filename.here\"",
+                Edna.pprintToString(new File("filename.here"), options)
+        );
+    }
 }

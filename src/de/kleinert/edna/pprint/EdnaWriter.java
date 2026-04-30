@@ -282,7 +282,7 @@ public class EdnaWriter {
     private void encodeOtherIterable(Iterable<?> i, Appendable writer, int indent) throws IOException{
         var list = new ArrayList<>();
         for (var e : i)
-            list.add(i);
+            list.add(e);
         formatCollectionTo(list, "(", ")", writer, indent);
     }
 
