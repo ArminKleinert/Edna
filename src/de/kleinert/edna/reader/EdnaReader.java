@@ -32,7 +32,39 @@ public class EdnaReader {
     }
 
     private void ensureValidDecoderNames() {
-        // TODO
+        for (String key : options.ednClassDecoders().keySet()) {
+            var name = Symbol.parse(key);
+            if (name == null) {
+                var message = "Decoder name \"" + key+"\" is not a valid symbol.";
+                throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
+            }
+            if (!options.allowMoreEncoderDecoderNames() && name.namespace() == null) {
+                var message = "Decoder without namespace: " + name;
+                throw new EdnaReaderException(cpi.getLineIdx(),cpi.getTextIndex(), message);
+            }
+            if (key.equals("inst") || key.equals("uuid") || key.equals("ref")) {
+                var message = "Decoder name "+name+" is not allowed.";
+                throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
+            }
+        }
+
+        /*
+        for (key in options.ednClassDecoders.keys) {
+            val name = Symbol.parse(key)
+            if (name == null) {
+                val message = "Decoder name \"$key\" is not a valid symbol."
+                throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
+            }
+            if (!options.allowMoreEncoderDecoderNames && name.namespace == null) {
+                val message = "Decoder without namespace: $name"
+                throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
+            }
+            if (key == "inst" || key == "uuid" || key == "ref") {
+                val message = "Decoder name $name is not allowed."
+                throw EdnReaderException(cpi.lineIdx, cpi.textIndex, message)
+            }
+        }
+         */
     }
 
     private final @NotNull Object NOTHING = new Object();
