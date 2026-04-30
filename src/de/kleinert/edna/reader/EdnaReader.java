@@ -269,6 +269,10 @@ public class EdnaReader {
                 final var decoder = options.ednClassDecoders().get(token);
                 if (decoder != null) return decoder.apply(form);
             }
+        } catch (
+                @SuppressWarnings("CaughtExceptionImmediatelyRethrown")
+                EdnaReaderException.EdnClassConversionError ex) {
+            throw ex;
         } catch (IllegalArgumentException ex) {
             // For UUID.fromString
             throw new EdnaReaderException.EdnClassConversionError(linePos, codePosIndex, null, ex);
@@ -296,7 +300,7 @@ public class EdnaReader {
         throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), "Unsupported reference macro: " + token);
     }
 
-    private @NotNull Set<Object> readSet(final int level, final int separator) {
+    private @NotNull Set<Object> readSet(final int level, @SuppressWarnings("SameParameterValue") final int separator) {
         final var linePos = cpi.getLineIdx();
         final var codePosIndex = cpi.getTextIndex();
         final Set<Object> result = new HashSet<>();

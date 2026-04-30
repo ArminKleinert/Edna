@@ -1,10 +1,57 @@
 package de.kleinert.edna.reader;
 
 import de.kleinert.edna.Edna;
+import de.kleinert.edna.EdnaConverters;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
+
+import java.util.Map;
+import java.util.function.Function;
+
 class EdnaReaderDispatchTaggedPredefinedTest {
+    Object parse(String s) {
+        Map<String, Function<Object, Object>> decoders = EdnaConverters.arrayConverters();
+        var opts = Edna.defaultOptions().copy(b -> b.allowMoreEncoderDecoderNames(true).ednClassDecoders(decoders));
+        return Edna.read(s, opts);
+    }
+
+    @Test
+    void parseArrayDecodersFailureTest() {
+        // Wrong type
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, () -> parse("#edna/bytearray \"\""));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, () -> parse("#edna/shortarray \"\""));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, () -> parse("#edna/intarray \"\""));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, () -> parse("#edna/longarray \"\""));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#edna/floatarray \"\""));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#edna/doublearray \"\""));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#edna/bigintarray \"\""));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#edna/bigdecimalarray \"\""));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, () -> parse("#edna/stringarray \"\""));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, () -> parse("#edna/array \"\""));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#edna/array2d \"\""));
+
+        // Wrong type
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, () -> parse("#edna/bytearray [a b]"));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, () -> parse("#edna/shortarray [a b]"));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, () -> parse("#edna/intarray [a b]"));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, () -> parse("#edna/longarray [a b]"));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#edna/floatarray [a b]"));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#edna/doublearray [a b]"));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#edna/bigintarray [a b]"));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#edna/bigdecimalarray [a b]"));
+        Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#edna/array2d [a b]"));
+    }
+
+    @Test
+    void parseNumericArrayDecodersTest() {
+        Assertions.assertArrayEquals(new byte[]{0, 1, 2, 3}, (byte[]) parse("#edna/bytearray [0 1 2 3]"));
+        Assertions.assertArrayEquals(new short[]{0, 1, 2, 3}, (short[]) parse("#edna/shortarray [0 1 2 3]"));
+        Assertions.assertArrayEquals(new int[]{0, 1, 2, 3}, (int[]) parse("#edna/intarray [0 1 2 3]"));
+        Assertions.assertArrayEquals(new long[]{0, 1, 2, 3}, (long[]) parse("#edna/longarray [0 1 2 3]"));
+        Assertions.assertArrayEquals(new String[]{"0", "1", "2", "3"}, (String[]) parse("#edna/stringarray [\"0\" \"1\" \"2\" \"3\"]"));
+        Assertions.assertArrayEquals(new Object[]{0L, "1", 2L, "3"}, (Object[]) parse("#edna/array [0 \"1\" 2 \"3\"]"));
+    }
 }
 /*
 
@@ -21,50 +68,50 @@ class EDNReaderDispatchTaggedPredefinedTest {
 @Test
 fun parseArrayDecodersFailureTest() {
     // Wrong type
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#bytearray \"\"") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#shortarray \"\"") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#intarray \"\"") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#longarray \"\"") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#floatarray \"\"") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#doublearray \"\"") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#bigintarray \"\"") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#bigdecimalarray \"\"") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#stringarray \"\"") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#array \"\"") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#array2d \"\"") }
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#bytearray \"\""));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#shortarray \"\""));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#intarray \"\""));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#longarray \"\""));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#floatarray \"\""));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#doublearray \"\""));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#bigintarray \"\""));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#bigdecimalarray \"\""));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#stringarray \"\""));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#array \"\""));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#array2d \"\""));
 
     // Wrong type
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#bytearray [a b]") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#shortarray [a b]") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#intarray [a b]") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#longarray [a b]") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#floatarray [a b]") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#doublearray [a b]") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#bigintarray [a b]") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#bigdecimalarray [a b]") }
-    Assertions.assertThrows(EdnClassConversionError::class.java) { parse("#array2d [a b]") }
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#bytearray [a b]"));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#shortarray [a b]"));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#intarray [a b]"));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#longarray [a b]"));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#floatarray [a b]"));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#doublearray [a b]"));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#bigintarray [a b]"));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#bigdecimalarray [a b]"));
+    Assertions.assertThrows(EdnaReaderException.EdnClassConversionError.class, ()-> parse("#array2d [a b]"));
 }
 
 @Test
 fun parseNumericArrayDecodersTest() {
-    Assertions.assertArrayEquals(ByteArray(4) { it.toByte() }, parse("#bytearray [0 1 2 3]") as ByteArray)
-    Assertions.assertArrayEquals(ShortArray(4) { it.toShort() }, parse("#shortarray [0 1 2 3]") as ShortArray)
+    Assertions.assertArrayEquals(ByteArray(4) { it.toByte());, parse("#bytearray [0 1 2 3]") as ByteArray)
+    Assertions.assertArrayEquals(ShortArray(4) { it.toShort());, parse("#shortarray [0 1 2 3]") as ShortArray)
     Assertions.assertArrayEquals(IntArray(4) { it }, parse("#intarray [0 1 2 3]") as IntArray)
-    Assertions.assertArrayEquals(LongArray(4) { it.toLong() }, parse("#longarray [0 1 2 3]") as LongArray)
-    Assertions.assertArrayEquals(Array(4) { it.toBigInteger() }, parse("#bigintarray [0 1 2 3]") as Array<*>)
+    Assertions.assertArrayEquals(LongArray(4) { it.toLong());, parse("#longarray [0 1 2 3]") as LongArray)
+    Assertions.assertArrayEquals(Array(4) { it.toBigInteger());, parse("#bigintarray [0 1 2 3]") as Array<*>)
 
-    Assertions.assertArrayEquals(FloatArray(4) { it.toFloat() }, parse("#floatarray [0 1 2 3]") as FloatArray)
+    Assertions.assertArrayEquals(FloatArray(4) { it.toFloat());, parse("#floatarray [0 1 2 3]") as FloatArray)
     Assertions.assertArrayEquals(
-            FloatArray(4) { it.toFloat() },
+            FloatArray(4) { it.toFloat());,
     parse("#floatarray [0.0 1.0 2.0 3.0]") as FloatArray
         )
-    Assertions.assertArrayEquals(DoubleArray(4) { it.toDouble() }, parse("#doublearray [0 1 2 3]") as DoubleArray)
+    Assertions.assertArrayEquals(DoubleArray(4) { it.toDouble());, parse("#doublearray [0 1 2 3]") as DoubleArray)
     Assertions.assertArrayEquals(
-            DoubleArray(4) { it.toDouble() },
+            DoubleArray(4) { it.toDouble());,
     parse("#doublearray [0.0 1.0 2.0 3.0]") as DoubleArray
         )
     Assertions.assertArrayEquals(
-            Array(4) { it.toLong().toBigDecimal() },
+            Array(4) { it.toLong().toBigDecimal());,
     parse("#bigdecimalarray [0 1 2 3]") as Array<*>
         )
     Assertions.assertArrayEquals(
@@ -76,16 +123,16 @@ fun parseNumericArrayDecodersTest() {
 @Test
 fun parseArrayDecodersTest() {
     Assertions.assertArrayEquals(
-            Array(0) { it.toString() },
+            Array(0) { it.toString());,
     parse("#stringarray []") as Array<*>
         )
     Assertions.assertArrayEquals(
-            Array(4) { it.toString() },
+            Array(4) { it.toString());,
     parse("#stringarray [0 1 2 3]") as Array<*>
         )
 
     Assertions.assertArrayEquals(
-            Array(4) { it.toString() },
+            Array(4) { it.toString());,
     parse("#stringarray [\"0\" \"1\" \"2\" \"3\"]") as Array<*>
         )
 
