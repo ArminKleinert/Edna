@@ -6,6 +6,7 @@ import de.kleinert.edna.data.EdnaCollections;
 import de.kleinert.edna.data.Keyword;
 import de.kleinert.edna.data.Symbol;
 
+import java.io.Flushable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -41,14 +42,13 @@ public class EdnaWriter {
 
     public static void pprint(Object obj, EdnaOptions options, Appendable writer) throws IOException {
         new EdnaWriter(options).encode(obj, writer, 0);
+        if (writer instanceof Flushable) ((Flushable) writer).flush();
     }
 
-    public static void pprint(Object obj, EdnaOptions options) throws IOException {
-        pprint(obj, options, System.out);
-    }
-
-    public static void pprint(Object obj) throws IOException {
-        pprint(obj, EdnaOptions.defaultOptions());
+    public static void pprintln(Object obj, EdnaOptions options, Appendable writer) throws IOException {
+        new EdnaWriter(options).encode(obj, writer, 0);
+        writer.append('\n');
+        if (writer instanceof Flushable) ((Flushable) writer).flush();
     }
 
     private Appendable appendIfPrettyEnabled(Appendable writer, CharSequence cs) throws IOException {
@@ -122,40 +122,40 @@ public class EdnaWriter {
             case Short n -> encodePredefinedNumberType(n, writer);
             case Integer n -> encodePredefinedNumberType(n, writer);
             case Long n -> encodePredefinedNumberType(n, writer);
-            case Float n -> encodeFloat(n, writer); // TODO
-            case Double n -> encodeDouble(n, writer); // TODO
+            case Float n -> encodeFloat(n, writer);
+            case Double n -> encodeDouble(n, writer);
             case BigInteger n -> encodePredefinedNumberType(n, writer);
             case BigDecimal n -> encodePredefinedNumberType(n, writer);
 
-            case EdnaCollections.IObj o -> encodeIObj(o, writer, finalIndent); // TODO
-            case UUID u -> encodeUuid(u, writer); // TODO
-            case Instant i -> encodeInstant(i, writer); // TODO
+            case EdnaCollections.IObj o -> encodeIObj(o, writer, finalIndent);
+            case UUID u -> encodeUuid(u, writer, finalIndent);
+            case Instant i -> encodeInstant(i, writer, finalIndent);
 
-            case byte[] a -> { // TODO
+            case byte[] a -> {
                 if (!tryEncoder(a, writer, indent))
                     encode(Arrays.stream(byteArrayToLongArray(a)).boxed().toList(), writer, finalIndent);
             }
-            case short[] a -> { // TODO
+            case short[] a -> {
                 if (!tryEncoder(a, writer, indent))
                     encode(Arrays.stream(shortArrayToLongArray(a)).boxed().toList(), writer, finalIndent);
             }
-            case int[] a -> { // TODO
+            case int[] a -> {
                 if (!tryEncoder(a, writer, indent))
                     encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
             }
-            case long[] a -> { // TODO
+            case long[] a -> {
                 if (!tryEncoder(a, writer, indent))
                     encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
             }
-            case float[] a -> { // TODO
+            case float[] a -> {
                 if (!tryEncoder(a, writer, indent))
                     encode(Arrays.stream(floatArrayToDoubleArray(a)).boxed().toList(), writer, finalIndent);
             }
-            case double[] a -> { // TODO
+            case double[] a -> {
                 if (!tryEncoder(a, writer, indent))
                     encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
             }
-            default -> { // TODO
+            default -> {
                 if (!tryEncoder(obj, writer, indent))
                     encodeAnything(obj.toString(), writer);
             }
@@ -185,28 +185,26 @@ public class EdnaWriter {
          writerAppend(writer, string);
     }
 
-    private void encodeInstant(Instant i, Appendable writer)throws IOException {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeInstant(Instant i, Appendable writer, int indent)throws IOException {
+        writerAppend(writer,"#inst \"" + i + '"');
     }
 
-    private void encodeUuid(UUID u, Appendable writer)throws IOException {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+    private void encodeUuid(UUID u, Appendable writer, int indent)throws IOException {
+        writerAppend(writer,"#uuid \"" + u + '"');
     }
 
     private void encodeDouble(Double n, Appendable writer)throws IOException {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+        if (n.isNaN()) writerAppend(writer,"##NaN");
+        else if (n < 0.0 && n.isInfinite()) writerAppend(writer,"##-INF");
+        else if (n.isInfinite()) writerAppend(writer,"##INF");
+        else writerAppend(writer,n.toString());
     }
 
     private void encodeFloat(Float n, Appendable writer)throws IOException {
-        throw new UnsupportedOperationException();
-        //var res =       ;
-        //return writerAppend(writer, res);
+        if (n.isNaN()) writerAppend(writer,"##NaN");
+        else if (n < 0.0 && n.isInfinite()) writerAppend(writer,"##-INF");
+        else if (n.isInfinite()) writerAppend(writer,"##INF");
+        else writerAppend(writer,n.toString());
     }
 
     private void encodePredefinedNumberType(Number n, Appendable writer)throws IOException {
