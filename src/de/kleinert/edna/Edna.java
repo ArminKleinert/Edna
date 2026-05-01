@@ -94,19 +94,19 @@ public class Edna {
         return read(reader, null, Object.class);
     }
 
-    public static void pprint(Object obj, File file, EdnaOptions options) {
+    public static void pprint(final @NotNull Object obj, final @NotNull File file, final @Nullable EdnaOptions options) {
         try (FileWriter fw = new FileWriter(file, StandardCharsets.UTF_8)) {
-            EdnaWriter.pprint(obj, options, fw);
+            EdnaWriter.pprint(obj, optsOrDefault(options), fw);
         } catch (Exception e) {
             throw new EdnaWriterException(e);
         }
     }
 
-    public static void pprint(Object obj, Appendable w, EdnaOptions options) {
+    public static void pprint(final @Nullable Object obj, final @Nullable Appendable w, final @Nullable EdnaOptions options) {
         try {
             if (w == null) {
                 try (Writer writer = new PrintWriter(System.out)) {
-                    EdnaWriter.pprint(obj, options, writer);
+                    EdnaWriter.pprint(obj, optsOrDefault(options), writer);
                 }
             } else {
                 EdnaWriter.pprint(obj, options, w);
@@ -116,37 +116,41 @@ public class Edna {
         }
     }
 
-    public static void pprint(Object obj, Appendable w) {pprint(obj,w, defaultOptions());
+    public static void pprint(final @Nullable Object obj, final @Nullable Appendable w) {
+        pprint(obj, w, defaultOptions());
     }
 
-    public static void pprintln(Object obj, Appendable w, EdnaOptions options) {
+    public static void pprintln(final @Nullable Object obj, final @Nullable Appendable w, final @Nullable EdnaOptions options) {
         try {
             if (w == null) {
                 try (Writer writer = new PrintWriter(System.out)) {
-                    EdnaWriter.pprintln(obj, options, writer);
+                    EdnaWriter.pprintln(obj, optsOrDefault(options), writer);
                 }
             } else {
-                EdnaWriter.pprintln(obj, options, w);
+                EdnaWriter.pprintln(obj, optsOrDefault(options), w);
             }
         } catch (Exception e) {
             throw new EdnaWriterException(e);
         }
     }
-    public static void pprintln(Object obj, Appendable w) {pprintln(obj, w, defaultOptions());}
 
-    public static String pprintToString(Object obj, EdnaOptions options) {
+    public static void pprintln(final @Nullable Object obj, final @Nullable Appendable w) {
+        pprintln(obj, w, defaultOptions());
+    }
+
+    public static String pprintToString(final @Nullable Object obj, final @Nullable EdnaOptions options) {
         try {
             StringBuilder sb = new StringBuilder();
-            EdnaWriter.pprint(obj, options, sb);
-        return sb.toString();} catch (Exception e) {
+            EdnaWriter.pprint(obj, optsOrDefault(options), sb);
+            return sb.toString();
+        } catch (Exception e) {
             throw new EdnaWriterException(e);
         }
     }
 
-    public static String pprintToString(Object obj) {
+    public static String pprintToString(final @Nullable Object obj) {
         return pprintToString(obj, defaultOptions());
     }
-
 
     private static @NotNull EdnaOptions optsOrDefault(
             final @Nullable EdnaOptions options) {
