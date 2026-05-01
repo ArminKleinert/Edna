@@ -13,7 +13,7 @@ public class EdnaConverters {
     }
 
     @SafeVarargs
-    private static <K, V> Map<K, V> merge(Map<K, V>... maps) {
+    public static <K, V> Map<K, V> merge(Map<K, V>... maps) {
         Map<K, V> res = new LinkedHashMap<>();
         for (Map<K, V> map : maps) {
             res.putAll(map);
@@ -34,6 +34,15 @@ public class EdnaConverters {
         res.put("edna/array2d", EdnaConverters::array2d);
         res.put("edna/bigintarray", EdnaConverters::bigintarray);
         res.put("edna/bigdecimalarray", EdnaConverters::bigdecimalarray);
+        return res;
+    }
+
+    public static Map<String, Function<Object, Object>> numberConverters() {
+        Map<String, Function<Object, Object>> res = new HashMap<>();
+        res.put("edna/byte", EdnaConverters::longToByte);
+        res.put("edna/short", EdnaConverters::longToShort);
+        res.put("edna/int", EdnaConverters::longToInt);
+        res.put("edna/long", EdnaConverters::longToLong);
         return res;
     }
 
@@ -173,5 +182,26 @@ public class EdnaConverters {
             }
         }
         return res;
+    }
+
+    public static byte longToByte(Object o) {
+        if (!(o instanceof Long)) throw new IllegalArgumentException();
+        return ((Long) o).byteValue();
+    }
+
+    public static short longToShort(Object o) {
+        if (!(o instanceof Long)) throw new IllegalArgumentException();
+        return ((Long) o).shortValue();
+    }
+
+    public static int longToInt(Object o) {
+        if (!(o instanceof Long)) throw new IllegalArgumentException();
+        return ((Long) o).intValue();
+    }
+
+    // this method is only here for completeness.
+    public static long longToLong(Object o) {
+        if (!(o instanceof Long)) throw new IllegalArgumentException();
+        return (Long) o;
     }
 }
