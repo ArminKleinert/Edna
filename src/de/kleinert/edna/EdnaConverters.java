@@ -39,10 +39,14 @@ public class EdnaConverters {
 
     public static Map<String, Function<Object, Object>> numberConverters() {
         Map<String, Function<Object, Object>> res = new HashMap<>();
-        res.put("edna/byte", EdnaConverters::longToByte);
-        res.put("edna/short", EdnaConverters::longToShort);
-        res.put("edna/int", EdnaConverters::longToInt);
-        res.put("edna/long", EdnaConverters::longToLong);
+        res.put("edna/byte", EdnaConverters::numberToByte);
+        res.put("edna/short", EdnaConverters::numberToShort);
+        res.put("edna/int", EdnaConverters::numberToInt);
+        res.put("edna/long", EdnaConverters::numberToLong);
+        res.put("edna/float", EdnaConverters::numberToFloat);
+        res.put("edna/double", EdnaConverters::numberToDouble);
+        res.put("edna/bigint", EdnaConverters::numberToBigInt);
+        res.put("edna/bigdec", EdnaConverters::numberToBigDec);
         return res;
     }
 
@@ -184,24 +188,60 @@ public class EdnaConverters {
         return res;
     }
 
-    public static byte longToByte(Object o) {
-        if (!(o instanceof Long)) throw new IllegalArgumentException();
-        return ((Long) o).byteValue();
+    public static byte numberToByte(Object o) {
+        return numberTo(o, Number::byteValue).byteValue();
     }
 
-    public static short longToShort(Object o) {
-        if (!(o instanceof Long)) throw new IllegalArgumentException();
-        return ((Long) o).shortValue();
+    public static short numberToShort(Object o) {
+        return numberTo(o, Number::shortValue).shortValue();
     }
 
-    public static int longToInt(Object o) {
-        if (!(o instanceof Long)) throw new IllegalArgumentException();
-        return ((Long) o).intValue();
+    public static int numberToInt(Object o) {
+        return numberTo(o, Number::intValue).intValue();
     }
 
     // this method is only here for completeness.
-    public static long longToLong(Object o) {
-        if (!(o instanceof Long)) throw new IllegalArgumentException();
-        return (Long) o;
+    public static long numberToLong(Object o) {
+        return numberTo(o, Number::longValue).longValue();
+    }
+
+    public static float numberToFloat(Object o) {
+        return numberTo(o, Number::floatValue).floatValue();
+    }
+
+    public static double numberToDouble(Object o) {
+        return numberTo(o, Number::doubleValue).doubleValue();
+    }
+
+    public static BigInteger numberToBigInt(Object obj) {
+        return obj instanceof BigInteger ? (BigInteger) obj : BigInteger.valueOf(numberToLong(obj));
+    }
+
+    public static BigDecimal numberToBigDec(Object obj) {
+        return (BigDecimal) numberTo(obj, (o) -> switch (o) {
+            case Float n -> BigDecimal.valueOf(n);
+            case Double n->BigDecimal.valueOf(n);
+            case Byte n->BigDecimal.valueOf(n);
+            case Short n->BigDecimal.valueOf(n);
+            case Integer n->BigDecimal.valueOf(n);
+            case Long n-> BigDecimal.valueOf(n);
+            case BigInteger n->new BigDecimal(n);
+            case BigDecimal n->n;
+            default -> throw new IllegalArgumentException();
+        });
+    }
+
+    private static Number numberTo(Object obj, Function<Number, Number> conv) {
+        return switch (obj) {
+            case Float n -> conv.apply(n);
+            case Double n->conv.apply(n);
+            case Byte n->conv.apply(n);
+            case Short n->conv.apply(n);
+            case Integer n->conv.apply(n);
+            case Long n->conv.apply(n);
+            case BigInteger n->conv.apply(n);
+            case BigDecimal n->conv.apply(n);
+            default -> throw new IllegalArgumentException();
+        };
     }
 }

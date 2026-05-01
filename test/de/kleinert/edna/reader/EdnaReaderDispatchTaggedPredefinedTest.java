@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -56,7 +58,7 @@ class EdnaReaderDispatchTaggedPredefinedTest {
         Assertions.assertArrayEquals(new Object[]{0L, "1", 2L, "3"}, (Object[]) parse("#edna/array [0 \"1\" 2 \"3\"]"));
     }
 
-    @Test void parseNumberDecodersTest() {
+    @Test void parseNumberIntegralDecodersTest() {
         Assertions.assertEquals((byte) 0, parse("#edna/byte 0"));
         Assertions.assertEquals((byte) 12, parse("#edna/byte 12"));
         Assertions.assertEquals((byte) -12, parse("#edna/byte -12"));
@@ -72,5 +74,25 @@ class EdnaReaderDispatchTaggedPredefinedTest {
         Assertions.assertEquals(0L, parse("#edna/long 0"));
         Assertions.assertEquals(12L, parse("#edna/long 12"));
         Assertions.assertEquals(-12L, parse("#edna/long -12"));
+    }
+
+    @Test void parseNumberFloatyDecodersTest() {
+        Assertions.assertEquals((float) 0, parse("#edna/float 0"));
+        Assertions.assertEquals((float) 12.5, parse("#edna/float 12.5"));
+        Assertions.assertEquals((float) -12, parse("#edna/float -12"));
+
+        Assertions.assertEquals((double) 0, parse("#edna/double 0"));
+        Assertions.assertEquals((double) 12.5, parse("#edna/double 12.5"));
+        Assertions.assertEquals((double) -12, parse("#edna/double -12"));
+    }
+
+    @Test void parseNumberBigDecodersTest() {
+        Assertions.assertEquals(BigInteger.valueOf(0), parse("#edna/bigint 0"));
+        Assertions.assertEquals(BigInteger.valueOf(12), parse("#edna/bigint 12"));
+        Assertions.assertEquals(BigInteger.valueOf(-12), parse("#edna/bigint -12"));
+
+        Assertions.assertEquals(BigDecimal.valueOf(0), parse("#edna/bigdec 0"));
+        Assertions.assertEquals(BigDecimal.valueOf(12.5), parse("#edna/bigdec 12.5"));
+        Assertions.assertEquals(BigDecimal.valueOf(-12), parse("#edna/bigdec -12"));
     }
 }
