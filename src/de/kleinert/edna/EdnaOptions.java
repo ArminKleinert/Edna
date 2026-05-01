@@ -32,8 +32,7 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           boolean encoderPrettyPrint,
                           @NotNull Map<Symbol, Object> referenceTable,
                           boolean allowMetaData,
-                          boolean allowZeroPrefix,
-                          boolean allowRatios) {
+                          boolean allowZeroPrefix) {
     private static EdnaOptions defaultOptions;
 
     public static @NotNull EdnaOptions defaultOptions() {
@@ -59,7 +58,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 "  ",
                 true,
                 Map.of(),
-                false,
                 false,
                 false);
         return defaultOptions;
@@ -90,7 +88,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 "  ",
                 true,
                 Map.of(),
-                true,
                 true,
                 true);
         return extendedOptions;
@@ -126,7 +123,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         private @NotNull Map<Symbol, Object> referenceTable;
         private boolean allowMetaData;
         private boolean allowZeroPrefix;
-        private boolean allowRatios;
 
         public Builder(final @NotNull EdnaOptions o) {
             this.allowSchemeUTF32Codes = o.allowSchemeUTF32Codes();
@@ -152,7 +148,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             this.referenceTable = o.referenceTable();
             this.allowMetaData = o.allowMetaData();
             this.allowZeroPrefix = o.allowZeroPrefix();
-            this.allowRatios = o.allowRatios();
         }
 
         public Builder allowSchemeUTF32Codes(final boolean v) {
@@ -270,11 +265,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
-        public Builder allowRatios(final boolean v) {
-            this.allowRatios = v;
-            return this;
-        }
-
         public @NotNull EdnaOptions build() {
             return new EdnaOptions(
                     allowSchemeUTF32Codes,
@@ -299,8 +289,7 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                     encoderPrettyPrint,
                     referenceTable,
                     allowMetaData,
-                    allowZeroPrefix,
-                    allowRatios
+                    allowZeroPrefix
             );
         }
     }

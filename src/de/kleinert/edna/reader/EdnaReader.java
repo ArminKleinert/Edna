@@ -364,7 +364,7 @@ public class EdnaReader {
             floatyRegex = Pattern.compile("[+\\-]?[0-9]*\\.?[0-9]+([eE][+\\-][0-9]+)?M?");
             intRegex = Pattern.compile("[+\\-]?(0[obx])?[0-9a-fA-F]+N?");
             ratioRegex = Pattern.compile("[+\\-]?[0-9]+/[0-9]+?");
-            expandedIntRegex = Pattern.compile("[+\\-]?(0[obx])?[0-9a-fA-F]+(N|_i8|_i16|_i32|_i64|L)?");
+            expandedIntRegex = Pattern.compile("[+\\-]?(0[obx])?[0-9a-fA-F]+N?");
         }
 
         var tokenLen = token.length();
@@ -414,8 +414,6 @@ public class EdnaReader {
                 return new BigDecimal(token.substring(0, tokenLen - 1));
             }
             return sign * Double.parseDouble(token);
-        } else if (options.allowRatios()) {
-            throw new UnsupportedOperationException(); // TODO?
         } else {
             throw new EdnaReaderException(linePos, codePosIndex, "Invalid number format: " + token);
         }
@@ -425,42 +423,9 @@ public class EdnaReader {
         if (token.endsWith("N"))
             return BigInteger.valueOf(sign).multiply(new BigInteger(token.substring(startIndex, tokenLen - 1), base));
 
+        final var tokenSubs = token.substring(startIndex, tokenLen);
 
-        final int byteNum, offset;
-
-        if (!options.allowNumericSuffixes()) {
-            byteNum = 8;
-            offset = 0;
-        } else if (token.endsWith("_i8")) {
-            byteNum = 1;
-            offset = 3;
-        } else if (token.endsWith("_i16")) {
-            byteNum = 2;
-            offset = 4;
-        } else if (token.endsWith("_i32")) {
-            byteNum = 4;
-            offset = 4;
-        } else if (token.endsWith("_i64")) {
-            byteNum = 8;
-            offset = 4;
-        } else if (token.endsWith("L")) {
-            byteNum = 8;
-            offset = 1;
-        } else {
-            byteNum = 8;
-            offset = 0;
-        }
-
-        final var tokenSubs = token.substring(startIndex, tokenLen - offset);
-        final long temp = sign * Long.valueOf(tokenSubs, base);
-
-        return switch (byteNum) {
-            case 1 -> (byte) temp;
-            case 2 -> (short) temp;
-            case 4 -> (int) temp;
-            case 8 -> temp;
-            default -> throw new IllegalStateException();
-        };
+        return sign * Long.valueOf(tokenSubs, base);
     }
 
     private final StringBuilder readTokenBuffer = new StringBuilder();
