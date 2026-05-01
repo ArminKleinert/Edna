@@ -354,17 +354,17 @@ public class EdnaReader {
 
     private Pattern floatyRegex;
     private Pattern intRegex;
-    private Pattern ratioRegex;
     private Pattern expandedIntRegex;
+    private Pattern basedIntRegex;
 
     private @NotNull Number readNumberHelper(final int linePos, final int codePosIndex) {
         var token = readToken(this::isNotBreakingSymbol);
 
         if (intRegex == null) {
             floatyRegex = Pattern.compile("[+\\-]?[0-9]*\\.?[0-9]+([eE][+\\-][0-9]+)?M?");
-            intRegex = Pattern.compile("[+\\-]?(0[obx])?[0-9a-fA-F]+N?");
-            ratioRegex = Pattern.compile("[+\\-]?[0-9]+/[0-9]+?");
+            intRegex = Pattern.compile("[+\\-]?[0-9]+N?");
             expandedIntRegex = Pattern.compile("[+\\-]?(0[obx])?[0-9a-fA-F]+N?");
+            basedIntRegex = Pattern.compile("[+\\-]?([1-9][0-9]?)r[0-9a-fA-F]+N?");
         }
 
         var tokenLen = token.length();
@@ -372,7 +372,17 @@ public class EdnaReader {
         var startIndex = 0;
         byte sign = 1;
 
-        if ((options.allowNumericSuffixes() && expandedIntRegex.matcher(token).matches())
+        if (options.moreNumberPrefixes() && basedIntRegex.matcher(token).matches()) {
+            if (token.codePointAt(0) == '+') {
+                startIndex++;
+            } else if (token.codePointAt(0) == '-') {
+                startIndex++;
+                sign = -1;
+            }
+            var split = token.substring(startIndex).split("r", 2);
+            base = Integer.parseInt(split[0]);
+            startIndex = split[0].length() + 1 + startIndex;
+        } else if ((options.moreNumberPrefixes() && expandedIntRegex.matcher(token).matches())
                 || intRegex.matcher(token).matches()) {
             if (token.codePointAt(0) == '+') {
                 startIndex++;
@@ -380,7 +390,6 @@ public class EdnaReader {
                 startIndex++;
                 sign = -1;
             }
-
             var first = token.codePointAt(startIndex);
             if (first == '0' && token.length() - startIndex > 1) {
                 startIndex += 2;

@@ -15,7 +15,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           @NotNull Map<String, Function<Object, Object>> ednClassDecoders,
                           @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders,
                           boolean moreNumberPrefixes,
-                          boolean allowNumericSuffixes,
                           boolean allowMoreEncoderDecoderNames,
                           @NotNull String encodingSequenceSeparator,
                           @NotNull Function<List<?>, List<?>> listToEdnListConverter,
@@ -24,7 +23,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> listToEdnMapConverter,
                           boolean allowUTFSymbols,
                           boolean allowReferences,
-                          @NotNull Map<String, Function<?, ?>> dispatchMacros,
                           int encoderSequenceElementLimit,
                           int encoderCollectionElementLimit,
                           int encoderMaxColumn,
@@ -43,7 +41,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 new EdnaMap<>(List.of()),
                 false,
                 false,
-                false,
                 ", ",
                 EdnaList::new,
                 EdnaVector::new,
@@ -51,7 +48,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 EdnaMap::new,
                 false,
                 false,
-                Map.of(),
                 1000,
                 10000,
                 80,
@@ -73,7 +69,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 new EdnaMap<>(List.of()),
                 true,
                 true,
-                true,
                 ", ",
                 EdnaList::new,
                 EdnaVector::new,
@@ -81,7 +76,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 EdnaMap::new,
                 true,
                 true,
-                Map.of(),
                 1000,
                 10000,
                 80,
@@ -105,7 +99,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         private @NotNull Map<String, Function<Object, Object>> ednClassDecoders;
         private @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders;
         private boolean moreNumberPrefixes;
-        private boolean allowNumericSuffixes;
         private boolean allowMoreEncoderDecoderNames;
         private @NotNull String encodingSequenceSeparator;
         private @NotNull Function<List<?>, List<?>> listToEdnListConverter;
@@ -114,7 +107,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         private @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> listToEdnMapConverter;
         private boolean allowUTFSymbols;
         private boolean allowReferences;
-        private @NotNull Map<String, Function<?, ?>> dispatchMacros;
         private int encoderSequenceElementLimit;
         private int encoderCollectionElementLimit;
         private int encoderMaxColumn;
@@ -130,7 +122,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             this.ednClassDecoders = o.ednClassDecoders();
             this.ednClassEncoders = o.ednClassEncoders();
             this.moreNumberPrefixes = o.moreNumberPrefixes();
-            this.allowNumericSuffixes = o.allowNumericSuffixes();
             this.allowMoreEncoderDecoderNames = o.allowMoreEncoderDecoderNames();
             this.encodingSequenceSeparator = o.encodingSequenceSeparator();
             this.listToEdnListConverter = o.listToEdnListConverter();
@@ -139,7 +130,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             this.listToEdnMapConverter = o.listToEdnMapConverter();
             this.allowUTFSymbols = o.allowUTFSymbols();
             this.allowReferences = o.allowReferences();
-            this.dispatchMacros = o.dispatchMacros();
             this.encoderSequenceElementLimit = o.encoderSequenceElementLimit();
             this.encoderCollectionElementLimit = o.encoderCollectionElementLimit();
             this.encoderMaxColumn = o.encoderMaxColumn();
@@ -172,11 +162,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
 
         public Builder moreNumberPrefixes(final boolean v) {
             this.moreNumberPrefixes = v;
-            return this;
-        }
-
-        public Builder allowNumericSuffixes(final boolean v) {
-            this.allowNumericSuffixes = v;
             return this;
         }
 
@@ -217,11 +202,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
 
         public Builder allowReferences(final boolean v) {
             this.allowReferences = v;
-            return this;
-        }
-
-        public Builder dispatchMacros(final @NotNull Map<String, Function<?, ?>> v) {
-            this.dispatchMacros = v;
             return this;
         }
 
@@ -272,7 +252,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                     ednClassDecoders,
                     ednClassEncoders,
                     moreNumberPrefixes,
-                    allowNumericSuffixes,
                     allowMoreEncoderDecoderNames,
                     encodingSequenceSeparator,
                     listToEdnListConverter,
@@ -281,7 +260,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                     listToEdnMapConverter,
                     allowUTFSymbols,
                     allowReferences,
-                    dispatchMacros,
                     encoderSequenceElementLimit,
                     encoderCollectionElementLimit,
                     encoderMaxColumn,

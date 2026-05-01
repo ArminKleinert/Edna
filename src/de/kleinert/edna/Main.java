@@ -47,7 +47,7 @@ void main() {
         IO.println(o.getClass());
     }
     {
-        var options = EdnaOptions.defaultOptions().copy((b)->b.allowNumericSuffixes(true));
+        var options = EdnaOptions.defaultOptions();
         var o = EdnaReader.read(new CodePointIterator(new StringReader("{2 3 :a 6}")), options, Object.class);
         IO.println(o);
         IO.println(o.getClass());

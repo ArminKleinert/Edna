@@ -210,15 +210,6 @@ public class EdnaWriter {
             }
             default -> sb.append(n);
         }
-        if (options.allowNumericSuffixes()) {
-            switch (n) {
-                case Byte ignored -> sb.append("_i8");
-                case Short ignored -> sb.append("_i16");
-                case Integer ignored -> sb.append("_i32");
-                default -> {
-                }
-            }
-        }
         writerAppend(writer, sb.toString());
     }
 

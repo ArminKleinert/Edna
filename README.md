@@ -1,5 +1,6 @@
 # Edna
-An EDN library for Java.
+
+An EDN library for Java with options for some additional features.
 
 ## Standard things implemented
 
@@ -8,6 +9,34 @@ An EDN library for Java.
 
 [x] Uses UTF-8 for inputs.  
 [x] Can parse any type mandated by the EDN standard.
+
+## Extended features
+
+[x]
+
+| Name                            | Meaning                                                                              | Type                                                             | Default           |
+|---------------------------------|--------------------------------------------------------------------------------------|------------------------------------------------------------------|-------------------|
+| `allowSchemeUTF32Codes`         | Allow `\xXXXXXXXX` Char32 literals.                                                  | `boolean`                                                        | `false`           |
+| `allowDispatchChars`            | Allow Char32 literals.                                                               | `boolean`                                                        | `false`           |
+| `ednClassDecoders`              | Converters for [tagged elements](https://github.com/edn-format/edn#tagged-elements). | `Map<String, Function<Object, Object>>`                          | Empty map         |
+| `ednClassEncoders`              |                                                                                      | `SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>>` | Empty map         |
+| `moreNumberPrefixes`            | Allow `0x` (hex), `0o` (octal), `0b` (binary) and `XXr` prefixes for integrals.      | `boolean`                                                        | `false`           |
+| `allowMoreEncoderDecoderNames`  | Allows tagged elements without namespaces.                                           | `boolean`                                                        | `false`           |
+| `encodingSequenceSeparator`     |                                                                                      | `String`                                                         | `", "`            |
+| `listToEdnListConverter`        | Converter from `(...)` sequences to lists.                                           | `Function<List<?>, List<?>>`                                     | `EdnaList::new`   |
+| `listToEdnVectorConverter`      | Converter from `[...]` vectors to lists.                                             | `Function<List<?>, List<?>>`                                     | `EdnaVector::new` |
+| `listToEdnSetConverter`         | Converter from element list in `#{...}` into sets.                                   | `Function<List<?>, Set<?>>`                                      | `EdnaSet::new`    |
+| `listToEdnMapConverter`         | Converter from pairs in `{...}` into maps.                                           | `Function<List<Map.Entry<Object, Object>>, Map<?, ?>>`           | `EdnaMap::new`    |
+| `allowUTFSymbols`               | Allow UTF-8 codepoints in `Symbol` and `Keyword` names and namespaces.               | `boolean`                                                        | `false`           |
+| `allowReferences`               | Make use of the `referenceTable` option.                                             | `boolean`                                                        | `false`           |
+| `encoderSequenceElementLimit`   |                                                                                      | `int`                                                            | May vary          |
+| `encoderCollectionElementLimit` |                                                                                      | `int`                                                            | May vary          |
+| `encoderMaxColumn`              |                                                                                      | `int`                                                            | May vary          |
+| `encoderLineIndent`             |                                                                                      | `String`                                                         | May vary          |
+| `encoderPrettyPrint`            | Use pretty printing when writing.                                                    | `boolean`                                                        | `true`            |
+| `referenceTable`                | Reference map for including outside variable into parsing.                           | `Map<Symbol, Object>`                                            | Empty map         |
+| `allowMetaData`                 | Allow metadata `^{...} e` (map), `^:... e` (keyword), `^... e` (symbol)              | `boolean`                                                        | `false`           |
+| `allowZeroPrefix`               | Allow numbers other than `0` to start with `0`.                                      | `boolean`                                                        | `false`           |
 
 ## Examples
 

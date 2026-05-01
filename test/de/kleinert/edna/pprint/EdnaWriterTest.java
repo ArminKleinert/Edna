@@ -101,11 +101,6 @@ public class EdnaWriterTest {
         Assertions.assertEquals("0", Edna.pprintToString((byte) 0));
         Assertions.assertEquals("1", Edna.pprintToString((byte) 1));
         Assertions.assertEquals("-1", Edna.pprintToString((byte) (-1)));
-
-        var options = Edna.defaultOptions().copy(b -> b.allowNumericSuffixes(true));
-        Assertions.assertEquals("0_i8", Edna.pprintToString((byte) 0, options));
-        Assertions.assertEquals("1_i8", Edna.pprintToString((byte) 1, options));
-        Assertions.assertEquals("-1_i8", Edna.pprintToString((byte) (-1), options));
     }
 
     @Test
@@ -113,11 +108,6 @@ public class EdnaWriterTest {
         Assertions.assertEquals("0", Edna.pprintToString((short) 0));
         Assertions.assertEquals("1", Edna.pprintToString((short) 1));
         Assertions.assertEquals("-1", Edna.pprintToString((short) (-1)));
-
-        var options = Edna.defaultOptions().copy(b -> b.allowNumericSuffixes(true));
-        Assertions.assertEquals("0_i16", Edna.pprintToString((short) 0, options));
-        Assertions.assertEquals("1_i16", Edna.pprintToString((short) 1, options));
-        Assertions.assertEquals("-1_i16", Edna.pprintToString((short) (-1), options));
     }
 
     @Test
@@ -125,11 +115,6 @@ public class EdnaWriterTest {
         Assertions.assertEquals("0", Edna.pprintToString(0));
         Assertions.assertEquals("1", Edna.pprintToString(1));
         Assertions.assertEquals("-1", Edna.pprintToString(-1));
-
-        var options = Edna.defaultOptions().copy(b -> b.allowNumericSuffixes(true));
-        Assertions.assertEquals("0_i32", Edna.pprintToString(0, options));
-        Assertions.assertEquals("1_i32", Edna.pprintToString(1, options));
-        Assertions.assertEquals("-1_i32", Edna.pprintToString((-1), options));
     }
 
     @Test
