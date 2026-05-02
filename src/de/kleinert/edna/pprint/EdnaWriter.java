@@ -40,7 +40,7 @@ public class EdnaWriter {
 
     private boolean tryEncoder(final @NotNull Object obj, final @NotNull Appendable writer, int indent) throws IOException {
         indent = options.encoderPrettyPrint() ? indent : 0;
-        AtomicReference<Function<Object, EdnaPair<String, ?>>> encoder = new AtomicReference<>(null);
+        AtomicReference<Function<Object, EdnaTagVal<String, ?>>> encoder = new AtomicReference<>(null);
         options.taggedElementEncoders().forEach((jClass, enc) -> {
             if (encoder.get() == null && jClass.isInstance(obj)) {
                 encoder.set(enc);
@@ -53,8 +53,8 @@ public class EdnaWriter {
         if (r == null)
             return true;
 
-        var prefix = r.first();
-        var output = r.second();
+        var prefix = r.tag();
+        var output = r.element();
         if (prefix != null && !prefix.isBlank()) writer.append('#').append(prefix).append(' ');
         this.encode(output, writer, indent);
         return false;
@@ -321,7 +321,7 @@ public class EdnaWriter {
     private void formatCollectionTo(final @NotNull List<?> l, final @NotNull String open, final @NotNull String close, final @NotNull Appendable writer, int indent, final boolean isMap) throws IOException {
         indent = options.encoderPrettyPrint() ? indent : 0;
 
-        // Try inline first (dry-run)
+        // Try inline tag (dry-run)
         var tmp = new StringBuilder();
         tmp.append(open);
         var entryIteratorDry = l.iterator();

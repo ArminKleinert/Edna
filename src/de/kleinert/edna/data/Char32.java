@@ -25,7 +25,7 @@ public record Char32(int code) implements Comparable<Char32> {
         var codePointIterator = s.codePoints().iterator();
         if (!codePointIterator.hasNext())
             throw new IllegalArgumentException(
-                    "Can not get first char code from empty string.");
+                    "Can not get tag char code from empty string.");
         codePointIterator.nextInt();
         if (codePointIterator.hasNext())
             throw new IllegalArgumentException(

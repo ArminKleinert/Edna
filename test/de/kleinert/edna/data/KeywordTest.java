@@ -103,9 +103,9 @@ class KeywordTest {
     void parseInvalid() {
         Assertions.assertNull(Keyword.parse(":")); //not valid
         Assertions.assertNull(Keyword.parse(":/abc")); // empty namespace
-        Assertions.assertNull(Keyword.parse(":+1"));// invalid first char
-        Assertions.assertNull(Keyword.parse(":-1"));// invalid first char
-        Assertions.assertNull(Keyword.parse(":.1"));// invalid first char
+        Assertions.assertNull(Keyword.parse(":+1"));// invalid tag char
+        Assertions.assertNull(Keyword.parse(":-1"));// invalid tag char
+        Assertions.assertNull(Keyword.parse(":.1"));// invalid tag char
         Assertions.assertNull(Keyword.parse(":🎁"));
         Assertions.assertNull(Keyword.parse(":#"));
         Assertions.assertNull(Keyword.parse(":~"));
@@ -118,9 +118,9 @@ class KeywordTest {
     @Test
     void parseInvalidWithNs() {
         Assertions.assertNull(Keyword.parse(":ns/"));// no name
-        Assertions.assertNull(Keyword.parse(":ns/+1"));// invalid first char
-        Assertions.assertNull(Keyword.parse(":ns/-1"));// invalid first char
-        Assertions.assertNull(Keyword.parse(":ns/.1"));// invalid first char
+        Assertions.assertNull(Keyword.parse(":ns/+1"));// invalid tag char
+        Assertions.assertNull(Keyword.parse(":ns/-1"));// invalid tag char
+        Assertions.assertNull(Keyword.parse(":ns/.1"));// invalid tag char
         Assertions.assertNull(Keyword.parse(":ns/🎁"));
         Assertions.assertNull(Keyword.parse(":ns/#"));
         Assertions.assertNull(Keyword.parse(":ns/~"));
@@ -133,9 +133,9 @@ class KeywordTest {
     @Test
     void parseInvalidWitInvalidNs() {
         Assertions.assertNull(Keyword.parse(":/abc")); // empty namespace
-        Assertions.assertNull(Keyword.parse(":+1/abc"));// invalid first char
-        Assertions.assertNull(Keyword.parse(":-1/abc"));// invalid first char
-        Assertions.assertNull(Keyword.parse(":.1/abc"));// invalid first char
+        Assertions.assertNull(Keyword.parse(":+1/abc"));// invalid tag char
+        Assertions.assertNull(Keyword.parse(":-1/abc"));// invalid tag char
+        Assertions.assertNull(Keyword.parse(":.1/abc"));// invalid tag char
         Assertions.assertNull(Keyword.parse(":🎁/abc"));
         Assertions.assertNull(Keyword.parse(":#/abc"));
         Assertions.assertNull(Keyword.parse(":~/abc"));
@@ -291,7 +291,7 @@ class KeywordTest {
         var random = new Random(0xCAFEC0FFEEL);
         var it = Symbol.symbol("" + random.nextDouble()); // A hopefully random name
         Assertions.assertNull(Keyword.find(it)); // Did not exist.
-        Assertions.assertNull(Keyword.find(it)); // Was not interned by the first call.
+        Assertions.assertNull(Keyword.find(it)); // Was not interned by the tag call.
 
         var k = Keyword.intern(it); // Create and intern
         Assertions.assertEquals(k, Keyword.find(it));
@@ -303,7 +303,7 @@ class KeywordTest {
         var it = "" + random.nextDouble(); // A hopefully random name
 
         Assertions.assertNull(Keyword.find(it)); // Did not exist.
-        Assertions.assertNull(Keyword.find(it)); // Was not interned by the first call.
+        Assertions.assertNull(Keyword.find(it)); // Was not interned by the tag call.
 
         var k = Keyword.get(it); // Create and intern
         Assertions.assertEquals(k, Keyword.find(it));

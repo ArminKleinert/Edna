@@ -85,10 +85,10 @@ class SymbolTest {
         Assertions.assertFalse(Symbol.isValidSymbol("")); //not valid
         Assertions.assertFalse(Symbol.isValidSymbol("/abc")); // empty namespace
         Assertions.assertFalse(Symbol.isValidSymbol("ns/"));// no name
-        Assertions.assertFalse(Symbol.isValidSymbol("+1"));// invalid first char
-        Assertions.assertFalse(Symbol.isValidSymbol("-1"));// invalid first char
-        Assertions.assertFalse(Symbol.isValidSymbol(".1"));// invalid first char
-        Assertions.assertFalse(Symbol.isValidSymbol("+1"));// invalid first char
+        Assertions.assertFalse(Symbol.isValidSymbol("+1"));// invalid tag char
+        Assertions.assertFalse(Symbol.isValidSymbol("-1"));// invalid tag char
+        Assertions.assertFalse(Symbol.isValidSymbol(".1"));// invalid tag char
+        Assertions.assertFalse(Symbol.isValidSymbol("+1"));// invalid tag char
     }
 
     @Test
@@ -148,9 +148,9 @@ class SymbolTest {
     void parseInvalid() {
         Assertions.assertNull(Symbol.parse("")); //not valid
         Assertions.assertNull(Symbol.parse("/abc")); // empty namespace
-        Assertions.assertNull(Symbol.parse("+1"));// invalid first char
-        Assertions.assertNull(Symbol.parse("-1"));// invalid first char
-        Assertions.assertNull(Symbol.parse(".1"));// invalid first char
+        Assertions.assertNull(Symbol.parse("+1"));// invalid tag char
+        Assertions.assertNull(Symbol.parse("-1"));// invalid tag char
+        Assertions.assertNull(Symbol.parse(".1"));// invalid tag char
         Assertions.assertNull(Symbol.parse("🎁"));
         Assertions.assertNull(Symbol.parse("#"));
         Assertions.assertNull(Symbol.parse("~"));
@@ -163,9 +163,9 @@ class SymbolTest {
     @Test
     void parseInvalidWithNs() {
         Assertions.assertNull(Symbol.parse("ns/"));// no name
-        Assertions.assertNull(Symbol.parse("ns/+1"));// invalid first char
-        Assertions.assertNull(Symbol.parse("ns/-1"));// invalid first char
-        Assertions.assertNull(Symbol.parse("ns/.1"));// invalid first char
+        Assertions.assertNull(Symbol.parse("ns/+1"));// invalid tag char
+        Assertions.assertNull(Symbol.parse("ns/-1"));// invalid tag char
+        Assertions.assertNull(Symbol.parse("ns/.1"));// invalid tag char
         Assertions.assertNull(Symbol.parse("ns/🎁"));
         Assertions.assertNull(Symbol.parse("ns/#"));
         Assertions.assertNull(Symbol.parse("ns/~"));
@@ -178,9 +178,9 @@ class SymbolTest {
     @Test
     void parseInvalidWitInvalidNs() {
         Assertions.assertNull(Symbol.parse("/abc")); // empty namespace
-        Assertions.assertNull(Symbol.parse("+1/abc"));// invalid first char
-        Assertions.assertNull(Symbol.parse("-1/abc"));// invalid first char
-        Assertions.assertNull(Symbol.parse(".1/abc"));// invalid first char
+        Assertions.assertNull(Symbol.parse("+1/abc"));// invalid tag char
+        Assertions.assertNull(Symbol.parse("-1/abc"));// invalid tag char
+        Assertions.assertNull(Symbol.parse(".1/abc"));// invalid tag char
         Assertions.assertNull(Symbol.parse("🎁/abc"));
         Assertions.assertNull(Symbol.parse("#/abc"));
         Assertions.assertNull(Symbol.parse("~/abc"));
@@ -263,7 +263,7 @@ class SymbolTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> Symbol.get("ns/🎁"));
         Assertions.assertThrows(IllegalArgumentException.class, () -> Symbol.get("ns/"));// no name
         Assertions.assertThrows(IllegalArgumentException.class, () -> Symbol.get("/abc")); // empty namespace
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Symbol.get("+1"));// invalid first char
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Symbol.get("+1"));// invalid tag char
     }
 
     @Test

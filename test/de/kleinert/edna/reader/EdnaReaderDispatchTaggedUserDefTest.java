@@ -44,7 +44,7 @@ class EdnaReaderDispatchTaggedUserDefTest {
     @Test
     void parseDecoderTest() {
         Function<Object, Object> mapOrListToPair = (o) -> switch (o) {
-            case Map<?, ?> m -> List.of(m.get("first"), m.get("second"));
+            case Map<?, ?> m -> List.of(m.get("tag"), m.get("element"));
             case List<?> l -> List.of(l.get(0), l.get(1));
             default -> throw new IllegalArgumentException();
         };
@@ -54,7 +54,7 @@ class EdnaReaderDispatchTaggedUserDefTest {
         Assertions.assertEquals(
                 List.of(4L, 5L),
                 Edna.read(
-                        "#my/pair {\"first\" 4 \"second\" 5}",
+                        "#my/pair {\"tag\" 4 \"element\" 5}",
                         Edna.defaultOptions().copy(b -> b.taggedElementDecoders(decoders))
                 )
         );
