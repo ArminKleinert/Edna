@@ -110,7 +110,7 @@ public class Edna {
                               final @Nullable EdnaOptions options) {
         try {
             if (w == null) {
-                    EdnaWriter.pprint(obj, optsOrDefault(options), new PrintWriter(System.out));
+                EdnaWriter.pprint(obj, optsOrDefault(options), new PrintWriter(System.out));
             } else {
                 EdnaWriter.pprint(obj, options == null ? defaultOptions() : options, w);
             }

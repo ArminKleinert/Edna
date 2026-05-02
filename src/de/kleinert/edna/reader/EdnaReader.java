@@ -21,7 +21,7 @@ public class EdnaReader {
                final @NotNull CodePointIterator cpi) {
         @NotNull var newOptions = options;
         if (options.allowSymbolicValues()) {
-            final @NotNull Map<Symbol, Object> symbolics = new HashMap<>(EdnaOptions.defaultSymbolicValues());
+            final @NotNull Map<@NotNull Symbol, Object> symbolics = new HashMap<>(EdnaOptions.defaultSymbolicValues());
             symbolics.putAll(options.symbolicValues());
             newOptions = options.copy(b -> b.symbolicValues(symbolics));
         }
@@ -51,8 +51,8 @@ public class EdnaReader {
     private final @NotNull Object NOTHING = new Object();
 
     public static <T> @Nullable T read(final @NotNull CodePointIterator cpi,
-                             final @NotNull EdnaOptions options,
-                             final @NotNull Class<T> castClass) {
+                                       final @NotNull EdnaOptions options,
+                                       final @NotNull Class<T> castClass) {
         final var temp = new EdnaReader(options, cpi).readString();
         if (temp == null) return null;
         return castClass.cast(temp);

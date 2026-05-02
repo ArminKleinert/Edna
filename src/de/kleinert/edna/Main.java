@@ -1,3 +1,5 @@
+package de.kleinert.edna;
+
 import de.kleinert.edna.Edna;
 import de.kleinert.edna.EdnaOptions;
 import de.kleinert.edna.data.EdnaMap;
@@ -5,66 +7,75 @@ import de.kleinert.edna.data.IObj;
 import de.kleinert.edna.reader.CodePointIterator;
 import de.kleinert.edna.reader.EdnaReader;
 
-void stdExamples() {
-    IO.println(Edna.read("symbol")); // Symbol without namespace
-    IO.println(Edna.read("namespace/symbol")); // Symbol
-    IO.println(Edna.read(":keyword")); // Keyword without namespace
-    IO.println(Edna.read(":namespace/keyword")); // Keyword
-    IO.println(Edna.read("\"string\"")); // String
-    IO.println(Edna.read("\\c")); // Character
+import java.io.StringReader;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.LongStream;
 
-    IO.println(Edna.read("(list elements)")); // List
-    IO.println(Edna.read("[vector elements]")); // Vector
-    IO.println(Edna.read("#{set elements}")); // Set
-    IO.println(Edna.read("{map-key map-value}")); // Map
+class Main {
+    void stdExamples() {
+        System.out.println(Edna.read("symbol")); // Symbol without namespace
+        System.out.println(Edna.read("namespace/symbol")); // Symbol
+        System.out.println(Edna.read(":keyword")); // Keyword without namespace
+        System.out.println(Edna.read(":namespace/keyword")); // Keyword
+        System.out.println(Edna.read("\"string\"")); // String
+        System.out.println(Edna.read("\\c")); // Character
 
-    IO.println(Edna.read("12648430")); // Long
-    IO.println(Edna.read("12648430N")); // The same as BigInt
-    IO.println(Edna.read("5.0")); // Double
-    IO.println(Edna.read("5.0M")); // BigDecimal
+        System.out.println(Edna.read("(list elements)")); // List
+        System.out.println(Edna.read("[vector elements]")); // Vector
+        System.out.println(Edna.read("#{set elements}")); // Set
+        System.out.println(Edna.read("{map-key map-value}")); // Map
 
-    IO.println(Edna.read("nil")); // null
-    IO.println(Edna.read("false")); // false
-    IO.println(Edna.read("true")); // true
+        System.out.println(Edna.read("12648430")); // Long
+        System.out.println(Edna.read("12648430N")); // The same as BigInt
+        System.out.println(Edna.read("5.0")); // Double
+        System.out.println(Edna.read("5.0M")); // BigDecimal
 
-    IO.println(Edna.read("#uuid \"f81d4fae-7dec-11d0-a765-00a0c91e6bf6\"")); // UUID
-    IO.println(Edna.read("#inst \"1985-04-12T23:20:50.52Z\"")); // Instant
+        System.out.println(Edna.read("nil")); // null
+        System.out.println(Edna.read("false")); // false
+        System.out.println(Edna.read("true")); // true
 
-    var decoders = Map.<String, Function<Object, Object>>of(
-            "list/repeat", (e) -> LongStream
-                    .range((Long) ((List) e).get(0), (Long) ((List) e).get(1))
-                    .boxed().toList());
-    var opts = Edna.defaultOptions().copy(b -> b.taggedElementDecoders(decoders));
-    IO.println(Edna.read("#list/repeat [2 7]", opts));
+        System.out.println(Edna.read("#uuid \"f81d4fae-7dec-11d0-a765-00a0c91e6bf6\"")); // UUID
+        System.out.println(Edna.read("#inst \"1985-04-12T23:20:50.52Z\"")); // Instant
 
-    IO.println(Edna.read("0xC0FFEE", Edna.extendedOptions())); // Long, hex prefix requires additional setting
-    IO.println(Edna.read("^:a abc", Edna.extendedOptions())); // Meta
+        var decoders = Map.<String, Function<Object, Object>>of(
+                "list/repeat", (e) -> LongStream
+                        .range((Long) ((List) e).get(0), (Long) ((List) e).get(1))
+                        .boxed().toList());
+        var opts = Edna.defaultOptions().copy(b -> b.taggedElementDecoders(decoders));
+        System.out.println(Edna.read("#list/repeat [2 7]", opts));
 
-    Edna.pprintln(BigInteger.valueOf(11), null);
-    Edna.pprintln(BigInteger.valueOf(11), null);
-}
+        System.out.println(Edna.read("0xC0FFEE", Edna.extendedOptions())); // Long, hex prefix requires additional setting
+        System.out.println(Edna.read("^:a abc", Edna.extendedOptions())); // Meta
 
-void main() {
-    stdExamples();
-
-    System.exit(0);
-
-    {
-        var options = Edna.defaultOptions().copy((b) -> b.allowMetaData(true));
-        var o = (IObj.Wrapper<?>) EdnaReader.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
-        IO.println(o.meta());
-        IO.println(o.obj());
-        IO.println(o.getClass());
+        Edna.pprintln(BigInteger.valueOf(11), null);
+        Edna.pprintln(BigInteger.valueOf(11), null);
     }
-    {
-        var options = Edna.defaultOptions();
-        var o = EdnaReader.read(new CodePointIterator(new StringReader("{2 3 :a 6}")), options, Object.class);
-        IO.println(o);
-        IO.println(o.getClass());
-    }
-    {
-        var o = new EdnaMap<>(Map.of("r", 1, "a", 3).entrySet().stream().toList());
-        IO.println(o);
-        IO.println(o.getClass());
+
+    void main() {
+        stdExamples();
+
+        System.exit(0);
+
+        {
+            var options = Edna.defaultOptions().copy((b) -> b.allowMetaData(true));
+            var o = (IObj.Wrapper<?>) EdnaReader.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
+            System.out.println(o.meta());
+            System.out.println(o.obj());
+            System.out.println(o.getClass());
+        }
+        {
+            var options = Edna.defaultOptions();
+            var o = EdnaReader.read(new CodePointIterator(new StringReader("{2 3 :a 6}")), options, Object.class);
+            System.out.println(o);
+            System.out.println(o.getClass());
+        }
+        {
+            var o = new EdnaMap<>(Map.of("r", 1, "a", 3).entrySet().stream().toList());
+            System.out.println(o);
+            System.out.println(o.getClass());
+        }
     }
 }

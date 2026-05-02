@@ -49,6 +49,6 @@ public final class EdnaVector<T>
 
     @Override
     public @NotNull String toString() {
-        return EdnaCollections.toStringHelper(this, '(', ')', ',');
+        return EdnaCollections.toStringHelper(this, '[', ']', ',');
     }
 }
