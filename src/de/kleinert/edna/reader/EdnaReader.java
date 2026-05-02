@@ -19,9 +19,9 @@ public class EdnaReader {
 
     EdnaReader(final @NotNull EdnaOptions options,
                final @NotNull CodePointIterator cpi) {
-        var newOptions = options;
+        @NotNull var newOptions = options;
         if (options.allowSymbolicValues()) {
-            var symbolics = new HashMap<>(EdnaOptions.defaultSymbolicValues());
+            final @NotNull Map<Symbol, Object> symbolics = new HashMap<>(EdnaOptions.defaultSymbolicValues());
             symbolics.putAll(options.symbolicValues());
             newOptions = options.copy(b -> b.symbolicValues(symbolics));
         }
@@ -31,18 +31,18 @@ public class EdnaReader {
     }
 
     private void ensureValidDecoderNames() {
-        for (String key : options.taggedElementDecoders().keySet()) {
+        for (final @NotNull String key : options.taggedElementDecoders().keySet()) {
             var name = Symbol.parse(key);
             if (name == null) {
-                var message = "Decoder name \"" + key + "\" is not a valid symbol.";
+                final @NotNull var message = "Decoder name \"" + key + "\" is not a valid symbol.";
                 throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
             }
             if (!options.allowMoreEncoderDecoderNames() && name.namespace() == null) {
-                var message = "Decoder without namespace: " + name;
+                final @NotNull var message = "Decoder without namespace: " + name;
                 throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
             }
             if (key.equals("inst") || key.equals("uuid") || key.equals("ref")) {
-                var message = "Decoder name " + name + " is not allowed.";
+                final @NotNull var message = "Decoder name " + name + " is not allowed.";
                 throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
             }
         }
@@ -50,10 +50,11 @@ public class EdnaReader {
 
     private final @NotNull Object NOTHING = new Object();
 
-    public static <T> T read(final @NotNull CodePointIterator cpi,
+    public static <T> @Nullable T read(final @NotNull CodePointIterator cpi,
                              final @NotNull EdnaOptions options,
                              final @NotNull Class<T> castClass) {
-        var temp = new EdnaReader(options, cpi).readString();
+        final var temp = new EdnaReader(options, cpi).readString();
+        if (temp == null) return null;
         return castClass.cast(temp);
     }
 
@@ -287,13 +288,12 @@ public class EdnaReader {
             result.add(key);
             i++;
         }
-        //noinspection unchecked
-        return (Set<Object>) options.listToEdnSetConverter().apply(lst);
+        return options.listToEdnSetConverter().apply(lst);
     }
 
     private @NotNull IObj readMeta(final int level) {
-        var linePos = cpi.getLineIdx();
-        var codePosIndex = cpi.getTextIndex();
+        final var linePos = cpi.getLineIdx();
+        final var codePosIndex = cpi.getTextIndex();
 
         if (!options.allowMetaData())
             throw new EdnaReaderException(
@@ -312,7 +312,7 @@ public class EdnaReader {
                     "Metadata must be a Symbol, Keyword, String or Map.");
         };
 
-        var obj = readForm(level, true);
+        final var obj = readForm(level, true);
         if (obj == NOTHING) {
             throw new EdnaReaderException(
                     linePos, codePosIndex,
@@ -323,8 +323,8 @@ public class EdnaReader {
     }
 
     private @NotNull Number readNumber() {
-        var linePos = cpi.getLineIdx();
-        var codePosIndex = cpi.getTextIndex();
+        final var linePos = cpi.getLineIdx();
+        final var codePosIndex = cpi.getTextIndex();
         try {
             return readNumberHelper(linePos, codePosIndex);
         } catch (NumberFormatException ex) {
@@ -338,7 +338,7 @@ public class EdnaReader {
     private Pattern basedIntRegex;
 
     private @NotNull Number readNumberHelper(final int linePos, final int codePosIndex) {
-        var token = readToken(this::isNotBreakingSymbol);
+        final @NotNull var token = readToken(this::isNotBreakingSymbol);
 
         if (intRegex == null) {
             floatyRegex = Pattern.compile("[+\\-]?[0-9]*\\.?[0-9]+([eE][+\\-][0-9]+)?M?");
@@ -347,7 +347,7 @@ public class EdnaReader {
             basedIntRegex = Pattern.compile("[+\\-]?([1-9][0-9]?)r[0-9a-fA-F]+N?");
         }
 
-        var tokenLen = token.length();
+        final var tokenLen = token.length();
         var base = 10;
         var startIndex = 0;
         byte sign = 1;
@@ -462,7 +462,7 @@ public class EdnaReader {
     private @NotNull Character readChar() {
         final var linePos = cpi.getLineIdx();
         final var codePosIndex = cpi.getTextIndex();
-        var token = readToken(this::isNotBreakingSymbol);
+        final var token = readToken(this::isNotBreakingSymbol);
         return readDispatchUnicodeChar(linePos, codePosIndex, token, false).toChar();
     }
 
@@ -470,7 +470,7 @@ public class EdnaReader {
                                            final int codePosIndex,
                                            final @NotNull String initialToken,
                                            final boolean isDispatch) {
-        var token = (initialToken.isEmpty() && cpi.hasNext())
+        final @NotNull var token = (initialToken.isEmpty() && cpi.hasNext())
                 ? readToken(1, this::isValidCharSingle).trim()
                 : initialToken.trim();
 
@@ -550,7 +550,7 @@ public class EdnaReader {
                         linePos, codePosIndex,
                         "Odd number of elements in map. Last key was " + key + ".");
             }
-            var value = kvs.get(i + 1);
+            final var value = kvs.get(i + 1);
             res.add(new AbstractMap.SimpleImmutableEntry<>(key, value));
         }
 
@@ -563,7 +563,7 @@ public class EdnaReader {
     }
 
     private @NotNull String readEdnString() {
-        final @NotNull var currentToken = new StringBuilder();
+        final var currentToken = new StringBuilder();
         final var linePos = cpi.getLineIdx();
         final var codePosIndex = cpi.getTextIndex();
         while (cpi.hasNext()) {

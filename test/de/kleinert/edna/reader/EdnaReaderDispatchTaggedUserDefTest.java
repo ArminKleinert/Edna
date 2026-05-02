@@ -29,6 +29,16 @@ class EdnaReaderDispatchTaggedUserDefTest {
             );
             Edna.read("1", options);
         }
+
+        // Valid name with option
+        {
+            Map<String, Function<Object, Object>> decoders = Map.of("pair", (e) -> e);
+            var options = Edna.defaultOptions().copy(b ->
+                    b.allowMoreEncoderDecoderNames(true)
+                            .taggedElementDecoders(decoders)
+            );
+            Edna.read("1", options);
+        }
     }
 
     @Test
@@ -65,4 +75,5 @@ class EdnaReaderDispatchTaggedUserDefTest {
         var options = Edna.defaultOptions().copy(b -> b.taggedElementDecoders(decoders));
         Assertions.assertSame(uniqueObj, Edna.read("#edna/ref abc", options));
     }
+    @Test void parseDecoderListRepeater(){}
 }

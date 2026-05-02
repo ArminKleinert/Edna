@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class Edna {
     public static @NotNull EdnaOptions defaultOptions() {
@@ -22,7 +23,7 @@ public class Edna {
     public static <T> @Nullable T read(final @NotNull String s,
                                        final @Nullable EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
-        var cpi = new CodePointIterator(s.codePoints());
+        final @NotNull var cpi = new CodePointIterator(s.codePoints());
         return EdnaReader.read(cpi, optsOrDefault(options), castClass);
     }
 
@@ -36,7 +37,7 @@ public class Edna {
     }
 
     /**
-     * Parse EDN from a [File]. The file is assumed to exist and be a non-directory.
+     * Parse EDN from a {@link File}. The file is assumed to exist and be a non-directory.
      */
     public static <T> @Nullable T read(
             final @NotNull File file,
@@ -51,31 +52,31 @@ public class Edna {
         return result;
     }
 
-    public static @Nullable Object read(final @NotNull File reader,
+    public static @Nullable Object read(final @NotNull File file,
                                         final @Nullable EdnaOptions options)
             throws FileNotFoundException {
-        return read(reader, options, Object.class);
+        return read(file, options, Object.class);
     }
 
-    public static @Nullable Object read(final @NotNull File reader)
+    public static @Nullable Object read(final @NotNull File file)
             throws FileNotFoundException {
-        return read(reader, null, Object.class);
+        return read(file, null, Object.class);
     }
 
-    public static <T> @Nullable T read(final @NotNull InputStream reader,
+    public static <T> @Nullable T read(final @NotNull InputStream inputStream,
                                        final @Nullable EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
-        var cpi = new CodePointIterator(reader);
+        final @NotNull var cpi = new CodePointIterator(inputStream);
         return EdnaReader.read(cpi, optsOrDefault(options), castClass);
     }
 
-    public static @Nullable Object read(final @NotNull InputStream reader,
+    public static @Nullable Object read(final @NotNull InputStream inputStream,
                                         final @Nullable EdnaOptions options) {
-        return read(reader, options, Object.class);
+        return read(inputStream, options, Object.class);
     }
 
-    public static @Nullable Object read(final @NotNull InputStream reader) {
-        return read(reader, null, Object.class);
+    public static @Nullable Object read(final @NotNull InputStream inputStream) {
+        return read(inputStream, null, Object.class);
     }
 
     public static <T> @Nullable T read(final @NotNull Reader reader,
@@ -94,7 +95,9 @@ public class Edna {
         return read(reader, null, Object.class);
     }
 
-    public static void pprint(final @NotNull Object obj, final @NotNull File file, final @Nullable EdnaOptions options) {
+    public static void pprint(final @NotNull Object obj,
+                              final @NotNull File file,
+                              final @Nullable EdnaOptions options) {
         try (FileWriter fw = new FileWriter(file, StandardCharsets.UTF_8)) {
             EdnaWriter.pprint(obj, optsOrDefault(options), fw);
         } catch (Exception e) {
@@ -102,12 +105,12 @@ public class Edna {
         }
     }
 
-    public static void pprint(final @Nullable Object obj, final @Nullable Appendable w, final @Nullable EdnaOptions options) {
+    public static void pprint(final @Nullable Object obj,
+                              final @Nullable Appendable w,
+                              final @Nullable EdnaOptions options) {
         try {
             if (w == null) {
-                try (Writer writer = new PrintWriter(System.out)) {
-                    EdnaWriter.pprint(obj, optsOrDefault(options), writer);
-                }
+                    EdnaWriter.pprint(obj, optsOrDefault(options), new PrintWriter(System.out));
             } else {
                 EdnaWriter.pprint(obj, options == null ? defaultOptions() : options, w);
             }
@@ -116,31 +119,34 @@ public class Edna {
         }
     }
 
-    public static void pprint(final @Nullable Object obj, final @Nullable Appendable w) {
+    public static void pprint(final @Nullable Object obj,
+                              final @Nullable Appendable w) {
         pprint(obj, w, defaultOptions());
     }
 
-    public static void pprintln(final @Nullable Object obj, final @Nullable Appendable w, final @Nullable EdnaOptions options) {
+    public static void pprintln(final @Nullable Object obj,
+                                final @Nullable Appendable w,
+                                final @Nullable EdnaOptions options) {
         try {
-            if (w == null) {
-                try (Writer writer = new PrintWriter(System.out)) {
-                    EdnaWriter.pprintln(obj, optsOrDefault(options), writer);
-                }
-            } else {
-                EdnaWriter.pprintln(obj, optsOrDefault(options), w);
-            }
+            EdnaWriter.pprintln(
+                    obj,
+                    optsOrDefault(options),
+                    Objects.requireNonNullElseGet(w, () -> new PrintWriter(System.out)));
         } catch (Exception e) {
             throw new EdnaWriterException(e);
         }
     }
 
-    public static void pprintln(final @Nullable Object obj, final @Nullable Appendable w) {
+    public static void pprintln(final @Nullable Object obj,
+                                final @Nullable Appendable w) {
         pprintln(obj, w, defaultOptions());
     }
 
-    public static String pprintToString(final @Nullable Object obj, final @Nullable EdnaOptions options) {
+    public static @NotNull String pprintToString(
+            final @Nullable Object obj,
+            final @Nullable EdnaOptions options) {
         try {
-            StringBuilder sb = new StringBuilder();
+            final @NotNull StringBuilder sb = new StringBuilder();
             EdnaWriter.pprint(obj, optsOrDefault(options), sb);
             return sb.toString();
         } catch (Exception e) {
@@ -148,7 +154,7 @@ public class Edna {
         }
     }
 
-    public static String pprintToString(final @Nullable Object obj) {
+    public static @NotNull String pprintToString(final @Nullable Object obj) {
         return pprintToString(obj, defaultOptions());
     }
 

@@ -19,7 +19,6 @@ void stdExamples() {
     IO.println(Edna.read("{map-key map-value}")); // Map
 
     IO.println(Edna.read("12648430")); // Long
-    IO.println(Edna.read("0xC0FFEE", Edna.extendedOptions())); // Long, hex prefix requires additional setting
     IO.println(Edna.read("12648430N")); // The same as BigInt
     IO.println(Edna.read("5.0")); // Double
     IO.println(Edna.read("5.0M")); // BigDecimal
@@ -31,17 +30,28 @@ void stdExamples() {
     IO.println(Edna.read("#uuid \"f81d4fae-7dec-11d0-a765-00a0c91e6bf6\"")); // UUID
     IO.println(Edna.read("#inst \"1985-04-12T23:20:50.52Z\"")); // Instant
 
+    var decoders = Map.<String, Function<Object, Object>>of(
+            "list/repeat", (e) -> LongStream
+                    .range((Long) ((List) e).get(0), (Long) ((List) e).get(1))
+                    .boxed().toList());
+    var opts = Edna.defaultOptions().copy(b -> b.taggedElementDecoders(decoders));
+    IO.println(Edna.read("#list/repeat [2 7]", opts));
+
+    IO.println(Edna.read("0xC0FFEE", Edna.extendedOptions())); // Long, hex prefix requires additional setting
     IO.println(Edna.read("^:a abc", Edna.extendedOptions())); // Meta
+
+    Edna.pprintln(BigInteger.valueOf(11), null);
+    Edna.pprintln(BigInteger.valueOf(11), null);
 }
 
 void main() {
     stdExamples();
-    
+
     System.exit(0);
-    
+
     {
-        var options = Edna.defaultOptions().copy((b)->b.allowMetaData(true));
-        var o = (IObj.Wrapper<?>)EdnaReader.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
+        var options = Edna.defaultOptions().copy((b) -> b.allowMetaData(true));
+        var o = (IObj.Wrapper<?>) EdnaReader.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
         IO.println(o.meta());
         IO.println(o.obj());
         IO.println(o.getClass());

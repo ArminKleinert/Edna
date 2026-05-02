@@ -23,9 +23,10 @@ public class EdnaReaderSymbolicValueTest {
     @Test
     public void parseUserDefSymbolicTest() {
         var o = new Object();
+        var sv = Map.of(Symbol.symbol("abc"), o);
         var optionsWithSymbolics = Edna.defaultOptions().copy(b -> b
                 .allowSymbolicValues(true)
-                .symbolicValues(Map.of(Symbol.symbol("abc"), o)));
+                .symbolicValues(sv));
         Assertions.assertSame(o, Edna.read("##abc", optionsWithSymbolics));
     }
 }

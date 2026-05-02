@@ -274,7 +274,7 @@ public class EdnaWriter {
         formatCollectionTo(l, "[", "]", writer, indent);
     }
 
-    private void encodePersistentList(final @NotNull EdnaList<?> l, final @NotNull Appendable writer, final int indent) throws IOException {
+    private void encodePersistentList(final @NotNull List<?> l, final @NotNull Appendable writer, final int indent) throws IOException {
         formatCollectionTo(l, "(", ")", writer, indent);
     }
 
