@@ -109,7 +109,7 @@ public class Edna {
                     EdnaWriter.pprint(obj, optsOrDefault(options), writer);
                 }
             } else {
-                EdnaWriter.pprint(obj, options, w);
+                EdnaWriter.pprint(obj, options == null ? defaultOptions() : options, w);
             }
         } catch (Exception e) {
             throw new EdnaWriterException(e);
@@ -154,6 +154,6 @@ public class Edna {
 
     private static @NotNull EdnaOptions optsOrDefault(
             final @Nullable EdnaOptions options) {
-        return options == null ? EdnaOptions.defaultOptions() : options;
+        return options == null ? defaultOptions() : options;
     }
 }

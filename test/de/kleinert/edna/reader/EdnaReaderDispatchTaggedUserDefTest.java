@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 
 class EdnaReaderDispatchTaggedUserDefTest {
@@ -17,7 +16,7 @@ class EdnaReaderDispatchTaggedUserDefTest {
         // invalid name
         {
             var options = Edna.defaultOptions().copy((builder ->
-                    builder.ednClassDecoders(Map.of("pair", (e) -> e))
+                    builder.taggedElementDecoders(Map.of("pair", (e) -> e))
             ));
             Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("1", options));
         }
@@ -26,7 +25,7 @@ class EdnaReaderDispatchTaggedUserDefTest {
         {
             var options = Edna.defaultOptions().copy(b ->
                     b.allowMoreEncoderDecoderNames(true)
-                            .ednClassDecoders(Map.of("pair", (e) -> e))
+                            .taggedElementDecoders(Map.of("pair", (e) -> e))
             );
             Edna.read("1", options);
         }
@@ -46,14 +45,14 @@ class EdnaReaderDispatchTaggedUserDefTest {
                 List.of(4L, 5L),
                 Edna.read(
                         "#my/pair {\"first\" 4 \"second\" 5}",
-                        Edna.defaultOptions().copy(b -> b.ednClassDecoders(decoders))
+                        Edna.defaultOptions().copy(b -> b.taggedElementDecoders(decoders))
                 )
         );
         Assertions.assertEquals(
                 List.of(4L, 5L),
                 Edna.read(
                         "#my/pair [4 5]",
-                        Edna.defaultOptions().copy(b -> b.ednClassDecoders(decoders))
+                        Edna.defaultOptions().copy(b -> b.taggedElementDecoders(decoders))
                 )
         );
     }
@@ -63,7 +62,7 @@ class EdnaReaderDispatchTaggedUserDefTest {
         var uniqueObj = new Object();
         var refs = Map.<Object, Object>of(Symbol.symbol("abc"), uniqueObj);
         var decoders = Map.of("edna/ref", (Function<Object, Object>) symbol -> refs.getOrDefault(symbol, 1));
-        var options = Edna.defaultOptions().copy(b -> b.ednClassDecoders(decoders));
+        var options = Edna.defaultOptions().copy(b -> b.taggedElementDecoders(decoders));
         Assertions.assertSame(uniqueObj, Edna.read("#edna/ref abc", options));
     }
 }

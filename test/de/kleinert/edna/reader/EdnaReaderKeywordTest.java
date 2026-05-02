@@ -136,7 +136,7 @@ class EdnaReaderKeywordTest {
     public void parseKeywordUTFTest() {
         { // 'λ' fits into simple chars.
             var text = ":λ";
-            var it = Edna.read(text, EdnaOptions.extendedOptions());
+            var it = Edna.read(text, Edna.extendedOptions());
             var keyword = Keyword.parse(text, true);
             Assertions.assertInstanceOf(Keyword.class, it);
             var itKeyword = (Keyword) it;
@@ -147,7 +147,7 @@ class EdnaReaderKeywordTest {
         }
         { // '🎁' does not fit into simple chars, requiring options.allowUTFSymbols.
             var text = ":🎁";
-            var it = Edna.read(text, EdnaOptions.extendedOptions());
+            var it = Edna.read(text, Edna.extendedOptions());
             var keyword = Keyword.parse(text, true);
             Assertions.assertInstanceOf(Keyword.class, it);
             var itKeyword = (Keyword) it;

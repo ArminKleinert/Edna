@@ -126,7 +126,7 @@ public class EdnaReaderSymbolTest {
     public void parseSymbolUTFTest() {
         { // 'λ' fits into simple chars.
             var text = "λ";
-            var it = Edna.read(text, EdnaOptions.extendedOptions(), Symbol.class);
+            var it = Edna.read(text, Edna.extendedOptions(), Symbol.class);
             var symbol = Symbol.parse(text, true);
             Assertions.assertInstanceOf(Symbol.class, it);
 
@@ -137,7 +137,7 @@ public class EdnaReaderSymbolTest {
         }
         { // '🎁' does not fit into simple chars, requiring options.allowUTFSymbols.
             var text = "🎁";
-            var it = Edna.read(text, EdnaOptions.extendedOptions(), Symbol.class);
+            var it = Edna.read(text, Edna.extendedOptions(), Symbol.class);
             var symbol = Symbol.parse(text, true);
             Assertions.assertInstanceOf(Symbol.class, it);
 

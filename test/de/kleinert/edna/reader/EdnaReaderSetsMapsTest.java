@@ -51,15 +51,15 @@ public class EdnaReaderSetsMapsTest {
     @Test
     public void parseWithConverter() {
         {
-            //var options = EdnaOptions.defaultOptions().copy(listToEdnMapConverter = { (it)->new IdentityHashMap(it.toMap()) })
-            var options = EdnaOptions.defaultOptions().copy((b) -> b.listToEdnMapConverter((it) -> new IdentityHashMap<>(it.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+            var options = Edna.defaultOptions().copy((b) -> b
+                    .listToEdnMapConverter((it) -> new IdentityHashMap<>(it.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
             ));
             var parsed = Edna.read("{1 2}", options);
             Assertions.assertInstanceOf(IdentityHashMap.class, parsed);
             Assertions.assertEquals(Map.of(1L, 2L), parsed);
         }
         {
-            var options = EdnaOptions.defaultOptions().copy((b) -> b.listToEdnSetConverter((it) -> new TreeSet<Long>()));
+            var options = Edna.defaultOptions().copy((b) -> b.listToEdnSetConverter((it) -> new TreeSet<Long>()));
             var parsed = Edna.read("#{1 2}", options);
             Assertions.assertInstanceOf(TreeSet.class, parsed);
             Assertions.assertEquals(Set.<Long>of(), parsed);

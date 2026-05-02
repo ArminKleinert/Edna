@@ -3,17 +3,14 @@ package de.kleinert.edna;
 import de.kleinert.edna.data.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Map;
-import java.util.SequencedMap;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           boolean allowDispatchChars,
-                          @NotNull Map<String, Function<Object, Object>> ednClassDecoders,
-                          @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders,
+                          @NotNull Map<String, Function<Object, Object>> taggedElementDecoders,
+                          @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> taggedElementEncoders,
                           boolean moreNumberPrefixes,
                           boolean allowMoreEncoderDecoderNames,
                           @NotNull String encodingSequenceSeparator,
@@ -22,28 +19,25 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           @NotNull Function<List<?>, Set<?>> listToEdnSetConverter,
                           @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> listToEdnMapConverter,
                           boolean allowUTFSymbols,
-                          boolean allowReferences,
                           int encoderSequenceElementLimit,
                           int encoderCollectionElementLimit,
                           int encoderMaxColumn,
                           @NotNull String encoderLineIndent,
                           boolean encoderPrettyPrint,
-                          @NotNull Map<Symbol, Object> referenceTable,
                           boolean allowMetaData,
                           boolean allowZeroPrefix,
                           boolean allowSymbolicValues,
                           @NotNull Map<Symbol, Object> symbolicValues) {
-    private static EdnaOptions defaultOptions;
 
-    private static Map<Symbol, Object> defaultSymbolicValues() {
-        return Map.of(
+    public static @NotNull Map<Symbol, Object> defaultSymbolicValues() {
+        return new HashMap<>(Map.of(
                 Symbol.symbol("NaN"), Double.NaN,
                 Symbol.symbol("Inf"), Double.POSITIVE_INFINITY,
-                Symbol.symbol("-Inf"), Double.NEGATIVE_INFINITY);
+                Symbol.symbol("-Inf"), Double.NEGATIVE_INFINITY));
     }
 
     public static @NotNull EdnaOptions defaultOptions() {
-        if (defaultOptions == null) defaultOptions = new EdnaOptions(
+        return new EdnaOptions(
                 false,
                 false,
                 Map.of(),
@@ -56,50 +50,28 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 EdnaSet::new,
                 EdnaMap::new,
                 false,
-                false,
                 1000,
                 10000,
                 80,
                 "  ",
                 true,
-                Map.of(),
                 false,
                 false,
                 false,
-                defaultSymbolicValues());
-        return defaultOptions;
+                Map.of());
     }
-
-    private static EdnaOptions extendedOptions;
 
     public static @NotNull EdnaOptions extendedOptions() {
-        if (extendedOptions == null) extendedOptions = new EdnaOptions(
-                true,
-                true,
-                Map.of(),
-                new EdnaMap<>(List.of()),
-                true,
-                true,
-                ", ",
-                EdnaList::new,
-                EdnaVector::new,
-                EdnaSet::new,
-                EdnaMap::new,
-                true,
-                true,
-                1000,
-                10000,
-                80,
-                "  ",
-                true,
-                Map.of(),
-                true,
-                true,
-                true,
-                defaultSymbolicValues());
-        return extendedOptions;
+        return defaultOptions().copy(builder -> builder
+                .allowSchemeUTF32Codes(true)
+                .allowDispatchChars(true)
+                .moreNumberPrefixes(true)
+                .allowMoreEncoderDecoderNames(true)
+                .allowUTFSymbols(true)
+                .allowMetaData(true)
+                .allowZeroPrefix(true)
+                .allowSymbolicValues(true));
     }
-
 
     public @NotNull EdnaOptions copy(final @NotNull UnaryOperator<Builder> f) {
         final @NotNull Builder b = new Builder(this);
@@ -109,8 +81,8 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
     public static final class Builder {
         private boolean allowSchemeUTF32Codes;
         private boolean allowDispatchChars;
-        private @NotNull Map<String, Function<Object, Object>> ednClassDecoders;
-        private @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> ednClassEncoders;
+        private @NotNull Map<String, Function<Object, Object>> taggedElementDecoders;
+        private @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> taggedElementEncoders;
         private boolean moreNumberPrefixes;
         private boolean allowMoreEncoderDecoderNames;
         private @NotNull String encodingSequenceSeparator;
@@ -119,13 +91,11 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         private @NotNull Function<List<?>, Set<?>> listToEdnSetConverter;
         private @NotNull Function<List<Map.Entry<Object, Object>>, Map<?, ?>> listToEdnMapConverter;
         private boolean allowUTFSymbols;
-        private boolean allowReferences;
         private int encoderSequenceElementLimit;
         private int encoderCollectionElementLimit;
         private int encoderMaxColumn;
         private @NotNull String encoderLineIndent;
         private boolean encoderPrettyPrint;
-        private @NotNull Map<Symbol, Object> referenceTable;
         private boolean allowMetaData;
         private boolean allowZeroPrefix;
         private boolean allowSymbolicValues;
@@ -134,8 +104,8 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         public Builder(final @NotNull EdnaOptions o) {
             this.allowSchemeUTF32Codes = o.allowSchemeUTF32Codes();
             this.allowDispatchChars = o.allowDispatchChars();
-            this.ednClassDecoders = o.ednClassDecoders();
-            this.ednClassEncoders = o.ednClassEncoders();
+            this.taggedElementDecoders = o.taggedElementDecoders();
+            this.taggedElementEncoders = o.taggedElementEncoders();
             this.moreNumberPrefixes = o.moreNumberPrefixes();
             this.allowMoreEncoderDecoderNames = o.allowMoreEncoderDecoderNames();
             this.encodingSequenceSeparator = o.encodingSequenceSeparator();
@@ -144,13 +114,11 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             this.listToEdnSetConverter = o.listToEdnSetConverter();
             this.listToEdnMapConverter = o.listToEdnMapConverter();
             this.allowUTFSymbols = o.allowUTFSymbols();
-            this.allowReferences = o.allowReferences();
             this.encoderSequenceElementLimit = o.encoderSequenceElementLimit();
             this.encoderCollectionElementLimit = o.encoderCollectionElementLimit();
             this.encoderMaxColumn = o.encoderMaxColumn();
             this.encoderLineIndent = o.encoderLineIndent();
             this.encoderPrettyPrint = o.encoderPrettyPrint();
-            this.referenceTable = o.referenceTable();
             this.allowMetaData = o.allowMetaData();
             this.allowZeroPrefix = o.allowZeroPrefix();
             this.allowSymbolicValues = o.allowSymbolicValues();
@@ -167,13 +135,13 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
-        public Builder ednClassDecoders(final @NotNull Map<String, Function<Object, Object>> v) {
-            this.ednClassDecoders = v;
+        public Builder taggedElementDecoders(final @NotNull Map<String, Function<Object, Object>> v) {
+            this.taggedElementDecoders = v;
             return this;
         }
 
-        public Builder ednClassEncoders(final @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> v) {
-            this.ednClassEncoders = v;
+        public Builder taggedElementEncoders(final @NotNull SequencedMap<Class<?>, Function<Object, Map.Entry<String, ?>>> v) {
+            this.taggedElementEncoders = v;
             return this;
         }
 
@@ -217,11 +185,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
-        public Builder allowReferences(final boolean v) {
-            this.allowReferences = v;
-            return this;
-        }
-
         public Builder encoderSequenceElementLimit(final int v) {
             this.encoderSequenceElementLimit = v;
             return this;
@@ -244,11 +207,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
 
         public Builder encoderPrettyPrint(final boolean v) {
             this.encoderPrettyPrint = v;
-            return this;
-        }
-
-        public Builder referenceTable(final @NotNull Map<Symbol, Object> v) {
-            this.referenceTable = v;
             return this;
         }
 
@@ -276,8 +234,8 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return new EdnaOptions(
                     allowSchemeUTF32Codes,
                     allowDispatchChars,
-                    ednClassDecoders,
-                    ednClassEncoders,
+                    taggedElementDecoders,
+                    taggedElementEncoders,
                     moreNumberPrefixes,
                     allowMoreEncoderDecoderNames,
                     encodingSequenceSeparator,
@@ -286,13 +244,11 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                     listToEdnSetConverter,
                     listToEdnMapConverter,
                     allowUTFSymbols,
-                    allowReferences,
                     encoderSequenceElementLimit,
                     encoderCollectionElementLimit,
                     encoderMaxColumn,
                     encoderLineIndent,
                     encoderPrettyPrint,
-                    referenceTable,
                     allowMetaData,
                     allowZeroPrefix,
                     allowSymbolicValues,

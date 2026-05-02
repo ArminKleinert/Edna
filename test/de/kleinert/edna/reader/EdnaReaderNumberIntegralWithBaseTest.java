@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import java.math.BigInteger;
 
 class EdnaReaderNumberIntegralWithBaseTest {
-    private final EdnaOptions allowMoreNumberPrefixes = EdnaOptions.defaultOptions().copy((b) -> b.moreNumberPrefixes(true));
-    private final EdnaOptions allowZeros = EdnaOptions.defaultOptions().copy((b) -> b.allowZeroPrefix(true));
+    private final EdnaOptions allowMoreNumberPrefixes = Edna.defaultOptions().copy((b) -> b.moreNumberPrefixes(true));
+    private final EdnaOptions allowZeros = Edna.defaultOptions().copy((b) -> b.allowZeroPrefix(true));
     @Test void parseIntegerIllegalNum(){
         Assertions.assertThrows(EdnaReaderException.class, ()-> Edna.read("10rFFFF", allowMoreNumberPrefixes));
         Assertions.assertThrows(EdnaReaderException.class, ()-> Edna.read("2r88", allowMoreNumberPrefixes));

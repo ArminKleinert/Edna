@@ -40,14 +40,14 @@ void main() {
     System.exit(0);
     
     {
-        var options = EdnaOptions.defaultOptions().copy((b)->b.allowMetaData(true));
+        var options = Edna.defaultOptions().copy((b)->b.allowMetaData(true));
         var o = (IObj.Wrapper<?>)EdnaReader.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
         IO.println(o.meta());
         IO.println(o.obj());
         IO.println(o.getClass());
     }
     {
-        var options = EdnaOptions.defaultOptions();
+        var options = Edna.defaultOptions();
         var o = EdnaReader.read(new CodePointIterator(new StringReader("{2 3 :a 6}")), options, Object.class);
         IO.println(o);
         IO.println(o.getClass());

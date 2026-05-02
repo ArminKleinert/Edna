@@ -66,7 +66,7 @@ public void parseSlashWhitespaceIsInvalid() {
         Assertions.assertEquals('\u2626', Edna.read("\\u2626")); // Orthodox cross
         Assertions.assertEquals('\u271D', Edna.read("\\u271D")); // Latin cross
 
-        var options = EdnaOptions.extendedOptions();
+        var options = Edna.extendedOptions();
         Assertions.assertEquals(new Char32('\n'), Edna.read("#\\newline", options));
         Assertions.assertEquals(new Char32(' '), Edna.read("#\\space", options));
         Assertions.assertEquals(new Char32('\t'), Edna.read("#\\tab", options));

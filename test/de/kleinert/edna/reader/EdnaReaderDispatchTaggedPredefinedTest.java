@@ -17,7 +17,7 @@ class EdnaReaderDispatchTaggedPredefinedTest {
         @NotNull Map<String, Function<Object, Object>> decoders = EdnaConverters.merge(
                         EdnaConverters.arrayConverters(),
                         EdnaConverters.numberConverters());
-        var opts = Edna.defaultOptions().copy(b -> b.allowMoreEncoderDecoderNames(true).ednClassDecoders(decoders));
+        var opts = Edna.defaultOptions().copy(b -> b.allowMoreEncoderDecoderNames(true).taggedElementDecoders(decoders));
         return Edna.read(s, opts);
     }
 

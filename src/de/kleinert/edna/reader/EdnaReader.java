@@ -5,7 +5,6 @@ import de.kleinert.edna.data.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -17,19 +16,22 @@ import java.util.regex.Pattern;
 public class EdnaReader {
     private final @NotNull EdnaOptions options;
     private final @NotNull CodePointIterator cpi;
-    final @NotNull Map<@NotNull Symbol, @Nullable Object> references;
 
     EdnaReader(final @NotNull EdnaOptions options,
-               final @NotNull CodePointIterator cpi,
-               final @NotNull Map<@NotNull Symbol, @Nullable Object> references) {
-        this.options = options;
+               final @NotNull CodePointIterator cpi) {
+        var newOptions = options;
+        if (options.allowSymbolicValues()) {
+            var symbolics = new HashMap<>(EdnaOptions.defaultSymbolicValues());
+            symbolics.putAll(options.symbolicValues());
+            newOptions = options.copy(b -> b.symbolicValues(symbolics));
+        }
+        this.options = newOptions;
         this.cpi = cpi;
-        this.references = references;
         ensureValidDecoderNames();
     }
 
     private void ensureValidDecoderNames() {
-        for (String key : options.ednClassDecoders().keySet()) {
+        for (String key : options.taggedElementDecoders().keySet()) {
             var name = Symbol.parse(key);
             if (name == null) {
                 var message = "Decoder name \"" + key + "\" is not a valid symbol.";
@@ -48,18 +50,10 @@ public class EdnaReader {
 
     private final @NotNull Object NOTHING = new Object();
 
-    public static Object read(String s) {
-        return read(new CodePointIterator(new StringReader(s)), EdnaOptions.defaultOptions(), Object.class);
-    }
-
-    public static Object read(String s, EdnaOptions options) {
-        return read(new CodePointIterator(new StringReader(s)), options, Object.class);
-    }
-
     public static <T> T read(final @NotNull CodePointIterator cpi,
                              final @NotNull EdnaOptions options,
                              final @NotNull Class<T> castClass) {
-        var temp = new EdnaReader(options, cpi, options.referenceTable()).readString();
+        var temp = new EdnaReader(options, cpi).readString();
         return castClass.cast(temp);
     }
 
@@ -260,10 +254,8 @@ public class EdnaReader {
                     throw new EdnaReaderException(linePos, codePosIndex, msg);
                 }
                 return Instant.parse((CharSequence) form);
-            } else if (options.allowReferences() && token.equals("edna/ref")) {
-                return readRef(token, form);
             } else {
-                final var decoder = options.ednClassDecoders().get(token);
+                final var decoder = options.taggedElementDecoders().get(token);
                 if (decoder != null) return decoder.apply(form);
             }
         } catch (
@@ -280,24 +272,9 @@ public class EdnaReader {
         throw new EdnaReaderException(linePos, codePosIndex, "Invalid dispatch expression #" + token + ".");
     }
 
-    private @Nullable Object readRef(@NotNull String token, @Nullable Object form) {
-        if (token.equals("edna/ref")) {
-            if (!(form instanceof Symbol)) throw new EdnaReaderException(
-                    cpi.getLineIdx(), cpi.getTextIndex(),
-                    "#" + token + " requires a symbol for the reference, but got $form of type "
-                            + (form == null ? "null" : form.getClass()) + ")"
-            );
-            if (!references.containsKey(form)) throw new EdnaReaderException(
-                    cpi.getLineIdx(), cpi.getTextIndex(),
-                    "#" + token + ": $form not found in the lookup. (lookup contains " + references.keySet() + ")"
-            );
-            return references.get((Symbol) form);
-        }
-
-        throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), "Unsupported reference macro: " + token);
-    }
-
-    private @NotNull Set<Object> readSet(final int level, @SuppressWarnings("SameParameterValue") final int separator) {
+    private @NotNull Set<Object> readSet(
+            final int level,
+            @SuppressWarnings("SameParameterValue") final int separator) {
         final var linePos = cpi.getLineIdx();
         final var codePosIndex = cpi.getTextIndex();
         final Set<Object> result = new HashSet<>();
@@ -447,7 +424,7 @@ public class EdnaReader {
     }
 
     private @NotNull String readToken(final int maxCount, final @NotNull IntPredicate condition) {
-        cpi.takeCodePoints(readTokenBuffer, condition);
+        cpi.takeCodePoints(readTokenBuffer, maxCount, condition);
         final @NotNull var tkn = readTokenBuffer.toString();
         readTokenBuffer.setLength(0);
         return tkn;
@@ -667,13 +644,6 @@ public class EdnaReader {
             case 'a', 'b', 'c', 'd', 'e', 'f',
                  'A', 'B', 'C', 'D', 'E', 'F',
                  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> true;
-            default -> false;
-        };
-    }
-
-    private boolean isNum(final int codepoint) {
-        return switch (codepoint) {
-            case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> true;
             default -> false;
         };
     }

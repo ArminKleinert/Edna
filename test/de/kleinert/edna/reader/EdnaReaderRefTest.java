@@ -12,17 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 public class EdnaReaderRefTest {
-    private @NotNull EdnaOptions options() {
-        return EdnaOptions.defaultOptions().copy((b) -> b.allowReferences(true));
-    }
-
-    private @NotNull EdnaOptions options(Map<Symbol, Object> refTable) {
-        return EdnaOptions.defaultOptions().copy((b) ->
-                b.allowReferences(true).referenceTable(refTable));
+    private @NotNull EdnaOptions options(final Map<Object, Object> refTable) {
+        return Edna.defaultOptions().copy((b) ->
+                b.taggedElementDecoders(Map.of("edna/ref", (e) -> {
+                    if (!refTable.containsKey(e)) throw new IllegalArgumentException();
+                    return refTable.get(e);
+                })));
     }
 
     private @Nullable Object parse(String s) {
-        return Edna.read(s, options());
+        return Edna.read(s, options(Map.of()));
     }
 
     @Test
@@ -34,7 +33,7 @@ public class EdnaReaderRefTest {
 
     @Test
     public void parseIllegalRefTest() {
-        Assertions.assertThrows(EdnaReaderException.class, () -> parse("#ref"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> parse("#edna/ref"));
         Assertions.assertThrows(EdnaReaderException.class, () -> parse("#edna/ref :A"));
         Assertions.assertThrows(EdnaReaderException.class, () -> parse("#edna/ref 0.1"));
         Assertions.assertThrows(EdnaReaderException.class, () -> parse("#edna/ref 1"));
@@ -49,8 +48,7 @@ public class EdnaReaderRefTest {
 
     @Test
     public void parseRefUsingOutsideTest() {
-        var options = options();
-        var refs = Map.<Symbol, Object>of(Symbol.symbol("A"), 1L, Symbol.symbol("B"), 2L);
+        var refs = Map.<Object, Object>of(Symbol.symbol("A"), 1L, Symbol.symbol("B"), 2L);
 
         Assertions.assertEquals(1L, Edna.read("#edna/ref A", options(refs)));
         Assertions.assertEquals(2L, Edna.read("#edna/ref B", options(refs)));
@@ -58,9 +56,8 @@ public class EdnaReaderRefTest {
 
     @Test
     public void parseRefUsesReferencesOutsideTest() {
-        var options = options();
         var value = List.of(1L, 2L, 3L);
-        var refs = Map.<Symbol, Object>of(Symbol.symbol("A"), value);
+        var refs = Map.<Object, Object>of(Symbol.symbol("A"), value);
 
         Assertions.assertEquals(value, Edna.read("#edna/ref A", options(refs)));
 
@@ -72,8 +69,7 @@ public class EdnaReaderRefTest {
 
     @Test
     public void parseRefIsDynamicTest() {
-        var options = options();
-        var refs = Map.<Symbol, Object>of(
+        var refs = Map.<Object, Object>of(
                 Symbol.symbol("A"), 1L,
                 Symbol.symbol("B"), Symbol.symbol("A"),
                 Symbol.symbol("C"), Symbol.symbol("B"));
@@ -105,10 +101,8 @@ public class EdnaReaderRefTest {
 
     @Test
     public void refFromConfig() {
-        var options = options();
-
         var configText = "{ A 1, B 2, C 3 }";
-        var config = Edna.read(configText, options, Map.class);
+        var config = Edna.read(configText, Edna.defaultOptions(), Map.class);
 
         var text = "[#edna/ref A #edna/ref B #edna/ref C]";
         Assertions.assertEquals(List.of(1L, 2L, 3L), Edna.read(text, options(config)));
