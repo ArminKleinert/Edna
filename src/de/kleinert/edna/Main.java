@@ -9,8 +9,10 @@ import java.io.StringReader;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.stream.LongStream;
+import java.util.stream.StreamSupport;
 
 public class Main {
     private static void stdExamples() {
@@ -53,16 +55,21 @@ public class Main {
     }
     public static void main(String[] args) {
         {
-            var text = "1 2 3";
+            var text = "1 \\2 [3] #{88}";
             var cpi = new CodePointIterator(text.codePoints());
-            var pars = EdnaParser.read1(cpi, Edna.defaultOptions(), Object.class);
-            System.out.println(pars);
-            pars = EdnaParser.read1(cpi, Edna.defaultOptions(), Object.class);
-            System.out.println(pars);
-            pars = EdnaParser.read1(cpi, Edna.defaultOptions(), Object.class);
-            System.out.println(pars);
-            pars = EdnaParser.read1(cpi, Edna.defaultOptions(), Object.class);
-            System.out.println(pars);
+            var pars = EdnaParser.reader(cpi, Edna.defaultOptions());
+            var iter = pars;
+//            System.out.println(iter.hasNext());
+//            if (iter.hasNext()) System.out.println(iter.next());
+//            System.out.println(iter.hasNext());
+//            if (iter.hasNext()) System.out.println(iter.next());
+//            System.out.println(iter.hasNext());
+//            if (iter.hasNext()) System.out.println(iter.next());
+//            System.out.println(iter.hasNext());
+//            if (iter.hasNext()) System.out.println(iter.next());
+//            System.out.println(iter.hasNext());
+//            if (iter.hasNext()) System.out.println(iter.next());
+            System.out.println(StreamSupport.stream(Spliterators.spliteratorUnknownSize(pars, 0), false).toList());
         }
 
         System.exit(0);

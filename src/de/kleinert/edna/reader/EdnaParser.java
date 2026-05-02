@@ -49,19 +49,69 @@ public class EdnaParser {
     }
 
     private final @NotNull Object NOTHING = new Object();
+    private final @NotNull Object EOF_MARKER = new Object();
+
+    public static @NotNull Iterator<Object> reader(
+            final @NotNull CodePointIterator cpi,
+            final @NotNull EdnaOptions options) {
+        EdnaParser parser = new EdnaParser(options, cpi);
+        var iterable = new Iterable<>() {
+            @Override
+            public @NotNull Iterator<Object> iterator() {
+                return new Iterator<>() {
+                    Object next = null;
+                    boolean reachedEnd = false;
+                    boolean buffered = false;
+                    @Override
+                    public boolean hasNext() {
+                        if (reachedEnd) {
+                            return false;
+                        }
+                        if (buffered) {
+                            return true;
+                        }
+                        next = readSkipNothing();
+                        buffered = true;
+                        if (next == parser.EOF_MARKER) {
+                            reachedEnd = true;
+                            return false;
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public Object next() {
+                        if (buffered) {
+                            var temp = next;
+                            next = null;
+                            buffered = false;
+                            return temp;
+                        }
+                        var temp = readSkipNothing();
+                        if (temp == parser.EOF_MARKER) {
+                            reachedEnd = true;
+                            throw new NoSuchElementException();
+                        }
+                        return temp;
+                    }
+
+                    private Object readSkipNothing() {
+                        var temp = parser.NOTHING;
+                        while (temp == parser.NOTHING) {
+                            temp = parser.readString(false, true);
+                        }
+                        return temp;
+                    }
+                };
+            }
+        };
+        return iterable.iterator();
+    }
 
     public static <T> @Nullable T read(final @NotNull CodePointIterator cpi,
                                        final @NotNull EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
         final var temp = new EdnaParser(options, cpi).readString(false, false);
-        if (temp == null) return null;
-        return castClass.cast(temp);
-    }
-
-    public static <T> @Nullable T read1(final @NotNull CodePointIterator cpi,
-                                        final @NotNull EdnaOptions options,
-                                        final @NotNull Class<T> castClass) {
-        final var temp = new EdnaParser(options, cpi).readString(false, true);
         if (temp == null) return null;
         return castClass.cast(temp);
     }
@@ -78,7 +128,7 @@ public class EdnaParser {
         var pars = readForm(0, stopAfterOne, true);
 
         if (stopAfterOne)
-            data = List.of(pars);
+            data = Arrays.asList(pars);
         else
             data = (List<?>) pars;
 
@@ -181,7 +231,7 @@ public class EdnaParser {
 
         if (stopAfterOne) {
             if (mayReturnNothing && res.isEmpty()) {
-                return NOTHING;
+                return EOF_MARKER;
             }
             if (res.size() != 1) {
                 //noinspection ConstantValue
