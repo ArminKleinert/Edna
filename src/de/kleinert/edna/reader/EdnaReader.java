@@ -228,15 +228,15 @@ public class EdnaReader {
                 return readSet(level + 1, '}');
             }
             case '#' -> {
+                if (!options.allowSymbolicValues())
+                    throw new EdnaReaderException(linePos, codePosIndex, "Symbolic values are not allowed.");
+                token.setLength(0); // Clear token
                 cpi.takeCodePoints(token, this::isNotBreakingSymbolOrDispatch);
 
-                return switch (token.toString()) {
-                    case "#NaN" -> Double.NaN;
-                    case "#-NaN" -> -Double.NaN;
-                    case "#INF" -> Double.POSITIVE_INFINITY;
-                    case "#-INF" -> Double.NEGATIVE_INFINITY;
-                    default -> throw new EdnaReaderException(linePos, codePosIndex, "Unknown symbolic value #" + token);
-                };
+                var sym = Symbol.symbol(token.toString());
+                if (!options.symbolicValues().containsKey(sym))
+                    throw new EdnaReaderException(linePos, codePosIndex, "Unknown symbolic value ##" + token);
+                return options.symbolicValues().get(Symbol.symbol(token.toString()));
             }
         }
 
@@ -260,7 +260,7 @@ public class EdnaReader {
                     throw new EdnaReaderException(linePos, codePosIndex, msg);
                 }
                 return Instant.parse((CharSequence) form);
-            } else if (options.allowReferences() && token.equals("ref")) {
+            } else if (options.allowReferences() && token.equals("edna/ref")) {
                 return readRef(token, form);
             } else {
                 final var decoder = options.ednClassDecoders().get(token);
@@ -281,7 +281,7 @@ public class EdnaReader {
     }
 
     private @Nullable Object readRef(@NotNull String token, @Nullable Object form) {
-        if (token.equals("ref")) {
+        if (token.equals("edna/ref")) {
             if (!(form instanceof Symbol)) throw new EdnaReaderException(
                     cpi.getLineIdx(), cpi.getTextIndex(),
                     "#" + token + " requires a symbol for the reference, but got $form of type "
@@ -310,6 +310,7 @@ public class EdnaReader {
             result.add(key);
             i++;
         }
+        //noinspection unchecked
         return (Set<Object>) options.listToEdnSetConverter().apply(lst);
     }
 
@@ -326,7 +327,9 @@ public class EdnaReader {
             case String v -> EdnaMap.create(List.of(Keyword.keyword("tag"), v));
             case Symbol v -> EdnaMap.create(List.of(Keyword.keyword("tag"), v));
             case Keyword v -> EdnaMap.create(List.of(v, true));
-            case Map<?, ?> tempMap -> (Map<Object, Object>) tempMap;
+            case Map<?, ?> tempMap ->
+                //noinspection unchecked
+                    (Map<Object, Object>) tempMap;
             default -> throw new EdnaReaderException(
                     linePos, codePosIndex,
                     "Metadata must be a Symbol, Keyword, String or Map.");

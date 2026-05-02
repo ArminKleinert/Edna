@@ -30,8 +30,17 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           boolean encoderPrettyPrint,
                           @NotNull Map<Symbol, Object> referenceTable,
                           boolean allowMetaData,
-                          boolean allowZeroPrefix) {
+                          boolean allowZeroPrefix,
+                          boolean allowSymbolicValues,
+                          @NotNull Map<Symbol, Object> symbolicValues) {
     private static EdnaOptions defaultOptions;
+
+    private static Map<Symbol, Object> defaultSymbolicValues() {
+        return Map.of(
+                Symbol.symbol("NaN"), Double.NaN,
+                Symbol.symbol("Inf"), Double.POSITIVE_INFINITY,
+                Symbol.symbol("-Inf"), Double.NEGATIVE_INFINITY);
+    }
 
     public static @NotNull EdnaOptions defaultOptions() {
         if (defaultOptions == null) defaultOptions = new EdnaOptions(
@@ -55,7 +64,9 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 true,
                 Map.of(),
                 false,
-                false);
+                false,
+                false,
+                defaultSymbolicValues());
         return defaultOptions;
     }
 
@@ -83,7 +94,9 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 true,
                 Map.of(),
                 true,
-                true);
+                true,
+                true,
+                defaultSymbolicValues());
         return extendedOptions;
     }
 
@@ -115,6 +128,8 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         private @NotNull Map<Symbol, Object> referenceTable;
         private boolean allowMetaData;
         private boolean allowZeroPrefix;
+        private boolean allowSymbolicValues;
+        private @NotNull Map<Symbol, Object> symbolicValues;
 
         public Builder(final @NotNull EdnaOptions o) {
             this.allowSchemeUTF32Codes = o.allowSchemeUTF32Codes();
@@ -138,6 +153,8 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             this.referenceTable = o.referenceTable();
             this.allowMetaData = o.allowMetaData();
             this.allowZeroPrefix = o.allowZeroPrefix();
+            this.allowSymbolicValues = o.allowSymbolicValues();
+            this.symbolicValues = o.symbolicValues();
         }
 
         public Builder allowSchemeUTF32Codes(final boolean v) {
@@ -245,6 +262,16 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
+        public Builder allowSymbolicValues(final boolean v) {
+            this.allowSymbolicValues = v;
+            return this;
+        }
+
+        public Builder symbolicValues(final Map<Symbol, Object> v) {
+            this.symbolicValues = v;
+            return this;
+        }
+
         public @NotNull EdnaOptions build() {
             return new EdnaOptions(
                     allowSchemeUTF32Codes,
@@ -267,7 +294,9 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                     encoderPrettyPrint,
                     referenceTable,
                     allowMetaData,
-                    allowZeroPrefix
+                    allowZeroPrefix,
+                    allowSymbolicValues,
+                    symbolicValues
             );
         }
     }

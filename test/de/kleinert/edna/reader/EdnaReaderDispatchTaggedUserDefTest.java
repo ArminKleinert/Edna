@@ -1,12 +1,14 @@
 package de.kleinert.edna.reader;
 
 import de.kleinert.edna.Edna;
+import de.kleinert.edna.data.Symbol;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 class EdnaReaderDispatchTaggedUserDefTest {
@@ -54,5 +56,14 @@ class EdnaReaderDispatchTaggedUserDefTest {
                         Edna.defaultOptions().copy(b -> b.ednClassDecoders(decoders))
                 )
         );
+    }
+
+    @Test
+    void parseDecoderReferencingExternal() {
+        var uniqueObj = new Object();
+        var refs = Map.<Object, Object>of(Symbol.symbol("abc"), uniqueObj);
+        var decoders = Map.of("edna/ref", (Function<Object, Object>) symbol -> refs.getOrDefault(symbol, 1));
+        var options = Edna.defaultOptions().copy(b -> b.ednClassDecoders(decoders));
+        Assertions.assertSame(uniqueObj, Edna.read("#edna/ref abc", options));
     }
 }
