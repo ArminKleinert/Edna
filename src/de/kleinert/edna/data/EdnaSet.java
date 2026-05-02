@@ -1,6 +1,7 @@
 package de.kleinert.edna.data;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
@@ -8,14 +9,16 @@ import java.util.*;
 @Unmodifiable
 public final class EdnaSet<T>
         extends AbstractSet<T>
-        implements SequencedSet<T> {
+        implements SequencedSet<T>, IObj {
     private final @NotNull SequencedSet<T> delegate;
+    private final @NotNull Map<Object, Object> meta;
 
     public EdnaSet(final @NotNull List<T> delegate) {
-        this(new LinkedHashSet<>(delegate));
+        this(null, new LinkedHashSet<>(delegate));
     }
 
-    private EdnaSet(final @NotNull SequencedSet<T> delegate) {
+    private EdnaSet(final @Nullable Map<Object, Object> meta, final @NotNull SequencedSet<T> delegate) {
+        this.meta = meta == null ? Map.of() : meta;
         this.delegate = delegate;
     }
 
@@ -47,11 +50,26 @@ public final class EdnaSet<T>
 
     @Override
     public @NotNull SequencedSet<T> reversed() {
-        return new EdnaSet<>(delegate.reversed());
+        return new EdnaSet<>(meta, delegate.reversed());
     }
 
     @Override
     public @NotNull String toString() {
         return "#" + EdnaCollections.toStringHelper(this, '{', '}', ',');
+    }
+
+    @Override
+    public @Unmodifiable @NotNull Map<Object, Object> meta() {
+        return meta;
+    }
+
+    @Override
+    public @Unmodifiable Object obj() {
+        return this;
+    }
+
+    @Override
+    public @NotNull IObj withMeta(@NotNull Map<Object, Object> newMeta) {
+        return new EdnaSet<>(meta, this.delegate);
     }
 }

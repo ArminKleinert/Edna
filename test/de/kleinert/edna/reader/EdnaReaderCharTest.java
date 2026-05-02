@@ -1,24 +1,25 @@
 package de.kleinert.edna.reader;
 
-import de.kleinert.edna.EdnaOptions;
 import de.kleinert.edna.Edna;
 import de.kleinert.edna.data.Char32;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
-public class EdnaReaderCharTest {    @Test
-public void parseSlashWhitespaceIsInvalid() {
-    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read(""));
-    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\") );
-    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\"));
-    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\ ") );
-    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\ ") );
-    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\\n "));
-    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\\n "));
 
-    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("[\\ ]"));
-    Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("[#\\ ]"));
-}
+public class EdnaReaderCharTest {
+    @Test
+    public void parseSlashWhitespaceIsInvalid() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read(""));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\ "));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\ "));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\\n "));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\\n "));
+
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("[\\ ]"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("[#\\ ]"));
+    }
 
     @Test
     public void parseSpecialCharsTest() {
@@ -26,34 +27,39 @@ public void parseSlashWhitespaceIsInvalid() {
         Assertions.assertEquals(' ', Edna.read("\\space"));
         Assertions.assertEquals('\t', Edna.read("\\tab"));
         Assertions.assertEquals('\b', Edna.read("\\backspace"));
-        Assertions.assertEquals((char)12, Edna.read("\\formfeed"));
+        Assertions.assertEquals((char) 12, Edna.read("\\formfeed"));
         Assertions.assertEquals('\r', Edna.read("\\return"));
     }
 
     @Test
     public void parseSimpleCharsTest() {
-    var str = "abcdefghijklmnopqrstuvwxyz";
-    str += str.toUpperCase();
-    str += "0123456789";
+        var str = "abcdefghijklmnopqrstuvwxyz";
+        str += str.toUpperCase();
+        str += "0123456789";
         for (int i = 0; i < str.length(); i++) {
-            Assertions.assertEquals(str.charAt(i), Edna.read("\\"+str.charAt(i)));
+            Assertions.assertEquals(str.charAt(i), Edna.read("\\" + str.charAt(i)));
         }
     }
 
     @Test
     public void parseSymbolCharsTest() {
-    var chars =  "!\"§$%&/()=?*+~^°'#-_.:,<>|€@`´λ";
+        var chars = "!\"§$%&/()=?*+~^°'#-_.:,<>|€@`´λ";
         for (int i = 0; i < chars.length(); i++) {
             var chr = chars.charAt(i);
-            Assertions.assertEquals(chr, Edna.read("\\"+chr));
+            Assertions.assertEquals(chr, Edna.read("\\" + chr));
         }
     }
 
     @Test
     public void parseOctCharsTest() {
-        Assertions.assertEquals('!', Edna.read("\\o41"));
-        Assertions.assertEquals('!', Edna.read("\\o041"));
-        Assertions.assertEquals('ǂ', Edna.read("\\o702"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\o41"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\o041"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\o702"));
+
+        // Octal dispatch "char" (string)
+        Assertions.assertEquals('!', Edna.read("\\o41", Edna.extendedOptions()));
+        Assertions.assertEquals('!', Edna.read("\\o041", Edna.extendedOptions()));
+        Assertions.assertEquals('ǂ', Edna.read("\\o702", Edna.extendedOptions()));
     }
 
     @Test

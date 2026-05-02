@@ -10,10 +10,11 @@ import java.util.function.UnaryOperator;
 
 public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           boolean allowDispatchChars,
+                          boolean allowBase8Chars,
                           @NotNull Map<@NotNull String, @NotNull Function<Object, Object>> taggedElementDecoders,
                           @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<@NotNull Object, EdnaTagVal<String, ?>>> taggedElementEncoders,
                           boolean moreNumberPrefixes,
-                          boolean allowMoreEncoderDecoderNames,
+                          boolean allowTaggedElementsWithoutNS,
                           @NotNull String encodingSequenceSeparator,
                           @NotNull Function<@NotNull List<@Nullable Object>, List<Object>> listToEdnListConverter,
                           @NotNull Function<@NotNull List<@Nullable Object>, List<Object>> listToEdnVectorConverter,
@@ -38,6 +39,7 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
 
     public static @NotNull EdnaOptions defaultOptions() {
         return new EdnaOptions(
+                false,
                 false,
                 false,
                 Map.of(),
@@ -65,8 +67,9 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         return defaultOptions().copy(builder -> builder
                 .allowSchemeUTF32Codes(true)
                 .allowDispatchChars(true)
+                .allowBase8Chars(true)
                 .moreNumberPrefixes(true)
-                .allowMoreEncoderDecoderNames(true)
+                .allowTaggedElementsWithoutNS(true)
                 .allowUTFSymbols(true)
                 .allowMetaData(true)
                 .allowZeroPrefix(true)
@@ -81,10 +84,11 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
     public static final class Builder {
         private boolean allowSchemeUTF32Codes;
         private boolean allowDispatchChars;
+        private boolean allowBase8Chars;
         private @NotNull Map<@NotNull String, @NotNull Function<@Nullable Object, Object>> taggedElementDecoders;
         private @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<@NotNull Object, EdnaTagVal<String, ?>>> taggedElementEncoders;
         private boolean moreNumberPrefixes;
-        private boolean allowMoreEncoderDecoderNames;
+        private boolean allowTaggedElementsWithoutNS;
         private @NotNull String encodingSequenceSeparator;
         private @NotNull Function<@NotNull List<Object>, @Nullable List<Object>> listToEdnListConverter;
         private @NotNull Function<@NotNull List<Object>, @Nullable List<Object>> listToEdnVectorConverter;
@@ -104,10 +108,11 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         public Builder(final @NotNull EdnaOptions o) {
             this.allowSchemeUTF32Codes = o.allowSchemeUTF32Codes();
             this.allowDispatchChars = o.allowDispatchChars();
+            this.allowBase8Chars = o.allowBase8Chars;
             this.taggedElementDecoders = o.taggedElementDecoders();
             this.taggedElementEncoders = o.taggedElementEncoders();
             this.moreNumberPrefixes = o.moreNumberPrefixes();
-            this.allowMoreEncoderDecoderNames = o.allowMoreEncoderDecoderNames();
+            this.allowTaggedElementsWithoutNS = o.allowTaggedElementsWithoutNS();
             this.encodingSequenceSeparator = o.encodingSequenceSeparator();
             this.listToEdnListConverter = o.listToEdnListConverter();
             this.listToEdnVectorConverter = o.listToEdnVectorConverter();
@@ -135,6 +140,11 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
+        public Builder allowBase8Chars(final boolean v) {
+            this.allowBase8Chars = v;
+            return this;
+        }
+
         public <K, V> Builder taggedElementDecoders(final Map<@NotNull String, @NotNull Function<K, V>> v) {
             //noinspection unchecked,rawtypes
             this.taggedElementDecoders = new HashMap<>((Map) v);
@@ -151,8 +161,8 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
-        public Builder allowMoreEncoderDecoderNames(boolean v) {
-            this.allowMoreEncoderDecoderNames = v;
+        public Builder allowTaggedElementsWithoutNS(boolean v) {
+            this.allowTaggedElementsWithoutNS = v;
             return this;
         }
 
@@ -239,10 +249,11 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return new EdnaOptions(
                     allowSchemeUTF32Codes,
                     allowDispatchChars,
+                    allowBase8Chars,
                     taggedElementDecoders,
                     taggedElementEncoders,
                     moreNumberPrefixes,
-                    allowMoreEncoderDecoderNames,
+                    allowTaggedElementsWithoutNS,
                     encodingSequenceSeparator,
                     listToEdnListConverter,
                     listToEdnVectorConverter,

@@ -27,7 +27,6 @@ public class EdnaReaderRefTest {
     @Test
     public void parseRefUndefTest() {
         Assertions.assertThrows(EdnaReaderException.class, () -> parse("#edna/ref A"));
-
         Assertions.assertThrows(EdnaReaderException.class, () -> parse("#edna/ref B"));
     }
 

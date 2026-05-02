@@ -5,9 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public interface IObj {
     @Unmodifiable
@@ -21,7 +19,7 @@ public interface IObj {
     static <T> @NotNull IObj of(final @NotNull Object meta,
                                 final T element) {
         var newMeta = formatMeta(meta);
-        return new Wrapper<>(newMeta, element);
+        return new Wrapper<>(Collections.unmodifiableMap(newMeta), element);
     }
 
      static @NotNull Map<Object, Object> formatMeta(final @Nullable Object meta) {
@@ -37,7 +35,18 @@ public interface IObj {
     default <T> @NotNull IObj of(final T element) {
         if (element instanceof IObj)
             return (IObj) element;
-        return new Wrapper<>(Map.of(), element);
+        return new Wrapper<>(Collections.unmodifiableMap(Map.of()), element);
+    }
+
+    public static IObj mergeMeta(Object unformattedMeta, Object obj) {
+        var meta1 = IObj.formatMeta(unformattedMeta);
+        if (obj instanceof IObj) {
+            var objMeta = ((IObj) obj).meta();
+            var merged = new HashMap<>(objMeta);
+            merged.putAll(meta1);
+            return ((IObj) obj).withMeta(merged);
+        }
+        return IObj.of(meta1, obj);
     }
 
     @Unmodifiable
@@ -61,7 +70,7 @@ public interface IObj {
         @Override
         public @NotNull IObj withMeta(
                 final @NotNull Map<Object, Object> newMeta) {
-            return new Wrapper<>(newMeta, obj);
+            return new Wrapper<>(Collections.unmodifiableMap(newMeta), obj);
         }
 
         @Override

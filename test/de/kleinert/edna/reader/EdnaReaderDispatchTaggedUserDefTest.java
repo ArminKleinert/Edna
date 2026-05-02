@@ -24,7 +24,7 @@ class EdnaReaderDispatchTaggedUserDefTest {
         // Valid name with option
         {
             var options = Edna.defaultOptions().copy(b ->
-                    b.allowMoreEncoderDecoderNames(true)
+                    b.allowTaggedElementsWithoutNS(true)
                             .taggedElementDecoders(Map.of("pair", (e) -> e))
             );
             Edna.read("1", options);
@@ -34,7 +34,7 @@ class EdnaReaderDispatchTaggedUserDefTest {
         {
             Map<String, Function<Object, Object>> decoders = Map.of("pair", (e) -> e);
             var options = Edna.defaultOptions().copy(b ->
-                    b.allowMoreEncoderDecoderNames(true)
+                    b.allowTaggedElementsWithoutNS(true)
                             .taggedElementDecoders(decoders)
             );
             Edna.read("1", options);

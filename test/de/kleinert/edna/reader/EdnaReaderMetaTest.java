@@ -136,4 +136,32 @@ class EdnaReaderMetaTest {
             Assertions.assertEquals(Symbol.symbol("b"), ((IObj) it).obj());
         }
     }
+
+    @Test
+    void parseMetaIsMergedTest() {
+        {
+            var it = Edna.read("^{\"b\" 12} ^{\"a\" \"c\"} o", opts);
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of("b", 12L, "a", "c"), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("o"), ((IObj) it).obj());
+        }
+        {
+            var it = Edna.read("^{\"b\" 12} #^{\"a\" \"c\"} o", opts);
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of("b", 12L, "a", "c"), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("o"), ((IObj) it).obj());
+        }
+        {
+            var it = Edna.read("#^{\"b\" 12} ^{\"a\" \"c\"} o", opts);
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of("b", 12L, "a", "c"), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("o"), ((IObj) it).obj());
+        }
+        {
+            var it = Edna.read("#^{\"b\" 12} #^{\"a\" \"c\"} o", opts);
+            Assertions.assertInstanceOf(IObj.class, it);
+            Assertions.assertEquals(Map.of("b", 12L, "a", "c"), ((IObj) it).meta());
+            Assertions.assertEquals(Symbol.symbol("o"), ((IObj) it).obj());
+        }
+    }
 }

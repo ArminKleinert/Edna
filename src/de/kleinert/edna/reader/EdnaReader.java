@@ -37,11 +37,11 @@ public class EdnaReader {
                 final @NotNull var message = "Decoder name \"" + key + "\" is not a valid symbol.";
                 throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
             }
-            if (!options.allowMoreEncoderDecoderNames() && name.namespace() == null) {
+            if (!options.allowTaggedElementsWithoutNS() && name.namespace() == null) {
                 final @NotNull var message = "Decoder without namespace: " + name;
                 throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
             }
-            if (key.equals("inst") || key.equals("uuid") || key.equals("ref")) {
+            if (key.equals("inst") || key.equals("uuid")) {
                 final @NotNull var message = "Decoder name " + name + " is not allowed.";
                 throw new EdnaReaderException(cpi.getLineIdx(), cpi.getTextIndex(), message);
             }
@@ -314,17 +314,7 @@ public class EdnaReader {
                     linePos, codePosIndex,
                     "Metadata is turned off.");
 
-        final Map<Object, Object> meta = switch (readForm(level, true)) {
-            case String v -> EdnaMap.create(List.of(Keyword.keyword("tag"), v));
-            case Symbol v -> EdnaMap.create(List.of(Keyword.keyword("tag"), v));
-            case Keyword v -> EdnaMap.create(List.of(v, true));
-            case Map<?, ?> tempMap ->
-                //noinspection unchecked
-                    (Map<Object, Object>) tempMap;
-            default -> throw new EdnaReaderException(
-                    linePos, codePosIndex,
-                    "Metadata must be a Symbol, Keyword, String or Map.");
-        };
+        final var meta = readForm(level, true);
 
         final var obj = readForm(level, true);
         if (obj == NOTHING) {
@@ -333,7 +323,12 @@ public class EdnaReader {
                     "Required object for metadata, but got nothing.");
         }
 
-        return new IObj.Wrapper<>(meta, obj);
+        try {
+            return IObj.mergeMeta(meta, obj);
+        } catch (IllegalArgumentException ex) {
+            var message = "Failed to apply metadata " + meta + " to object " + obj + ".";
+            throw new EdnaReaderException(linePos, codePosIndex, message);
+        }
     }
 
     private @NotNull Number readNumber() {
@@ -511,7 +506,7 @@ public class EdnaReader {
         final var reducedToken = token.subSequence(1, token.length());
         final var errorTokenText = (isDispatch ? "#" : "") + '\\' + token;
         final var c0 = token.codePointAt(0);
-        if (c0 == 'o') {
+        if (options.allowBase8Chars() && c0 == 'o') {
             if (reducedToken.length() < 2 || reducedToken.length() > 3)
                 throw new EdnaReaderException(
                         linePos, codePosIndex,

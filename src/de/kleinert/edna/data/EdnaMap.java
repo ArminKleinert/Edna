@@ -1,6 +1,7 @@
 package de.kleinert.edna.data;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
@@ -8,7 +9,7 @@ import java.util.*;
 @Unmodifiable
 public final class EdnaMap<K, V>
         extends AbstractMap<K, V>
-        implements SequencedMap<K, V> {
+        implements SequencedMap<K, V>, IObj {
     private static EdnaMap empty = null;
 
     private static <K, V> EdnaMap<K, V> empty() {
@@ -17,9 +18,10 @@ public final class EdnaMap<K, V>
     }
 
     private final @NotNull SequencedMap<K, V> delegate;
+    private final @NotNull Map<Object, Object> meta;
 
     public EdnaMap(final @NotNull List<Entry<K, V>> delegate) {
-        this(sequencedMapFromEntryList(delegate));
+        this(null, sequencedMapFromEntryList(delegate));
     }
 
     private static <K, V> @NotNull SequencedMap<K, V> sequencedMapFromEntryList(
@@ -31,8 +33,9 @@ public final class EdnaMap<K, V>
         return temp;
     }
 
-    public EdnaMap(final @NotNull SequencedMap<K, V> delegate) {
-        this.delegate = delegate;
+    public EdnaMap(final @Nullable Map<Object, Object> meta, final @NotNull SequencedMap<K, V> delegate) {
+        this.meta = meta == null ? Map.of() : meta;
+        this.delegate = Collections.unmodifiableSequencedMap(delegate);
     }
 
     public static <K, V> @NotNull EdnaMap<K, V> of(K k, V v) {
@@ -66,7 +69,7 @@ public final class EdnaMap<K, V>
     public static <K, V> @NotNull EdnaMap<K, V> create(
             final @NotNull List<Object> kvs) {
         if (kvs.isEmpty())
-            return EdnaMap.<K, V>empty();
+            return EdnaMap.empty();
         if (kvs.size() % 2 != 0) {
             throw new IllegalArgumentException();
         }
@@ -96,7 +99,7 @@ public final class EdnaMap<K, V>
 
     @Override
     public @NotNull SequencedMap<K, V> reversed() {
-        return new EdnaMap<>(delegate.reversed());
+        return new EdnaMap<>(meta, delegate.reversed());
     }
 
     @Override
@@ -113,5 +116,20 @@ public final class EdnaMap<K, V>
             sb.append(',').append(' ');
         }
         return sb.append('}').toString();
+    }
+
+    @Override
+    public @Unmodifiable @NotNull Map<Object, Object> meta() {
+        return meta;
+    }
+
+    @Override
+    public @Unmodifiable Object obj() {
+        return this;
+    }
+
+    @Override
+    public @NotNull IObj withMeta(@NotNull Map<Object, Object> newMeta) {
+        return new EdnaMap<>(meta, this.delegate);
     }
 }

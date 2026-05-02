@@ -1,7 +1,6 @@
 package de.kleinert.edna.data;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 
@@ -23,5 +22,4 @@ final class EdnaCollections {
         }
         return sb.append(endDelimiter).toString();
     }
-
 }
