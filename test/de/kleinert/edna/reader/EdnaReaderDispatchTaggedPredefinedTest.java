@@ -12,7 +12,7 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.function.Function;
 
-class EdnaParserDispatchTaggedPredefinedTest {
+class EdnaReaderDispatchTaggedPredefinedTest {
     private Object parse(String s) {
         @NotNull Map<String, Function<Object, Object>> decoders = EdnaConverters.merge(
                         EdnaConverters.arrayConverters(),

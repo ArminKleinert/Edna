@@ -4,7 +4,7 @@ import de.kleinert.edna.Edna;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class EdnaParserExceptionTest {
+class EdnaReaderExceptionTest {
     @Test
     public void positionStartTest() {
         try {

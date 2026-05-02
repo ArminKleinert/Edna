@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.io.StringReader;
 import java.util.List;
 
-class EdnaParserIteratorTest {
+class EdnaReaderIteratorTest {
     @Test
     public void parseIteratorEmptyWhitespaceTest() {
         Assertions.assertFalse(Edna.reader("").hasNext());

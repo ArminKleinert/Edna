@@ -6,7 +6,7 @@ import de.kleinert.edna.data.Symbol;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class EdnaParserSymbolTest {
+public class EdnaReaderSymbolTest {
     @Test
     public void parseSymbolBasicTest() {
         {

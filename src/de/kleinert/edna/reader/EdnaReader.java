@@ -13,11 +13,11 @@ import java.util.*;
 import java.util.function.IntPredicate;
 import java.util.regex.Pattern;
 
-public class EdnaParser {
+public class EdnaReader {
     private final @NotNull EdnaOptions options;
     private final @NotNull CodePointIterator cpi;
 
-    EdnaParser(final @NotNull EdnaOptions options,
+    EdnaReader(final @NotNull EdnaOptions options,
                final @NotNull CodePointIterator cpi) {
         @NotNull var newOptions = options;
         if (options.allowSymbolicValues()) {
@@ -54,7 +54,7 @@ public class EdnaParser {
     public static @NotNull Iterator<Object> reader(
             final @NotNull CodePointIterator cpi,
             final @NotNull EdnaOptions options) {
-        EdnaParser parser = new EdnaParser(options, cpi);
+        EdnaReader parser = new EdnaReader(options, cpi);
         var iterable = new Iterable<>() {
             @Override
             public @NotNull Iterator<Object> iterator() {
@@ -111,7 +111,7 @@ public class EdnaParser {
     public static <T> @Nullable T read(final @NotNull CodePointIterator cpi,
                                        final @NotNull EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
-        final var temp = new EdnaParser(options, cpi).readString(false, false);
+        final var temp = new EdnaReader(options, cpi).readString(false, false);
         if (temp == null) return null;
         return castClass.cast(temp);
     }
@@ -120,7 +120,7 @@ public class EdnaParser {
             final @NotNull CodePointIterator cpi,
             final @NotNull EdnaOptions options) {
         //noinspection unchecked
-        return Collections.unmodifiableList((List<Object>) (Objects.requireNonNull(new EdnaParser(options, cpi).readString(true, false))));
+        return Collections.unmodifiableList((List<Object>) (Objects.requireNonNull(new EdnaReader(options, cpi).readString(true, false))));
     }
 
     private @Nullable Object readString(final boolean readMulti, final boolean stopAfterOne) {

@@ -3,7 +3,7 @@ package de.kleinert.edna;
 import de.kleinert.edna.pprint.EdnaWriter;
 import de.kleinert.edna.pprint.EdnaWriterException;
 import de.kleinert.edna.reader.CodePointIterator;
-import de.kleinert.edna.reader.EdnaParser;
+import de.kleinert.edna.reader.EdnaReader;
 import de.kleinert.edna.reader.EdnaReaderException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +30,7 @@ public class Edna {
                                               @Nullable EdnaOptions options,
                                               final @NotNull Class<T> castClass) {
         options = optsOrDefault(options);
-        final Iterator<Object> iterator = EdnaParser.reader(cpi, options);
+        final Iterator<Object> iterator = EdnaReader.reader(cpi, options);
         if (!iterator.hasNext()) throw new EdnaReaderException(0, 0, "Expected exactly one element, but found none.");
         var output = iterator.next();
 
@@ -74,7 +74,7 @@ public class Edna {
     private static @NotNull @Unmodifiable List<Object> readMulti(
             final @NotNull CodePointIterator cpi,
             final @Nullable EdnaOptions options) {
-        final Iterator<Object> iter = EdnaParser.reader(cpi, optsOrDefault(options));
+        final Iterator<Object> iter = EdnaReader.reader(cpi, optsOrDefault(options));
         final var spliterator = Spliterators.spliteratorUnknownSize(iter, 0);
         return StreamSupport.stream(spliterator, false).toList();
     }
@@ -103,7 +103,7 @@ public class Edna {
     private static @NotNull Iterator<Object> reader(
             final @NotNull CodePointIterator cpi,
             final @Nullable EdnaOptions options) {
-        return EdnaParser.reader(cpi, optsOrDefault(options));
+        return EdnaReader.reader(cpi, optsOrDefault(options));
     }
 
     public static @NotNull Iterator<Object> reader(

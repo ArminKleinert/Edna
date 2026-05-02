@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 
-class EdnaParserNumberIntegralWithBaseTest {
+class EdnaReaderNumberIntegralWithBaseTest {
     private final EdnaOptions allowMoreNumberPrefixes = Edna.defaultOptions().copy((b) -> b.moreNumberPrefixes(true));
     private final EdnaOptions allowZeros = Edna.defaultOptions().copy((b) -> b.allowZeroPrefix(true));
     @Test void parseIntegerIllegalNum(){

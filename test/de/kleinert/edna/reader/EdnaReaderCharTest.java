@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
 
-public class EdnaParserCharTest {
+public class EdnaReaderCharTest {
     @Test
     public void parseSlashWhitespaceIsInvalid() {
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read(""));

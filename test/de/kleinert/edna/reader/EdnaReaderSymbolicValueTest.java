@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class EdnaParserSymbolicValueTest {
+public class EdnaReaderSymbolicValueTest {
     @Test
     public void parseStandardSymbolicTest() {
         var optionsWithSymbolics = Edna.defaultOptions().copy(b -> b.allowSymbolicValues(true));

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-public class EdnaParserRefTest {
+public class EdnaReaderRefTest {
     private @NotNull EdnaOptions options(final Map<Object, Object> refTable) {
         return Edna.defaultOptions().copy((b) ->
                 b.taggedElementDecoders(Map.of("edna/ref", (e) -> {

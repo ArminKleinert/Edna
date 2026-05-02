@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-class EdnaParserNumberFloatyTest {
+class EdnaReaderNumberFloatyTest {
     @Test
     public void parseDouble() {
         {
