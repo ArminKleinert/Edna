@@ -58,19 +58,20 @@ public class EdnaReader {
         return castClass.cast(temp);
     }
 
-    public static @NotNull List<Object> readMulti(final @NotNull CodePointIterator cpi,
-                                       final @NotNull EdnaOptions options) {
+    public static @NotNull List<Object> readMulti(
+            final @NotNull CodePointIterator cpi,
+            final @NotNull EdnaOptions options) {
         //noinspection unchecked
-        return Collections.unmodifiableList((List<Object>)(Objects.requireNonNull(new EdnaReader(options, cpi).readString(true))));
+        return Collections.unmodifiableList((List<Object>) (Objects.requireNonNull(new EdnaReader(options, cpi).readString(true))));
     }
 
     private @Nullable Object readString(final boolean readMulti) {
         var data = (List<?>) readForm(0, false);
+
         if (readMulti)
             return data;
 
         if (data.size() != 1) {
-            System.out.println(data);
             throw new EdnaReaderException(
                     cpi.getLineIdx(), cpi.getTextIndex(),
                     "The input should only contain one expression, but there are " + data.size() + ".");
@@ -159,16 +160,19 @@ public class EdnaReader {
 
             res.remove(NOTHING);
 
-            if (stopAfterOne && !res.isEmpty()) {
-                return res.getFirst();
+            if (stopAfterOne) {
+                break;
             }
         }
 
-//        if (res.size() != 1) {
-//            throw new EdnaReaderException(
-//                    linePos, codePosIndex, "Reader requires exactly one expression, but got " + res.size() + "."
-//            );
-//        }
+        if (stopAfterOne) {
+            if (res.size() != 1) {
+                //noinspection ConstantValue
+                final var message = "Reader requires exactly one expression, but got " + res.size() + ".";
+                throw new EdnaReaderException(linePos, codePosIndex, message);
+            }
+            return res.getFirst();
+        }
 
         return res;
     }

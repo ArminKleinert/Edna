@@ -5,6 +5,7 @@ import de.kleinert.edna.data.Symbol;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.StringReader;
 import java.util.*;
 
 class EdnaReaderMultiTest {
@@ -25,10 +26,17 @@ class EdnaReaderMultiTest {
         Assertions.assertEquals(List.of(Symbol.symbol("abc"), Symbol.symbol("def")), Edna.readMulti("abc def"));
         Assertions.assertEquals(List.of("abc", "def"), Edna.readMulti("\"abc\" \"def\""));
         Assertions.assertEquals(List.of(123L, "def"), Edna.readMulti("123 \"def\""));
+
+        Assertions.assertEquals(List.of(Symbol.symbol("abc"), Symbol.symbol("def")), Edna.readMulti(new StringReader("abc def"), null));
+        Assertions.assertEquals(List.of("abc", "def"), Edna.readMulti(new StringReader("\"abc\" \"def\""), null));
+        Assertions.assertEquals(List.of(123L, "def"), Edna.readMulti(new StringReader("123 \"def\""), null));
     }
     @Test
     public void parseErrorMultiTest() {
         Assertions.assertThrows(EdnaReaderException.class, ()->Edna.readMulti("/abc def"));
         Assertions.assertThrows(EdnaReaderException.class, ()->Edna.readMulti("ab \""));
+
+        Assertions.assertThrows(EdnaReaderException.class, ()->Edna.readMulti(new StringReader("/abc def"), null));
+        Assertions.assertThrows(EdnaReaderException.class, ()->Edna.readMulti(new StringReader("ab \""), null));
     }
 }

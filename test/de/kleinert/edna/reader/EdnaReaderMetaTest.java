@@ -17,6 +17,11 @@ class EdnaReaderMetaTest {
 
     @Test
     void parseMetaErrors() {
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^abc"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^[]"));
+        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^[] abc"));
+
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^", opts));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^abc", opts));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("^[]", opts));

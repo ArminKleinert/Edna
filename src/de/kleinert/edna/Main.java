@@ -52,11 +52,20 @@ public class Main {
         Edna.pprintln(BigInteger.valueOf(11), null);
     }
     public static void main(String[] args) {
-        var iobj = ((IObj)Edna.read("^:a :b", Edna.defaultOptions().copy(b -> b.allowMetaData(true))));
-        System.out.println(iobj.meta() + " "+iobj.obj());
+        {
+            var temp = Edna.read("^abc", Edna.defaultOptions().copy(b -> b.allowMetaData(true)));
+            System.out.println(temp);
+        }
 
-        var r = EdnaReader.readMulti(new CodePointIterator("".codePoints()), EdnaOptions.defaultOptions());
-        System.out.println(r);
+        System.exit(0);
+
+        {
+            var iobj = ((IObj) Edna.read("^:a :b", Edna.defaultOptions().copy(b -> b.allowMetaData(true))));
+            System.out.println(iobj.meta() + " " + iobj.obj());
+
+            var r = EdnaReader.readMulti(new CodePointIterator("".codePoints()), EdnaOptions.defaultOptions());
+            System.out.println(r);
+        }
 
         System.exit(0);
 
