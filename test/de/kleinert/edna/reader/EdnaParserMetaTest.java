@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions;
 
 import java.util.Map;
 
-class EdnaReaderMetaTest {
+class EdnaParserMetaTest {
     private final EdnaOptions opts = Edna.defaultOptions().copy(b -> b.allowMetaData(true));
 
     @Test

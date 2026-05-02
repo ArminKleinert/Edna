@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-public class EdnaReaderStringTest {
+public class EdnaParserStringTest {
     @Test
     public void parseStringBasicTest() {
         {

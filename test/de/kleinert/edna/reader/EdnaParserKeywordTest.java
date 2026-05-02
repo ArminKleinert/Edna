@@ -6,7 +6,7 @@ import de.kleinert.edna.data.Keyword;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class EdnaReaderKeywordTest {
+class EdnaParserKeywordTest {
     @Test
     public void parseKeywordBasicTest() {
         {

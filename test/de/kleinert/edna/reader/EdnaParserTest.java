@@ -1,24 +1,28 @@
 package de.kleinert.edna.reader;
 
 import de.kleinert.edna.Edna;
+
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-class EdnaReaderBasicsTest {
+class EdnaParserTest {
     @Test
-    public void parseStringBasicTest() {
+    void parseStringBasicTest() {
         Assertions.assertInstanceOf(String.class, Edna.read("\"\""));
         Assertions.assertEquals("", Edna.read("\"\""));
         Assertions.assertEquals("abc", Edna.read("\"abc\""));
     }
 
     @Test
-    public void parseStringEscapeSequenceTest() {
+    void parseStringEscapeSequenceTest() {
         Assertions.assertEquals("\n", Edna.read("\"\\n\""));
-        Assertions.assertEquals(List.of("", ""), Arrays.asList(((String) Edna.read("\"\\n\"")).split("\n", -1)));
+        Assertions.assertEquals(List.of("", ""), Arrays.asList(((String) Edna.read("\"\n\"")).split("\n", -1)));
         Assertions.assertEquals("\t", Edna.read("\"\\t\""));
 
         Assertions.assertEquals("\t", Edna.read("\"\\t\""));
@@ -28,13 +32,19 @@ class EdnaReaderBasicsTest {
 
         Assertions.assertEquals("\\", Edna.read("\"\\\\\""));
         Assertions.assertEquals("\\\\", Edna.read("\"\\\\\\\\\""));
-
         {
-            var it = Edna.read("\"\\\\\"");
+            var it = Edna.read(
+                    """
+                                 "\\\\"
+                            """);
             Assertions.assertEquals("\\", it);
         }
+
         {
-            var it = Edna.read("\"\\\\\\\\\"");
+            var it = Edna.read(
+                    """
+                                "\\\\\\\\"
+                            """);
             Assertions.assertEquals("\\\\", it);
         }
 
@@ -42,7 +52,7 @@ class EdnaReaderBasicsTest {
     }
 
     @Test
-    public void parseStringUnicodeSequenceTest() {
+    void parseStringUnicodeSequenceTest() {
         Assertions.assertEquals("🎁", Edna.read("\"🎁\""));
         Assertions.assertEquals("🎁", Edna.read("\"\\uD83C\\uDF81\""));
         Assertions.assertEquals("🎁", Edna.read("\"\\uD83C\\uDF81\""));
@@ -50,19 +60,19 @@ class EdnaReaderBasicsTest {
     }
 
     @Test
-    public void parseStringUnclosedTest() {
+    void parseStringUnclosedTest() {
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\""));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\"abc"));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\"\"\""));
     }
 
     @Test
-    public void parseDiscardSimpleTest() {
+    void parseDiscardSimpleTest() {
         Assertions.assertEquals(2L, Edna.read("#_1 2"));
     }
 
     @Test
-    public void parseDiscardTest() {
+    void parseDiscardTest() {
         Assertions.assertEquals(2L, Edna.read("#_1 2"));
 
         // Discard tags ignore spaces.
@@ -81,18 +91,18 @@ class EdnaReaderBasicsTest {
     }
 
     @Test
-    public void parseDiscardAssociativityTest() {
-        // Discard is right-associative
+    void parseDiscardAssociativityTest() {
+        // Discard instanceof right-associative
         Assertions.assertEquals(3L, Edna.read("#_ #_ 1 2 3"));
     }
 
     @Test
-    public void parseDiscardInCollectionTest() {
-        // Discard is nothing. When discard appears in a list, vector, set, or map, it does nothing
+    void parseDiscardInCollectionTest() {
+        // Discard instanceof nothing. When discard appears in a list, vector, set, or map, it does nothing
         {
             var it = Edna.read("( #_ 1 #_ 2 #_ 3 )");
             Assertions.assertInstanceOf(Iterable.class, it);
-            Assertions.assertTrue(iterableToList((Iterable<?>) it).isEmpty());
+            Assertions.assertTrue(((List<?>) it).isEmpty());
         }
         {
             var it = Edna.read("[#_1 #_2 #_3]");
@@ -112,7 +122,7 @@ class EdnaReaderBasicsTest {
     }
 
     @Test
-    public void parseEmptySet() {
+    void parseEmptySet() {
         // Normal
         {
             var it = Edna.read("#{}");
@@ -139,7 +149,7 @@ class EdnaReaderBasicsTest {
     }
 
     @Test
-    public void parseEmptyMap() {
+    void parseEmptyMap() {
         // Normal
         {
             var it = Edna.read("{}");
@@ -165,39 +175,31 @@ class EdnaReaderBasicsTest {
         }
     }
 
-    private <T> List<T> iterableToList(Iterable<T> iterable) {
-        List<T> output = new ArrayList<>();
-        for (T t : iterable) {
-            output.add(t);
-        }
-        return output;
-    }
-
     @Test
-    public void parseListSimple() {
+    void parseListSimple() {
         {
             var it = Edna.read("(\\a)");
             Assertions.assertInstanceOf(Iterable.class, it);
-            Assertions.assertEquals(List.of('a'), iterableToList((Iterable<?>) it));
+            Assertions.assertEquals(List.of('a'), (List<?>) it);
         }
         {
             var it = Edna.read("(\\a \\b)");
             Assertions.assertInstanceOf(Iterable.class, it);
-            Assertions.assertEquals(List.of('a', 'b'), iterableToList((Iterable<?>) it));
+            Assertions.assertEquals(List.of('a', 'b'), (List<?>) it);
         }
         {
             var it = Edna.read("(())");
             Assertions.assertInstanceOf(Iterable.class, it);
-            Assertions.assertEquals(List.of(List.of()), iterableToList((Iterable<?>) it));
+            Assertions.assertEquals(List.of(List.of()), (List<?>) it);
         }
     }
 
     @Test
-    public void parseVectorSimple() {
+    void parseVectorSimple() {
         {
             var it = Edna.read("[\\a]");
             Assertions.assertInstanceOf(List.class, it);
-            Assertions.assertEquals(List.of('a'), it);
+            Assertions.assertEquals(List.of('a'), ((List<?>) it));
         }
         {
             var it = Edna.read("[\\a \\b]");
@@ -212,7 +214,7 @@ class EdnaReaderBasicsTest {
     }
 
     @Test
-    public void parseSetSimple() {
+    void parseSetSimple() {
         {
             var it = Edna.read("#{\\a \\b}");
             Assertions.assertInstanceOf(Set.class, it);
@@ -231,7 +233,7 @@ class EdnaReaderBasicsTest {
     }
 
     @Test
-    public void parseMapSimple() {
+    void parseMapSimple() {
         {
             var it = Edna.read("{\\a \\b}");
             Assertions.assertInstanceOf(Map.class, it);
@@ -245,7 +247,7 @@ class EdnaReaderBasicsTest {
         {
             var it = Edna.read("{{} {}}");
             Assertions.assertInstanceOf(Map.class, it);
-            Assertions.assertEquals(Map.of(Map.of(), Map.of()), it);
+            Assertions.assertEquals(Map.of(Map.of(), Map.of()), ((Map<?, ?>) it));
         }
     }
 }

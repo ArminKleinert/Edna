@@ -4,7 +4,7 @@ import de.kleinert.edna.Edna;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class EdnaReaderConstantsTest {
+class EdnaParserConstantsTest {
     @Test
     public void parseDirectConstantsTest() {
         Assertions.assertEquals(false, Edna.read("false"));

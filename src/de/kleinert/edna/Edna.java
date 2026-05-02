@@ -3,7 +3,7 @@ package de.kleinert.edna;
 import de.kleinert.edna.pprint.EdnaWriter;
 import de.kleinert.edna.pprint.EdnaWriterException;
 import de.kleinert.edna.reader.CodePointIterator;
-import de.kleinert.edna.reader.EdnaReader;
+import de.kleinert.edna.reader.EdnaParser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +25,7 @@ public class Edna {
                                        final @Nullable EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
         final @NotNull var cpi = new CodePointIterator(s.codePoints());
-        return EdnaReader.read(cpi, optsOrDefault(options), castClass);
+        return EdnaParser.read(cpi, optsOrDefault(options), castClass);
     }
 
     public static @Nullable Object read(final @NotNull String s,
@@ -46,7 +46,7 @@ public class Edna {
             final @NotNull Class<T> castClass) throws FileNotFoundException {
         T result;
         try (CodePointIterator cpi = new CodePointIterator(new FileReader(file))) {
-            result = EdnaReader.read(cpi, optsOrDefault(options), castClass);
+            result = EdnaParser.read(cpi, optsOrDefault(options), castClass);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -68,7 +68,7 @@ public class Edna {
                                        final @Nullable EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
         final @NotNull var cpi = new CodePointIterator(inputStream);
-        return EdnaReader.read(cpi, optsOrDefault(options), castClass);
+        return EdnaParser.read(cpi, optsOrDefault(options), castClass);
     }
 
     public static @Nullable Object read(final @NotNull InputStream inputStream,
@@ -84,7 +84,7 @@ public class Edna {
                                        final @Nullable EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
         var cpi = new CodePointIterator(reader);
-        return EdnaReader.read(cpi, optsOrDefault(options), castClass);
+        return EdnaParser.read(cpi, optsOrDefault(options), castClass);
     }
 
     public static @Nullable Object read(final @NotNull Reader reader,
@@ -99,7 +99,7 @@ public class Edna {
 
     public static @NotNull List<Object> readMulti(final @NotNull String s,
                                                   final @Nullable EdnaOptions options) {
-        return EdnaReader.readMulti(new CodePointIterator(s.codePoints()), optsOrDefault(options));
+        return EdnaParser.readMulti(new CodePointIterator(s.codePoints()), optsOrDefault(options));
     }
 
     public static @NotNull List<Object> readMulti(final @NotNull String s) {
@@ -110,14 +110,14 @@ public class Edna {
             final @NotNull Reader reader,
             final @Nullable EdnaOptions options) {
         var cpi = new CodePointIterator(reader);
-        return EdnaReader.readMulti(cpi, optsOrDefault(options));
+        return EdnaParser.readMulti(cpi, optsOrDefault(options));
     }
 
     public static @NotNull List<Object> readMulti(
             final @NotNull InputStream inputStream,
             final @Nullable EdnaOptions options) {
         final @NotNull var cpi = new CodePointIterator(inputStream);
-        return EdnaReader.readMulti(cpi, optsOrDefault(options));
+        return EdnaParser.readMulti(cpi, optsOrDefault(options));
     }
 
     public static void pprint(final @NotNull Object obj,

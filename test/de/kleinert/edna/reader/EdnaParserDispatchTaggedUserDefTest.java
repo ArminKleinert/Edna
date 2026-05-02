@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-class EdnaReaderDispatchTaggedUserDefTest {
+class EdnaParserDispatchTaggedUserDefTest {
     @Test
     void parseDecoderNameErrorTest() {
         // invalid name

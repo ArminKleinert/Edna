@@ -3,7 +3,7 @@ package de.kleinert.edna;
 import de.kleinert.edna.data.EdnaMap;
 import de.kleinert.edna.data.IObj;
 import de.kleinert.edna.reader.CodePointIterator;
-import de.kleinert.edna.reader.EdnaReader;
+import de.kleinert.edna.reader.EdnaParser;
 
 import java.io.StringReader;
 import java.math.BigInteger;
@@ -53,6 +53,21 @@ public class Main {
     }
     public static void main(String[] args) {
         {
+            var text = "1 2 3";
+            var cpi = new CodePointIterator(text.codePoints());
+            var pars = EdnaParser.read1(cpi, Edna.defaultOptions(), Object.class);
+            System.out.println(pars);
+            pars = EdnaParser.read1(cpi, Edna.defaultOptions(), Object.class);
+            System.out.println(pars);
+            pars = EdnaParser.read1(cpi, Edna.defaultOptions(), Object.class);
+            System.out.println(pars);
+            pars = EdnaParser.read1(cpi, Edna.defaultOptions(), Object.class);
+            System.out.println(pars);
+        }
+
+        System.exit(0);
+
+        {
             var temp = Edna.read("^abc", Edna.defaultOptions().copy(b -> b.allowMetaData(true)));
             System.out.println(temp);
         }
@@ -63,7 +78,7 @@ public class Main {
             var iobj = ((IObj) Edna.read("^:a :b", Edna.defaultOptions().copy(b -> b.allowMetaData(true))));
             System.out.println(iobj.meta() + " " + iobj.obj());
 
-            var r = EdnaReader.readMulti(new CodePointIterator("".codePoints()), EdnaOptions.defaultOptions());
+            var r = EdnaParser.readMulti(new CodePointIterator("".codePoints()), EdnaOptions.defaultOptions());
             System.out.println(r);
         }
 
@@ -73,14 +88,14 @@ public class Main {
 
         {
             var options = Edna.defaultOptions().copy((b) -> b.allowMetaData(true));
-            var o = (IObj.Wrapper<?>) EdnaReader.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
+            var o = (IObj.Wrapper<?>) EdnaParser.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
             System.out.println(o.meta());
             System.out.println(o.obj());
             System.out.println(o.getClass());
         }
         {
             var options = Edna.defaultOptions();
-            var o = EdnaReader.read(new CodePointIterator(new StringReader("{2 3 :a 6}")), options, Object.class);
+            var o = EdnaParser.read(new CodePointIterator(new StringReader("{2 3 :a 6}")), options, Object.class);
             System.out.println(o);
             System.out.println(o.getClass());
         }

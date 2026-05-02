@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.io.StringReader;
 import java.util.*;
 
-class EdnaReaderMultiTest {
+class EdnaParserMultiTest {
     @Test public void parseMultiEmptyTest() {
         Assertions.assertEquals(List.of(), Edna.readMulti(""));
         Assertions.assertEquals(List.of(), Edna.readMulti("                      "));
