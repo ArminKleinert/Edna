@@ -11,7 +11,7 @@ import java.util.function.UnaryOperator;
 public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           boolean allowDispatchChars,
                           @NotNull Map<@NotNull String, @NotNull Function<Object, Object>> taggedElementDecoders,
-                          @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<@NotNull Object, Map.Entry<String, ?>>> taggedElementEncoders,
+                          @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<@NotNull Object, EdnaPair<String, ?>>> taggedElementEncoders,
                           boolean moreNumberPrefixes,
                           boolean allowMoreEncoderDecoderNames,
                           @NotNull String encodingSequenceSeparator,
@@ -82,7 +82,7 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         private boolean allowSchemeUTF32Codes;
         private boolean allowDispatchChars;
         private @NotNull Map<@NotNull String, @NotNull Function<@Nullable Object, Object>> taggedElementDecoders;
-        private @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<@NotNull Object, Map.Entry<String, ?>>> taggedElementEncoders;
+        private @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<@NotNull Object, EdnaPair<String, ?>>> taggedElementEncoders;
         private boolean moreNumberPrefixes;
         private boolean allowMoreEncoderDecoderNames;
         private @NotNull String encodingSequenceSeparator;
@@ -141,7 +141,7 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
-        public Builder taggedElementEncoders(final @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<Object, Map.Entry<String, ?>>> v) {
+        public Builder taggedElementEncoders(final @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<Object, EdnaPair<String, ?>>> v) {
             this.taggedElementEncoders = new LinkedHashMap<>(v);
             return this;
         }

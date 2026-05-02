@@ -40,7 +40,7 @@ public class EdnaWriter {
 
     private boolean tryEncoder(final @NotNull Object obj, final @NotNull Appendable writer, int indent) throws IOException {
         indent = options.encoderPrettyPrint() ? indent : 0;
-        AtomicReference<Function<Object, Map.Entry<String, ?>>> encoder = new AtomicReference<>(null);
+        AtomicReference<Function<Object, EdnaPair<String, ?>>> encoder = new AtomicReference<>(null);
         options.taggedElementEncoders().forEach((jClass, enc) -> {
             if (encoder.get() == null && jClass.isInstance(obj)) {
                 encoder.set(enc);
@@ -53,8 +53,8 @@ public class EdnaWriter {
         if (r == null)
             return true;
 
-        var prefix = r.getKey();
-        var output = r.getValue();
+        var prefix = r.first();
+        var output = r.second();
         if (prefix != null && !prefix.isBlank()) writer.append('#').append(prefix).append(' ');
         this.encode(output, writer, indent);
         return false;

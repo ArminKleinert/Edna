@@ -565,7 +565,7 @@ public class EdnaReader {
                         "Odd number of elements in map. Last key was " + key + ".");
             }
             final var value = kvs.get(i + 1);
-            res.add(new AbstractMap.SimpleImmutableEntry<>(key, value));
+            res.add(Map.entry(key, value));
         }
 
         return options.listToEdnMapConverter().apply(res);

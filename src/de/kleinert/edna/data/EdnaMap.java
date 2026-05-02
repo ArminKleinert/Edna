@@ -9,6 +9,13 @@ import java.util.*;
 public final class EdnaMap<K, V>
         extends AbstractMap<K, V>
         implements SequencedMap<K, V> {
+    private static EdnaMap empty = null;
+
+    private static <K, V> EdnaMap<K, V> empty() {
+        if (empty == null) empty = new EdnaMap<>(List.of());
+        return (EdnaMap<K, V>) empty;
+    }
+
     private final @NotNull SequencedMap<K, V> delegate;
 
     public EdnaMap(final @NotNull List<Entry<K, V>> delegate) {
@@ -58,6 +65,8 @@ public final class EdnaMap<K, V>
 
     public static <K, V> @NotNull EdnaMap<K, V> create(
             final @NotNull List<Object> kvs) {
+        if (kvs.isEmpty())
+            return EdnaMap.<K, V>empty();
         if (kvs.size() % 2 != 0) {
             throw new IllegalArgumentException();
         }

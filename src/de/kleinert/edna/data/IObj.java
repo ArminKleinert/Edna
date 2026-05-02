@@ -1,6 +1,8 @@
 package de.kleinert.edna.data;
 
+import de.kleinert.edna.Edna;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
@@ -18,15 +20,19 @@ public interface IObj {
 
     static <T> @NotNull IObj of(final @NotNull Object meta,
                                 final T element) {
-        var newMeta = switch (meta) {
+        var newMeta = formatMeta(meta);
+        return new Wrapper<>(newMeta, element);
+    }
+
+     static @NotNull Map<Object, Object> formatMeta(final @Nullable Object meta) {
+        return switch (meta) {
+            case null -> EdnaMap.create(List.of());
             case String v -> EdnaMap.create(List.of(Keyword.keyword("tag"), v));
             case Symbol v -> EdnaMap.create(List.of(Keyword.keyword("tag"), v));
             case Keyword v -> EdnaMap.create(List.of(v, true));
             case Map<?, ?> tempMap -> (Map<Object, Object>) tempMap;
             default -> throw new IllegalArgumentException();
-        };
-        return new Wrapper<>(newMeta, element);
-    }
+        };}
 
     default <T> @NotNull IObj of(final T element) {
         if (element instanceof IObj)
