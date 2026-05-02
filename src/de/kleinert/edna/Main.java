@@ -1,7 +1,5 @@
 package de.kleinert.edna;
 
-import de.kleinert.edna.Edna;
-import de.kleinert.edna.EdnaOptions;
 import de.kleinert.edna.data.EdnaMap;
 import de.kleinert.edna.data.IObj;
 import de.kleinert.edna.reader.CodePointIterator;
@@ -14,8 +12,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.LongStream;
 
-class Main {
-    void stdExamples() {
+public class Main {
+    private static void stdExamples() {
         System.out.println(Edna.read("symbol")); // Symbol without namespace
         System.out.println(Edna.read("namespace/symbol")); // Symbol
         System.out.println(Edna.read(":keyword")); // Keyword without namespace
@@ -53,11 +51,16 @@ class Main {
         Edna.pprintln(BigInteger.valueOf(11), null);
         Edna.pprintln(BigInteger.valueOf(11), null);
     }
+    public static void main(String[] args) {
+        var iobj = ((IObj)Edna.read("^:a :b", Edna.defaultOptions().copy(b -> b.allowMetaData(true))));
+        System.out.println(iobj.meta() + " "+iobj.obj());
 
-    void main() {
-        stdExamples();
+        var r = EdnaReader.readMulti(new CodePointIterator("".codePoints()), EdnaOptions.defaultOptions());
+        System.out.println(r);
 
         System.exit(0);
+
+        stdExamples();
 
         {
             var options = Edna.defaultOptions().copy((b) -> b.allowMetaData(true));

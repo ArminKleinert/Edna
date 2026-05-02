@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 
 public class Edna {
@@ -91,8 +92,32 @@ public class Edna {
         return read(reader, options, Object.class);
     }
 
+
     public static @Nullable Object read(final @NotNull Reader reader) {
         return read(reader, null, Object.class);
+    }
+
+    public static @NotNull List<Object> readMulti(final @NotNull String s,
+                                                  final @Nullable EdnaOptions options) {
+        return EdnaReader.readMulti(new CodePointIterator(s.codePoints()), optsOrDefault(options));
+    }
+
+    public static @NotNull List<Object> readMulti(final @NotNull String s) {
+        return readMulti(s, null);
+    }
+
+    public static @NotNull List<Object> readMulti(
+            final @NotNull Reader reader,
+            final @Nullable EdnaOptions options) {
+        var cpi = new CodePointIterator(reader);
+        return EdnaReader.readMulti(cpi, optsOrDefault(options));
+    }
+
+    public static @NotNull List<Object> readMulti(
+            final @NotNull InputStream inputStream,
+            final @Nullable EdnaOptions options) {
+        final @NotNull var cpi = new CodePointIterator(inputStream);
+        return EdnaReader.readMulti(cpi, optsOrDefault(options));
     }
 
     public static void pprint(final @NotNull Object obj,

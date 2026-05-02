@@ -53,14 +53,24 @@ public class EdnaReader {
     public static <T> @Nullable T read(final @NotNull CodePointIterator cpi,
                                        final @NotNull EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
-        final var temp = new EdnaReader(options, cpi).readString();
+        final var temp = new EdnaReader(options, cpi).readString(false);
         if (temp == null) return null;
         return castClass.cast(temp);
     }
 
-    private @Nullable Object readString() {
+    public static @NotNull List<Object> readMulti(final @NotNull CodePointIterator cpi,
+                                       final @NotNull EdnaOptions options) {
+        //noinspection unchecked
+        return Collections.unmodifiableList((List<Object>)(Objects.requireNonNull(new EdnaReader(options, cpi).readString(true))));
+    }
+
+    private @Nullable Object readString(final boolean readMulti) {
         var data = (List<?>) readForm(0, false);
+        if (readMulti)
+            return data;
+
         if (data.size() != 1) {
+            System.out.println(data);
             throw new EdnaReaderException(
                     cpi.getLineIdx(), cpi.getTextIndex(),
                     "The input should only contain one expression, but there are " + data.size() + ".");
@@ -74,7 +84,7 @@ public class EdnaReader {
         int linePos = 0;
         int codePosIndex = 0;
 
-        do {
+        while (true) {
             cpi.skipWhile(this::isWhitespace);
 
             if (!cpi.hasNext())
@@ -152,13 +162,13 @@ public class EdnaReader {
             if (stopAfterOne && !res.isEmpty()) {
                 return res.getFirst();
             }
-        } while (true);
-
-        if (res.size() != 1) {
-            throw new EdnaReaderException(
-                    linePos, codePosIndex, "Reader requires exactly one expression, but got " + res.size() + "."
-            );
         }
+
+//        if (res.size() != 1) {
+//            throw new EdnaReaderException(
+//                    linePos, codePosIndex, "Reader requires exactly one expression, but got " + res.size() + "."
+//            );
+//        }
 
         return res;
     }
