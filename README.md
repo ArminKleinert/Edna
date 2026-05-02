@@ -1,6 +1,6 @@
 # Edna
 
-An EDN library for Java with options for some additional features.
+An EDN library for Java with options for some additional features. I made this as a personal replacement for my [Kotlin EDN library](https://github.com/ArminKleinert/ExtensibleDataSoup).
 
 ## Standard things implemented
 
@@ -8,12 +8,16 @@ An EDN library for Java with options for some additional features.
 - [x] Can write to strings, files and any `Appendable`.
 
 
-- [x] Uses UTF-8 for inputs.  
+- [x] [Tagged elements](https://github.com/edn-format/edn#tagged-elements)  
+  - Note that Edna handles tagged elements as function that take an object, not a Map, as input. This allows doing much more than just instantiate class instances.
+- [x] [Symbolic values](https://clojure.org/guides/weird_characters#_symbolic_values) (optional because they are not mandated by the specification)
+  - The user can define their own symbolic values, but `NaN`, `Inf` and `-Inf` are available when the `allowSymbolicValues` option is true.
+  - Since EDN technically does not mandate symbolic values, but the linked guide says that they are available, I eventually decided to make them optional.
+
+
+- [x] Uses UTF-8 for inputs.
 - [x] Can parse any type mandated by the EDN specification.
 
-
-- [x] [tagged elements](https://github.com/edn-format/edn#tagged-elements)  
-- [x] [Symbolic values](https://clojure.org/guides/weird_characters#_symbolic_values) (optional because they are not mandated by the specification)
 
 ## Extended features
 

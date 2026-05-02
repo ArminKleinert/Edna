@@ -28,7 +28,6 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           boolean allowZeroPrefix,
                           boolean allowSymbolicValues,
                           @NotNull Map<Symbol, Object> symbolicValues) {
-
     public static @NotNull Map<Symbol, Object> defaultSymbolicValues() {
         return new HashMap<>(Map.of(
                 Symbol.symbol("NaN"), Double.NaN,
