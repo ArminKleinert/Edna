@@ -1,8 +1,12 @@
 # Edna
 
-An EDN library for Java with options for some additional features. The file format specification can be found in the [edn-format  github repository](https://github.com/edn-format/edn). Additional inspiration was taken directly from [Clojure's source code for the LispReader class](https://github.com/clojure/clojure/blob/1fa5b038a434da34f787e3aec56f9cb48ed4dd99/src/jvm/clojure/lang/LispReader.java) and other implementations of the EDN file format, primarily [edn-ruby](https://github.com/relevance/edn-ruby).
+An EDN library for Java with options for some additional features. The file format specification can be found in
+the [edn-format GitHub repository](https://github.com/edn-format/edn). Additional inspiration was taken directly
+from [Clojure's source code for the LispReader class](https://github.com/clojure/clojure/blob/1fa5b038a434da34f787e3aec56f9cb48ed4dd99/src/jvm/clojure/lang/LispReader.java)
+and other implementations of the EDN file format, primarily [edn-ruby](https://github.com/relevance/edn-ruby).
 
-I made this library as a replacement for my [Kotlin EDN library](https://github.com/ArminKleinert/ExtensibleDataSoup) for *personal use*. 
+I made this library as a replacement for my [Kotlin EDN library](https://github.com/ArminKleinert/ExtensibleDataSoup)
+for *personal use*.
 
 ## Standard things implemented
 
@@ -21,13 +25,11 @@ I made this library as a replacement for my [Kotlin EDN library](https://github.
 
 These features are not in the specification, but most people implement them anyway.
 
-- [x] [Metadata](https://clojure.org/guides/weird_characters#_and_metadata) (optional because they are not mandated by
-  the specification)
+- [x] [Metadata](https://clojure.org/guides/weird_characters#_and_metadata)
     - Most parsers would implement this, but it's actually not mandated by the specification.
     - If metadata different metadata maps are applied to the same object, they are merged. This idea comes
       from [edn-ruby](https://github.com/relevance/edn-ruby#metadata).
-- [x] [Symbolic values](https://clojure.org/guides/weird_characters#_symbolic_values) (optional because they are not
-  mandated by the specification)
+- [x] [Symbolic values](https://clojure.org/guides/weird_characters#_symbolic_values)
     - The user can define their own symbolic values, but `NaN`, `Inf` and `-Inf` are available when the
       `allowSymbolicValues` option is true.
     - Since EDN technically does not mandate symbolic values, but the linked guide says that they are available, I
@@ -36,9 +38,10 @@ These features are not in the specification, but most people implement them anyw
 ## Extended features
 
 - [x] Casting values read to get objects of concrete classes.
-- [x] Parse inputs that contain multiple values via ```java Edna.readMulti(...)```.
-    - I was inspired by [edn-ruby](https://github.com/relevance/edn-ruby#ednreader), except that Edna parses values
-      eagerly.
+- [x] Three different reader functions.
+    - `Edna.read` returns a single value and requires that the input resolves to a single value. (eager)
+    - `Edna.readAll` returns a list of all values. (eager)
+    - `Edna.reader` returns an iterator. (lazy)
 - [x] Symbols and keywords with Unicode characters. This requires the `allowUTFSymbols` option.
 - [x] Tagged elements without a namespace. Available through the `allowTaggedElementsWithoutNS` option.
 - [x] Supports octal chars like Clojure with the `allowBase8Chars` option.
@@ -53,7 +56,8 @@ These features are not in the specification, but most people implement them anyw
     - `0x` (hexadecimal), `Oo` (octal), `0b` (binary)
     - `XXr` for anything. E.g. `10r255` is 255 base 10, `16rFF` is 255 base 16, etc.
     - Optionally allows
-- [x] User-defined symbolic values. If the `allowSymbolicValues` option is true and `symbolicValues` is not empty, the user can insert their own symbolic values. I advise against it, but it's possible.
+- [x] User-defined symbolic values. If the `allowSymbolicValues` option is true and `symbolicValues` is not empty, the
+  user can insert their own symbolic values. I advise against it, but it's possible.
 
 ## Options
 
@@ -90,9 +94,9 @@ builder object. Options can be applied to it by writing the name and the new val
 import de.kleinert.edna.Edna;
 
 var opts = Edna.defaultOptions().copy(builder -> builder
-                .allowZeroPrefix(true)
-                .allowMetaData(true)
-                //.<OptionName>(...)
+        .allowZeroPrefix(true)
+        .allowMetaData(true)
+        //.OptionName(blablabla)
 );
 ```
 

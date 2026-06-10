@@ -6,10 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 class EdnaReaderTest {
     @Test
@@ -22,7 +19,10 @@ class EdnaReaderTest {
     @Test
     void parseStringEscapeSequenceTest() {
         Assertions.assertEquals("\n", Edna.read("\"\\n\""));
-        Assertions.assertEquals(List.of("", ""), Arrays.asList(((String) Edna.read("\"\n\"")).split("\n", -1)));
+
+        var temp = ((String) Objects.requireNonNull(Edna.read("\"\n\""))).split("\n", -1);
+        Assertions.assertEquals(List.of("", ""), Arrays.asList(temp));
+
         Assertions.assertEquals("\t", Edna.read("\"\\t\""));
 
         Assertions.assertEquals("\t", Edna.read("\"\\t\""));
@@ -180,17 +180,17 @@ class EdnaReaderTest {
         {
             var it = Edna.read("(\\a)");
             Assertions.assertInstanceOf(Iterable.class, it);
-            Assertions.assertEquals(List.of('a'), (List<?>) it);
+            Assertions.assertEquals(List.of('a'), it);
         }
         {
             var it = Edna.read("(\\a \\b)");
             Assertions.assertInstanceOf(Iterable.class, it);
-            Assertions.assertEquals(List.of('a', 'b'), (List<?>) it);
+            Assertions.assertEquals(List.of('a', 'b'), it);
         }
         {
             var it = Edna.read("(())");
             Assertions.assertInstanceOf(Iterable.class, it);
-            Assertions.assertEquals(List.of(List.of()), (List<?>) it);
+            Assertions.assertEquals(List.of(List.of()), it);
         }
     }
 
@@ -199,17 +199,17 @@ class EdnaReaderTest {
         {
             var it = Edna.read("[\\a]");
             Assertions.assertInstanceOf(List.class, it);
-            Assertions.assertEquals(List.of('a'), ((List<?>) it));
+            Assertions.assertEquals(List.of('a'), it);
         }
         {
             var it = Edna.read("[\\a \\b]");
             Assertions.assertInstanceOf(Iterable.class, it);
-            Assertions.assertEquals(List.of('a', 'b'), ((List<?>) it));
+            Assertions.assertEquals(List.of('a', 'b'), it);
         }
         {
             var it = Edna.read("[[]]");
             Assertions.assertInstanceOf(Iterable.class, it);
-            Assertions.assertEquals(List.of(List.of()), ((List<?>) it));
+            Assertions.assertEquals(List.of(List.of()), it);
         }
     }
 
@@ -218,17 +218,17 @@ class EdnaReaderTest {
         {
             var it = Edna.read("#{\\a \\b}");
             Assertions.assertInstanceOf(Set.class, it);
-            Assertions.assertEquals(Set.of('a', 'b'), ((Set<?>) it));
+            Assertions.assertEquals(Set.of('a', 'b'), it);
         }
         {
             var it = Edna.read("#{ \\a }");
             Assertions.assertInstanceOf(Set.class, it);
-            Assertions.assertEquals(Set.of('a'), ((Set<?>) it));
+            Assertions.assertEquals(Set.of('a'), it);
         }
         {
             var it = Edna.read("#{\\a #{}}");
             Assertions.assertInstanceOf(Set.class, it);
-            Assertions.assertEquals(Set.of('a', Set.of()), ((Set<?>) it));
+            Assertions.assertEquals(Set.of('a', Set.of()), it);
         }
     }
 
@@ -247,7 +247,7 @@ class EdnaReaderTest {
         {
             var it = Edna.read("{{} {}}");
             Assertions.assertInstanceOf(Map.class, it);
-            Assertions.assertEquals(Map.of(Map.of(), Map.of()), ((Map<?, ?>) it));
+            Assertions.assertEquals(Map.of(Map.of(), Map.of()), it);
         }
     }
 }

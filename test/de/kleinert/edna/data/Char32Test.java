@@ -58,14 +58,12 @@ class Char32Test {
 
     @Test
     void toByte() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new Char32(Byte.MAX_VALUE + 1).toByte());
         Assertions.assertEquals((byte) 65, Char32.valueOf('A').toByte());
         Assertions.assertEquals((byte) 65, new Char32('A').toByte());
     }
 
     @Test
     void toShort() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new Char32(Short.MAX_VALUE + 1).toShort());
         Assertions.assertEquals((short) 65, Char32.valueOf('A').toShort());
         Assertions.assertEquals((short) 65, new Char32('A').toShort());
     }

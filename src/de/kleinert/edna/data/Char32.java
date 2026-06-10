@@ -74,16 +74,10 @@ public record Char32(int code) implements Comparable<Char32> {
     }
 
     public byte toByte() {
-        if (code > Byte.MAX_VALUE)
-            throw new IllegalArgumentException(
-                    "Cannot convert Char32 to Byte because the char code $code is too big.");
         return (byte) code;
     }
 
     public short toShort() {
-        if (code > Short.MAX_VALUE)
-            throw new IllegalArgumentException(
-                    "Cannot convert Char32 to Short because the char code $code is too big.");
         return (short) code;
     }
 
