@@ -12,9 +12,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class EdnaReaderSetsMapsTest {
+class EdnaReaderSetsMapsTest {
     @Test
-    public void parseEmpty() {
+    void parseEmpty() {
         {
             var it = Edna.read("{}", null, Map.class);
             Assertions.assertInstanceOf(Map.class, it);
@@ -28,7 +28,7 @@ public class EdnaReaderSetsMapsTest {
     }
 
     @Test
-    public void parseBasicList() {
+    void parseBasicList() {
         {
             var it = Edna.read("{a b c d}");
             Assertions.assertInstanceOf(Map.class, it);
@@ -49,7 +49,7 @@ public class EdnaReaderSetsMapsTest {
     }
 
     @Test
-    public void parseWithConverter() {
+    void parseWithConverter() {
         {
             var options = Edna.defaultOptions().copy((b) -> b
                     .listToEdnMapConverter((it) -> new IdentityHashMap<>(it.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
@@ -68,7 +68,7 @@ public class EdnaReaderSetsMapsTest {
     }
 
     @Test
-    public void invalidTest() {
+    void invalidTest() {
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("{"));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#{"));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("}"));

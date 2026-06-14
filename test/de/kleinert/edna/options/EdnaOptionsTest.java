@@ -4,9 +4,9 @@ import de.kleinert.edna.Edna;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class EdnaOptionsTest {
+class EdnaOptionsTest {
     @Test
-    public void testBasicBuilder() {
+    void testBasicBuilder() {
         var a = Edna.defaultOptions();
         var aAttr = a.allowSchemeUTF32Codes();
 

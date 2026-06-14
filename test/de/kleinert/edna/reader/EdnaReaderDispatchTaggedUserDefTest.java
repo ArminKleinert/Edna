@@ -75,5 +75,4 @@ class EdnaReaderDispatchTaggedUserDefTest {
         var options = Edna.defaultOptions().copy(b -> b.taggedElementDecoders(decoders));
         Assertions.assertSame(uniqueObj, Edna.read("#edna/ref abc", options));
     }
-    @Test void parseDecoderListRepeater(){}
 }

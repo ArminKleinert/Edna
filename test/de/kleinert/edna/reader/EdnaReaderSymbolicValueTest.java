@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class EdnaReaderSymbolicValueTest {
+class EdnaReaderSymbolicValueTest {
     @Test
-    public void parseStandardSymbolicTest() {
+    void parseStandardSymbolicTest() {
         var optionsWithSymbolics = Edna.defaultOptions().copy(b -> b.allowSymbolicValues(true));
         Assertions.assertTrue(((Double) Edna.read("##NaN", optionsWithSymbolics)).isNaN());
         Assertions.assertEquals(Double.POSITIVE_INFINITY, Edna.read("##Inf", optionsWithSymbolics));
@@ -21,7 +21,7 @@ public class EdnaReaderSymbolicValueTest {
     }
 
     @Test
-    public void parseUserDefSymbolicTest() {
+    void parseUserDefSymbolicTest() {
         var o = new Object();
         var sv = Map.of(Symbol.symbol("abc"), o);
         var optionsWithSymbolics = Edna.defaultOptions().copy(b -> b

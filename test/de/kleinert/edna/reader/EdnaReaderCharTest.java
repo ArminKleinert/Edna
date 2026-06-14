@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.Assertions;
 
-public class EdnaReaderCharTest {
+class EdnaReaderCharTest {
     @Test
-    public void parseSlashWhitespaceIsInvalid() {
+    void parseSlashWhitespaceIsInvalid() {
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read(""));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\"));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\"));
@@ -22,7 +22,7 @@ public class EdnaReaderCharTest {
     }
 
     @Test
-    public void parseSpecialCharsTest() {
+    void parseSpecialCharsTest() {
         Assertions.assertEquals('\n', Edna.read("\\newline"));
         Assertions.assertEquals(' ', Edna.read("\\space"));
         Assertions.assertEquals('\t', Edna.read("\\tab"));
@@ -32,7 +32,7 @@ public class EdnaReaderCharTest {
     }
 
     @Test
-    public void parseSimpleCharsTest() {
+    void parseSimpleCharsTest() {
         var str = "abcdefghijklmnopqrstuvwxyz";
         str += str.toUpperCase();
         str += "0123456789";
@@ -42,7 +42,7 @@ public class EdnaReaderCharTest {
     }
 
     @Test
-    public void parseSymbolCharsTest() {
+    void parseSymbolCharsTest() {
         var chars = "!\"§$%&/()=?*+~^°'#-_.:,<>|€@`´λ";
         for (int i = 0; i < chars.length(); i++) {
             var chr = chars.charAt(i);
@@ -51,7 +51,7 @@ public class EdnaReaderCharTest {
     }
 
     @Test
-    public void parseOctCharsTest() {
+    void parseOctCharsTest() {
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\o41"));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\o041"));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\\o702"));
@@ -63,7 +63,7 @@ public class EdnaReaderCharTest {
     }
 
     @Test
-    public void parseUniCharsTest() {
+    void parseUniCharsTest() {
         Assertions.assertEquals('λ', Edna.read("\\u03BB"));
         Assertions.assertEquals('λ', Edna.read("\\u03bb"));
         Assertions.assertEquals('ῷ', Edna.read("\\u1ff7"));

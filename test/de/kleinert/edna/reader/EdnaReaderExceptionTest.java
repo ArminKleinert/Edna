@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class EdnaReaderExceptionTest {
     @Test
-    public void positionStartTest() {
+    void positionStartTest() {
         try {
             Edna.read("[");
         } catch (EdnaReaderException ex ) {
@@ -22,7 +22,7 @@ class EdnaReaderExceptionTest {
     }
 
     @Test
-    public void positionTest() {
+    void positionTest() {
         try {
             Edna.read("   [");
         } catch (EdnaReaderException ex) {

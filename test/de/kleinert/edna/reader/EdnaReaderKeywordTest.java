@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 class EdnaReaderKeywordTest {
     @Test
-    public void parseKeywordBasicTest() {
+    void parseKeywordBasicTest() {
         {
             var text = ":ab";
             var it = Edna.read(text);
@@ -34,7 +34,7 @@ class EdnaReaderKeywordTest {
     }
 
     @Test
-    public void parseKeywordWithNamespaceTest() {
+    void parseKeywordWithNamespaceTest() {
         {
             var text = ":a/b";
             var it = Edna.read(text);
@@ -49,7 +49,7 @@ class EdnaReaderKeywordTest {
     }
 
     @Test
-    public void parseKeywordSymbolsTest() {
+     void parseKeywordSymbolsTest() {
         {
             var text = ":+";
             var it = Edna.read(text);
@@ -97,7 +97,7 @@ class EdnaReaderKeywordTest {
     }
 
     @Test
-    public void parseKeywordSymbolsMixTest() {
+    void parseKeywordSymbolsMixTest() {
         {
             var it = Edna.read(":a+");
             Assertions.assertInstanceOf(Keyword.class, it);
@@ -133,7 +133,7 @@ class EdnaReaderKeywordTest {
     }
 
     @Test
-    public void parseKeywordUTFTest() {
+    void parseKeywordUTFTest() {
         { // 'λ' fits into simple chars.
             var text = ":λ";
             var it = Edna.read(text, Edna.extendedOptions());
@@ -159,7 +159,7 @@ class EdnaReaderKeywordTest {
     }
 
     @Test
-    public void parseInvalidKeywordTest() {
+    void parseInvalidKeywordTest() {
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read(":")); // Only colon instanceof invalid.
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read(":/")); // Colon+slash instanceof invalid.
 

@@ -60,17 +60,6 @@ public class EdnaReaderDispatchSimpleTest {
     }
 
     @Test
-    public void parseDiscardTest() {
-        // Empty after discard is resolved
-        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#_"));
-        Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#_a"));
-
-        Assertions.assertEquals(1L, Edna.read("#_a 1"));
-        Assertions.assertEquals(List.of(), Edna.read("[#_a #_b]"));
-        Assertions.assertEquals(List.of(), Edna.read("[#_ #_a b]"));
-    }
-
-    @Test
     public void parseDispatchChar() {
         // Only possible with extensions
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\a"));

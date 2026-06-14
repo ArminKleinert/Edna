@@ -6,13 +6,15 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-public class EdnaReaderStringTest {
-    @Test void  parseStringEscapes() {
+class EdnaReaderStringTest {
+    @Test
+    void parseStringEscapes() {
         Assertions.assertEquals("\"", Edna.read("\"\\u0022\""));
         Assertions.assertEquals("'", Edna.read("\"'\""));
     }
+
     @Test
-    public void parseStringBasicTest() {
+    void parseStringBasicTest() {
         {
             var it = Edna.read("\"\"", null, String.class);
             Assertions.assertNotNull(it);

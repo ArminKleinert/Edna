@@ -10,7 +10,7 @@ import java.util.List;
 
 class EdnaReaderIteratorTest {
     @Test
-    public void parseIteratorEmptyWhitespaceTest() {
+    void parseIteratorEmptyWhitespaceTest() {
         Assertions.assertFalse(Edna.reader("").hasNext());
         Assertions.assertFalse(Edna.reader("                      ").hasNext());
         Assertions.assertFalse(Edna.reader(" \n ").hasNext());
@@ -19,14 +19,14 @@ class EdnaReaderIteratorTest {
     }
 
     @Test
-    public void parseIteratorEmptyCommentTest() {
+    void parseIteratorEmptyCommentTest() {
         Assertions.assertFalse(Edna.reader("; comment").hasNext());
         Assertions.assertFalse(Edna.reader("#_discard").hasNext());
         Assertions.assertFalse(Edna.reader("#_discard #_again").hasNext());
     }
 
     @Test
-    public void parseIteratorBasicSingleTest() {
+    void parseIteratorBasicSingleTest() {
         {
             var iter = Edna.reader("abc");
             Assertions.assertTrue(iter.hasNext());
@@ -40,7 +40,7 @@ class EdnaReaderIteratorTest {
     }
 
     @Test
-    public void parseIteratorBasicSingleOptionsTest() {
+    void parseIteratorBasicSingleOptionsTest() {
         {
             var iter = Edna.reader("abc", null);
             Assertions.assertEquals(Symbol.symbol("abc"), iter.next());
@@ -55,7 +55,7 @@ class EdnaReaderIteratorTest {
         }
         {
             var iter = Edna.reader("0xFF", Edna.defaultOptions());
-            Assertions.assertThrows(EdnaReaderException.class, () -> iter.next());
+            Assertions.assertThrows(EdnaReaderException.class, iter::next);
         }
         {
             var iter = Edna.reader("0xFF", Edna.defaultOptions().copy(b -> b.moreNumberPrefixes(true)));
@@ -64,7 +64,7 @@ class EdnaReaderIteratorTest {
     }
 
     @Test
-    public void parseIteratorBasicMultiTest() {
+    void parseIteratorBasicMultiTest() {
         {
             var iter = Edna.reader("0xFF 0x1", Edna.defaultOptions().copy(b -> b.moreNumberPrefixes(true)));
             Assertions.assertEquals(255L, iter.next());
@@ -73,7 +73,7 @@ class EdnaReaderIteratorTest {
     }
 
     @Test
-    public void parseIteratorMultiWithDiscardTest() {
+    void parseIteratorMultiWithDiscardTest() {
         {
             var iter = Edna.reader("0xFF #_discarded 0x1", Edna.defaultOptions().copy(b -> b.moreNumberPrefixes(true)));
             Assertions.assertEquals(255L, iter.next());

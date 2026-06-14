@@ -12,7 +12,7 @@ class EdnaReaderNumberBasicIntegralTest {
     private final EdnaOptions allowZeros = Edna.defaultOptions().copy((b) -> b.allowZeroPrefix(true));
 
     @Test
-    public void parseIntegerDecimal() {
+    void parseIntegerDecimal() {
         {
             var it = Edna.read("0");
             Assertions.assertInstanceOf(Long.class, it);
@@ -84,7 +84,7 @@ class EdnaReaderNumberBasicIntegralTest {
     }
 
     @Test
-    public void parseIntegerOctal() {
+    void parseIntegerOctal() {
         {
             var it = Edna.read("0o0", allowMoreNumberPrefixes);
             Assertions.assertInstanceOf(Long.class, it);
@@ -151,7 +151,7 @@ class EdnaReaderNumberBasicIntegralTest {
     }
 
     @Test
-    public void parseIntegerBinary() {
+    void parseIntegerBinary() {
         {
             var it = Edna.read("0b0", allowMoreNumberPrefixes);
             Assertions.assertInstanceOf(Long.class, it);
@@ -218,7 +218,7 @@ class EdnaReaderNumberBasicIntegralTest {
     }
 
     @Test
-    public void parseIntegerHex() {
+    void parseIntegerHex() {
         {
             var it = Edna.read("0x0", allowMoreNumberPrefixes);
             Assertions.assertInstanceOf(Long.class, it);
@@ -285,7 +285,7 @@ class EdnaReaderNumberBasicIntegralTest {
     }
 
     @Test
-    public void parseBigInt() {
+    void parseBigInt() {
         {
             var it = Edna.read("0N");
             Assertions.assertInstanceOf(BigInteger.class, it);

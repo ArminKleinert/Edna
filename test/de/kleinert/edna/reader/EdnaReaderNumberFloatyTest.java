@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 class EdnaReaderNumberFloatyTest {
     @Test
-    public void parseDouble() {
+    void parseDouble() {
         {
             var it = Edna.read("0.0");
             Assertions.assertInstanceOf(Double.class, it);
@@ -107,7 +107,7 @@ class EdnaReaderNumberFloatyTest {
     }
 
     @Test
-    public void parseDoubleENotation() {
+    void parseDoubleENotation() {
         {
             var it = Edna.read("0e+0");
             Assertions.assertInstanceOf(Double.class, it);
@@ -187,7 +187,7 @@ class EdnaReaderNumberFloatyTest {
     }
 
     @Test
-    public void parseDoubleENotationBig() {
+    void parseDoubleENotationBig() {
         {
             var it = Edna.read("0E+0");
             Assertions.assertInstanceOf(Double.class, it);
@@ -252,7 +252,7 @@ class EdnaReaderNumberFloatyTest {
     }
 
     @Test
-    public void parseDoubleENotation2() {
+    void parseDoubleENotation2() {
         {
             var it = Edna.read("0.0e+0");
             Assertions.assertInstanceOf(Double.class, it);
@@ -317,7 +317,7 @@ class EdnaReaderNumberFloatyTest {
     }
 
     @Test
-    public void parseDoubleENotationBig2() {
+    void parseDoubleENotationBig2() {
         {
             var it = Edna.read("0.0E+0");
             Assertions.assertInstanceOf(Double.class, it);
@@ -382,7 +382,7 @@ class EdnaReaderNumberFloatyTest {
     }
 
     @Test
-    public void parseBigDecimal() {
+    void parseBigDecimal() {
         var temp = BigDecimal.valueOf(0.0);
         {
             var it = Edna.read("0M");
@@ -522,7 +522,7 @@ class EdnaReaderNumberFloatyTest {
     }
 
     @Test
-    public void parseBigDecimalENotation() {
+    void parseBigDecimalENotation() {
         {
             var it = Edna.read("0.0e+0M");
             Assertions.assertInstanceOf(BigDecimal.class, it);
@@ -587,7 +587,7 @@ class EdnaReaderNumberFloatyTest {
     }
 
     @Test
-    public void parseBigDecimalENotationBig2() {
+    void parseBigDecimalENotationBig2() {
         {
             var it = Edna.read("0.0E+0M");
             Assertions.assertInstanceOf(BigDecimal.class, it);

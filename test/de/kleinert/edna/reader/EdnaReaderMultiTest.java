@@ -10,7 +10,7 @@ import java.util.*;
 
 class EdnaReaderMultiTest {
     @Test
-    public void parseMultiEmptyWhitespaceTest() {
+    void parseMultiEmptyWhitespaceTest() {
         Assertions.assertEquals(List.of(), Edna.readMulti(""));
         Assertions.assertEquals(List.of(), Edna.readMulti("                      "));
         Assertions.assertEquals(List.of(), Edna.readMulti(" \n "));
@@ -19,20 +19,20 @@ class EdnaReaderMultiTest {
     }
 
     @Test
-    public void parseMultiEmptyCommentTest() {
+    void parseMultiEmptyCommentTest() {
         Assertions.assertEquals(List.of(), Edna.readMulti("; comment"));
         Assertions.assertEquals(List.of(), Edna.readMulti("#_discard"));
         Assertions.assertEquals(List.of(), Edna.readMulti("#_discard #_again"));
     }
 
     @Test
-    public void parseBasicSingleMultiTest() {
+    void parseBasicSingleMultiTest() {
         Assertions.assertEquals(List.of(Symbol.symbol("abc")), Edna.readMulti("abc"));
         Assertions.assertEquals(List.of(123L), Edna.readMulti("123"));
     }
 
     @Test
-    public void parseBasicMultiTest() {
+    void parseBasicMultiTest() {
         Assertions.assertEquals(List.of(Symbol.symbol("abc"), Symbol.symbol("def")), Edna.readMulti("abc def"));
         Assertions.assertEquals(List.of("abc", "def"), Edna.readMulti("\"abc\" \"def\""));
         Assertions.assertEquals(List.of(123L, "def"), Edna.readMulti("123 \"def\""));
@@ -43,7 +43,7 @@ class EdnaReaderMultiTest {
     }
 
     @Test
-    public void parseErrorMultiTest() {
+    void parseErrorMultiTest() {
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.readMulti("/abc def"));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.readMulti("ab \""));
 

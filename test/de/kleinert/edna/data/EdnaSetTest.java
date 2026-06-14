@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-public class EdnaSetTest {
+class EdnaSetTest {
     @SafeVarargs
     private <T> SequencedSet<T> sequencedSetOf(T... xs) {
         return new LinkedHashSet<>(Arrays.stream(xs).toList());

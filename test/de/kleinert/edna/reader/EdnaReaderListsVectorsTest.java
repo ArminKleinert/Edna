@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EdnaReaderListsVectorsTest {
+class EdnaReaderListsVectorsTest {
 
     @Test
-    public void parseEmptyList() {
+    void parseEmptyList() {
         // Normal
         {
             var it = Edna.read("()");
@@ -61,7 +61,7 @@ public class EdnaReaderListsVectorsTest {
     }
 
     @Test
-    public void parseBasicList() {
+    void parseBasicList() {
         {
             var it = Edna.read("(1)");
             Assertions.assertInstanceOf(List.class, it);
@@ -85,7 +85,7 @@ public class EdnaReaderListsVectorsTest {
     }
 
     @Test
-    public void parseNestedList() {
+    void parseNestedList() {
         {
             var it = Edna.read("((1))");
             Assertions.assertInstanceOf(List.class, it);
@@ -119,7 +119,7 @@ public class EdnaReaderListsVectorsTest {
     }
 
     @Test
-    public void parseWithConverter() {
+    void parseWithConverter() {
         {
             var options = Edna.defaultOptions().copy((builder -> builder.listToEdnListConverter(ArrayList::new)));
             var parsed = Edna.read("(1 2)", options);
@@ -135,7 +135,7 @@ public class EdnaReaderListsVectorsTest {
     }
 
     @Test
-    public void invalidTest() {
+    void invalidTest() {
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("("));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("["));
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read(")"));

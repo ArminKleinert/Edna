@@ -1,14 +1,13 @@
 package de.kleinert.edna.reader;
 
 import de.kleinert.edna.Edna;
-import de.kleinert.edna.EdnaOptions;
 import de.kleinert.edna.data.Symbol;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class EdnaReaderSymbolTest {
+class EdnaReaderSymbolTest {
     @Test
-    public void parseSymbolBasicTest() {
+    void parseSymbolBasicTest() {
         {
             var text = "ab";
             var it = Edna.read(text, null, Symbol.class);
@@ -34,7 +33,7 @@ public class EdnaReaderSymbolTest {
     }
 
     @Test
-    public void parseSymbolWithNamespaceTest() {
+    void parseSymbolWithNamespaceTest() {
         {
             var text = "a/b";
             var it = Edna.read(text, null, Symbol.class);
@@ -49,7 +48,7 @@ public class EdnaReaderSymbolTest {
     }
 
     @Test
-    public void parseSymbolSymbolsTest() {
+    void parseSymbolSymbolsTest() {
         {
             var text = "+";
             var it = Edna.read(text, null, Symbol.class);
@@ -97,7 +96,7 @@ public class EdnaReaderSymbolTest {
     }
 
     @Test
-    public void parseSymbolSymbolsMixTest() {
+    void parseSymbolSymbolsMixTest() {
         {
             var text = "a+";
             var it = Edna.read(text, null, Symbol.class);
@@ -123,7 +122,7 @@ public class EdnaReaderSymbolTest {
     }
 
     @Test
-    public void parseSymbolUTFTest() {
+    void parseSymbolUTFTest() {
         { // 'λ' fits into simple chars.
             var text = "λ";
             var it = Edna.read(text, Edna.extendedOptions(), Symbol.class);
@@ -149,7 +148,7 @@ public class EdnaReaderSymbolTest {
     }
 
     @Test
-    public void parseInvalidSymbolTest() {
+    void parseInvalidSymbolTest() {
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("\uD83C\uDF81")); // UTF-16 only valid with extension.
     }
 }
