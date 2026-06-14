@@ -136,4 +136,18 @@ class EdnaListTest {
             Assertions.assertNotEquals(list, List.<Integer>of());
         }
     }
+
+    @Test
+    void meta() {
+        var list = EdnaList.create(List.of(1,2,3,4,5)).withMeta();
+
+    }
+
+    @Test
+    void obj() {
+    }
+
+    @Test
+    void withMeta() {
+    }
 }

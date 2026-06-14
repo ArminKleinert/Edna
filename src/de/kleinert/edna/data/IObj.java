@@ -35,10 +35,10 @@ public interface IObj {
     default <T> @NotNull IObj of(final T element) {
         if (element instanceof IObj)
             return (IObj) element;
-        return new Wrapper<>(Collections.unmodifiableMap(Map.of()), element);
+        return new Wrapper<>(Map.of(), element);
     }
 
-    public static IObj mergeMeta(Object unformattedMeta, Object obj) {
+    static IObj mergeMeta(Object unformattedMeta, Object obj) {
         var meta1 = IObj.formatMeta(unformattedMeta);
         if (obj instanceof IObj) {
             var objMeta = ((IObj) obj).meta();

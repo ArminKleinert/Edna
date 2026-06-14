@@ -38,40 +38,145 @@ public final class EdnaMap<K, V>
         this.delegate = Collections.unmodifiableSequencedMap(delegate);
     }
 
+
+    /**
+     * Create a new instance with the provided keys and values.
+     * @return A new instance.
+     * @param <K> Key type.
+     * @param <V> Value type.
+     * @see #create(List)
+     */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k, V v) {
         return create(List.of(k, v));
     }
 
+
+    /**
+     * Create a new instance with the provided keys and values.
+     * @param k1 Key 1.
+     * @param v1 Value 1.
+     * @param k2 Key 2.
+     * @param v2 Value 2.
+     * @return A new instance.
+     * @param <K> Key type.
+     * @param <V> Value type.
+     * @see #create(List)
+     */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k1, V v1, K k2, V v2) {
         return create(List.of(k1, v1, k2, v2));
     }
 
+
+    /**
+     * Create a new instance with the provided keys and values.
+     * @param k1 Key 1.
+     * @param v1 Value 1.
+     * @param k2 Key 2.
+     * @param v2 Value 2.
+     * @param k3 Key 3.
+     * @param v3 Value 3.
+     * @return A new instance.
+     * @param <K> Key type.
+     * @param <V> Value type.
+     * @see #create(List)
+     */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3) {
         return create(List.of(k1, v1, k2, v2, k3, v3));
     }
 
+
+    /**
+     * Create a new instance with the provided keys and values.
+     * @param k1 Key 1.
+     * @param v1 Value 1.
+     * @param k2 Key 2.
+     * @param v2 Value 2.
+     * @param k3 Key 3.
+     * @param v3 Value 3.
+     * @param k4 Key 4.
+     * @param v4 Value 4.
+     * @return A new instance.
+     * @param <K> Key type.
+     * @param <V> Value type.
+     * @see #create(List)
+     */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
         return create(List.of(k1, v1, k2, v2, k3, v3, k4, v4));
     }
 
+
+    /**
+     * Create a new instance with the provided keys and values.
+     * @param k1 Key 1.
+     * @param v1 Value 1.
+     * @param k2 Key 2.
+     * @param v2 Value 2.
+     * @param k3 Key 3.
+     * @param v3 Value 3.
+     * @param k4 Key 4.
+     * @param v4 Value 4.
+     * @param k5 Key 5.
+     * @param v5 Value 5.
+     * @return A new instance.
+     * @param <K> Key type.
+     * @param <V> Value type.
+     * @see #create(List)
+     */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
         return create(List.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
     }
 
+    /**
+     * Create a new instance with the provided keys and values.
+     * @param k1 Key 1.
+     * @param v1 Value 1.
+     * @param k2 Key 2.
+     * @param v2 Value 2.
+     * @param k3 Key 3.
+     * @param v3 Value 3.
+     * @param k4 Key 4.
+     * @param v4 Value 4.
+     * @param k5 Key 5.
+     * @param v5 Value 5.
+     * @param k6 Key 6.
+     * @param v6 Value 6.
+     * @return A new instance.
+     * @param <K> Key type.
+     * @param <V> Value type.
+     * @see #create(List)
+     */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
         return create(List.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6));
     }
 
+
+
+    /**
+     * Create a new instance with the provided keys and values.
+     * @param kvs Keys and values as a variadic argument.
+     * @return A new instance.
+     * @param <K> Key type.
+     * @param <V> Value type.
+     * @see #create(List)
+     */
     public static <K, V> @NotNull EdnaMap<K, V> of(final Object... kvs) {
         return create(Arrays.stream(kvs).toList());
     }
 
+    /**
+     * Create a new instance with the provided keys and values.
+     * @param kvs Keys and values as a list.
+     * @return A new instance.
+     * @param <K> Key type.
+     * @param <V> Value type.
+     * @throws IllegalArgumentException if there are duplicate keys or if there is a key without an associated value.
+     */
     public static <K, V> @NotNull EdnaMap<K, V> create(
             final @NotNull List<Object> kvs) {
         if (kvs.isEmpty())
             return EdnaMap.empty();
         if (kvs.size() % 2 != 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Key " + kvs.getLast() + " has no associated value.");
         }
         final @NotNull Set<K> gatheredKeys = new HashSet<>();
         final @NotNull List<Entry<K, V>> kvList = new ArrayList<>();
@@ -86,6 +191,8 @@ public final class EdnaMap<K, V>
         }
         return new EdnaMap<>(kvList);
     }
+    public static <K, V> @NotNull EdnaMap<K, V> createFromEntries(
+            final @NotNull List<Entry<K,V>> kvs) {return new EdnaMap<>(kvs);}
 
     @Override
     public int size() {
