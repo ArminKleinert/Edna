@@ -19,7 +19,7 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           @NotNull Function<@NotNull List<@Nullable Object>, List<Object>> listToEdnListConverter,
                           @NotNull Function<@NotNull List<@Nullable Object>, List<Object>> listToEdnVectorConverter,
                           @NotNull Function<@NotNull List<@Nullable Object>, Set<Object>> listToEdnSetConverter,
-                          @NotNull Function<@NotNull List<Map.Entry<@Nullable Object, @Nullable Object>>, Map<Object, Object>> listToEdnMapConverter,
+                          @NotNull Function<@NotNull List<@Nullable Object>, Map<Object, Object>> listToEdnMapConverter,
                           boolean allowUTFSymbols,
                           int encoderSequenceElementLimit,
                           int encoderCollectionElementLimit,
@@ -50,7 +50,7 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                 EdnaList::create,
                 EdnaVector::create,
                 EdnaSet::create,
-                EdnaMap::createFromEntries,
+                EdnaMap::create,
                 false,
                 1000,
                 10000,
@@ -93,7 +93,7 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         private @NotNull Function<@NotNull List<Object>, @Nullable List<Object>> listToEdnListConverter;
         private @NotNull Function<@NotNull List<Object>, @Nullable List<Object>> listToEdnVectorConverter;
         private @NotNull Function<@NotNull List<Object>, @Nullable Set<Object>> listToEdnSetConverter;
-        private @NotNull Function<@NotNull List<Map.Entry<@Nullable Object, @Nullable Object>>, @Nullable Map<Object, Object>> listToEdnMapConverter;
+        private @NotNull Function<@NotNull List<@Nullable Object>, @Nullable Map<Object, Object>> listToEdnMapConverter;
         private boolean allowUTFSymbols;
         private int encoderSequenceElementLimit;
         private int encoderCollectionElementLimit;
@@ -189,9 +189,9 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
-        public <K1, V1, K2, V2> Builder listToEdnMapConverter(final @NotNull Function<@NotNull List<Map.Entry<@Nullable K1, @Nullable V1>>, Map<K2, V2>> v) {
+        public <KV, K2, V2> Builder listToEdnMapConverter(final @NotNull Function<@NotNull List<@Nullable KV>, Map<K2, V2>> v) {
             //noinspection unchecked,rawtypes
-            this.listToEdnMapConverter = (Function<List<Map.Entry<Object, Object>>, Map<Object, Object>>) ((Function) v);
+            this.listToEdnMapConverter = (Function) v;
             return this;
         }
 

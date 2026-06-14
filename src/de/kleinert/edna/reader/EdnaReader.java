@@ -62,6 +62,7 @@ public class EdnaReader {
                     Object next = null;
                     boolean reachedEnd = false;
                     boolean buffered = false;
+
                     @Override
                     public boolean hasNext() {
                         if (reachedEnd) {
@@ -389,9 +390,14 @@ public class EdnaReader {
                     linePos, codePosIndex,
                     "Required object for metadata, but got nothing.");
         }
+        if (!(obj instanceof IObj)) {
+            throw new EdnaReaderException(
+                    linePos, codePosIndex,
+                    "Required IObj for metadata.");
+        }
 
         try {
-            return IObj.mergeMeta(meta, obj);
+            return IObj.mergeMeta(meta, (IObj) obj);
         } catch (IllegalArgumentException ex) {
             var message = "Failed to apply metadata " + meta + " to object " + obj + ".";
             throw new EdnaReaderException(linePos, codePosIndex, message);
@@ -610,27 +616,12 @@ public class EdnaReader {
         final var linePos = cpi.getLineIdx();
         final var codePosIndex = cpi.getTextIndex();
         final var kvs = readVector(level, '}');
-        final var gatheredKeys = new HashSet<>();
-        final var res = new ArrayList<Map.Entry<Object, Object>>();
 
-        for (int i = 0; i < kvs.size(); i += 2) {
-            var key = kvs.get(i);
-            if (gatheredKeys.contains(key)) {
-                throw new EdnaReaderException(
-                        linePos, codePosIndex,
-                        "Illegal map. Duplicate key " + key + ".");
-            }
-            gatheredKeys.add(key);
-            if (i + 1 >= kvs.size()) {
-                throw new EdnaReaderException(
-                        linePos, codePosIndex,
-                        "Odd number of elements in map. Last key was " + key + ".");
-            }
-            final var value = kvs.get(i + 1);
-            res.add(Map.entry(key, value));
+        try {
+            return options.listToEdnMapConverter().apply(kvs);
+        } catch (IllegalArgumentException iae) {
+            throw new EdnaReaderException(linePos, codePosIndex, "Failed to read Map.", iae);
         }
-
-        return options.listToEdnMapConverter().apply(res);
     }
 
     private @NotNull List<?> readList(final int level) {

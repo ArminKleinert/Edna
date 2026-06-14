@@ -64,12 +64,7 @@ public final class EdnaSet<T>
     }
 
     @Override
-    public @Unmodifiable Object obj() {
-        return this;
-    }
-
-    @Override
     public @NotNull IObj withMeta(@NotNull Map<Object, Object> newMeta) {
-        return new EdnaSet<>(meta, this.delegate);
+        return new EdnaSet<>(newMeta, this.delegate);
     }
 }

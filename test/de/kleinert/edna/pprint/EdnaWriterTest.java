@@ -154,14 +154,6 @@ class EdnaWriterTest {
     }
 
     @Test
-    void encodeIObj() {
-        Assertions.assertEquals("^{:tag \"abc\"} :a", Edna.pprintToString(IObj.of("abc", Keyword.get("a"))));
-        Assertions.assertEquals("^{:abc true} :a", Edna.pprintToString(IObj.of(Keyword.get("abc"), Keyword.get("a"))));
-        Assertions.assertEquals("^{:tag abc} :a", Edna.pprintToString(IObj.of(Symbol.symbol("abc"), Keyword.get("a"))));
-        Assertions.assertEquals("^{\"b\" \"c\"} :a", Edna.pprintToString(IObj.of(Map.of("b", "c"), Keyword.get("a"))));
-    }
-
-    @Test
     void encodePersistentList() {
         Assertions.assertEquals("()", Edna.pprintToString(EdnaList.<Keyword>of()));
         Assertions.assertEquals("(:a, :b)", Edna.pprintToString(EdnaList.of(Keyword.get("a"), Keyword.get("b"))));

@@ -16,8 +16,9 @@ public final class EdnaList<T>
         this(null, delegate);
     }
 
-    public EdnaList(final @Nullable Map<Object, Object> meta, final @NotNull List<T> delegate) {
-        this.meta = meta == null ? Map.of() : meta;
+    public EdnaList(final @Nullable Map<?, ?> meta, final @NotNull List<T> delegate) {
+        //noinspection unchecked
+        this.meta = meta == null ? Map.of() : (Map<Object, Object>) meta;
         this.delegate = Collections.unmodifiableList(delegate);
     }
 
@@ -64,12 +65,7 @@ public final class EdnaList<T>
     }
 
     @Override
-    public @Unmodifiable Object obj() {
-        return this;
-    }
-
-    @Override
     public @NotNull IObj withMeta(@NotNull Map<Object, Object> newMeta) {
-        return new EdnaList<>(meta, this.delegate);
+        return new EdnaList<>(newMeta, this.delegate);
     }
 }

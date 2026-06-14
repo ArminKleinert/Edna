@@ -152,7 +152,7 @@ public class EdnaWriter {
         writer.append('^');
         encode(obj.meta(), writer, indent);
         writer.append(' ');
-        encode(obj.obj(), writer, indent);
+        encode(obj, writer, indent);
     }
 
     private long[] byteArrayToLongArray(final byte @NotNull [] a) {

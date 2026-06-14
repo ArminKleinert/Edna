@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 public class EdnaVectorTest {
     @Test
@@ -135,5 +136,29 @@ public class EdnaVectorTest {
             Assertions.assertEquals(list, List.of(1, 2, 3, 2, 1));
             Assertions.assertNotEquals(list, List.<Integer>of());
         }
+    }
+
+    @Test
+    void meta() {
+        var o = EdnaVector.create(List.of(1, 2, 3, 4, 5));
+        Assertions.assertTrue(o.meta().isEmpty());
+
+        Map<Object, Object> meta1 = Map.of(Keyword.keyword("hasMeta"), true);
+        Assertions.assertEquals(meta1, o.withMeta(meta1).meta());
+
+        Map<Object, Object> meta2 = Map.of(Keyword.keyword("hasMeta1"), true);
+        Assertions.assertEquals(meta2, o.withMeta(meta2).meta());
+    }
+
+    @Test
+    void withMeta() {
+        var o = EdnaVector.create(List.of(1, 2, 3, 4, 5));
+        Assertions.assertTrue(o.meta().isEmpty());
+
+        Map<Object, Object> meta1 = Map.of(Keyword.keyword("hasMeta"), true);
+        Assertions.assertEquals(meta1, o.withMeta(meta1).meta());
+
+        Map<Object, Object> meta2 = Map.of(Keyword.keyword("hasMeta1"), true);
+        Assertions.assertEquals(meta2, o.withMeta(meta2).meta());
     }
 }

@@ -82,4 +82,28 @@ class EdnaSetTest {
         Assertions.assertNotEquals(testSet, List.<Integer>of());
         Assertions.assertNotEquals(testSet, Set.<Integer>of());
     }
+
+    @Test
+    void meta() {
+        var o = EdnaSet.create(List.of(1, 2, 3, 4, 5));
+        Assertions.assertTrue(o.meta().isEmpty());
+
+        Map<Object, Object> meta1 = Map.of(Keyword.keyword("hasMeta"), true);
+        Assertions.assertEquals(meta1, o.withMeta(meta1).meta());
+
+        Map<Object, Object> meta2 = Map.of(Keyword.keyword("hasMeta1"), true);
+        Assertions.assertEquals(meta2, o.withMeta(meta2).meta());
+    }
+
+    @Test
+    void withMeta() {
+        var o = EdnaSet.create(List.of(1, 2, 3, 4, 5));
+        Assertions.assertTrue(o.meta().isEmpty());
+
+        Map<Object, Object> meta1 = Map.of(Keyword.keyword("hasMeta"), true);
+        Assertions.assertEquals(meta1, o.withMeta(meta1).meta());
+
+        Map<Object, Object> meta2 = Map.of(Keyword.keyword("hasMeta1"), true);
+        Assertions.assertEquals(meta2, o.withMeta(meta2).meta());
+    }
 }

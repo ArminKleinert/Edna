@@ -2,6 +2,7 @@ package de.kleinert.edna.reader;
 
 import de.kleinert.edna.Edna;
 import de.kleinert.edna.EdnaOptions;
+import de.kleinert.edna.data.EdnaMap;
 import de.kleinert.edna.data.Symbol;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class EdnaReaderSetsMapsTest {
     void parseWithConverter() {
         {
             var options = Edna.defaultOptions().copy((b) -> b
-                    .listToEdnMapConverter((it) -> new IdentityHashMap<>(it.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+                    .listToEdnMapConverter((it) -> new IdentityHashMap<>(EdnaMap.create(it))
             ));
             var parsed = Edna.read("{1 2}", options);
             Assertions.assertInstanceOf(IdentityHashMap.class, parsed);

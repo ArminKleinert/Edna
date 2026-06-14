@@ -81,25 +81,8 @@ public class Main {
 
         System.exit(0);
 
-        {
-            var iobj = ((IObj) Edna.read("^:a :b", Edna.defaultOptions().copy(b -> b.allowMetaData(true))));
-            System.out.println(iobj.meta() + " " + iobj.obj());
-
-            var r = EdnaReader.readMulti(new CodePointIterator("".codePoints()), EdnaOptions.defaultOptions());
-            System.out.println(r);
-        }
-
-        System.exit(0);
-
         stdExamples();
 
-        {
-            var options = Edna.defaultOptions().copy((b) -> b.allowMetaData(true));
-            var o = (IObj.Wrapper<?>) EdnaReader.read(new CodePointIterator(new StringReader("^a 166")), options, Object.class);
-            System.out.println(o.meta());
-            System.out.println(o.obj());
-            System.out.println(o.getClass());
-        }
         {
             var options = Edna.defaultOptions();
             var o = EdnaReader.read(new CodePointIterator(new StringReader("{2 3 :a 6}")), options, Object.class);

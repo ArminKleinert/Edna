@@ -33,8 +33,9 @@ public final class EdnaMap<K, V>
         return temp;
     }
 
-    public EdnaMap(final @Nullable Map<Object, Object> meta, final @NotNull SequencedMap<K, V> delegate) {
-        this.meta = meta == null ? Map.of() : meta;
+    private EdnaMap(final @Nullable Map<?, ?> meta, final @NotNull SequencedMap<K, V> delegate) {
+        //noinspection unchecked
+        this.meta = meta == null ? Map.of() : (Map<Object, Object>) meta;
         this.delegate = Collections.unmodifiableSequencedMap(delegate);
     }
 
@@ -231,12 +232,7 @@ public final class EdnaMap<K, V>
     }
 
     @Override
-    public @Unmodifiable Object obj() {
-        return this;
-    }
-
-    @Override
     public @NotNull IObj withMeta(@NotNull Map<Object, Object> newMeta) {
-        return new EdnaMap<>(meta, this.delegate);
+        return new EdnaMap<>(newMeta, this.delegate);
     }
 }

@@ -65,12 +65,7 @@ public final class EdnaVector<T>
     }
 
     @Override
-    public @Unmodifiable Object obj() {
-        return this;
-    }
-
-    @Override
     public @NotNull IObj withMeta(@NotNull Map<Object, Object> newMeta) {
-        return new EdnaVector<>(meta, this.delegate);
+        return new EdnaVector<>(newMeta, this.delegate);
     }
 }
