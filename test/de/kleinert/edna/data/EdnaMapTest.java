@@ -19,7 +19,7 @@ class EdnaMapTest {
 
     @Test
     void equalityToMap() {
-        var ednaMap = new EdnaMap<>(List.of(Map.entry(1, 2), Map.entry(3, 4)));
+        var ednaMap = EdnaMap.create(List.of(Map.entry(1, 2), Map.entry(3, 4)));
         var normalMap = Map.of(1, 2, 3, 4);
         Assertions.assertEquals(normalMap, ednaMap);
         Assertions.assertEquals(ednaMap, normalMap);
@@ -83,6 +83,47 @@ class EdnaMapTest {
         Assertions.assertEquals(
                 EdnaMap.of(1, 4, 2, 4, 3, 4, 4, 4, 5, 4, 6, 4, 7, 4),
                 EdnaMap.create(List.of(1, 4, 2, 4, 3, 4, 4, 4, 5, 4, 6, 4, 7, 4)));
+    }
+
+    @Test
+    void createFromEntries() {
+        Assertions.assertEquals(
+                EdnaMap.of(),
+                EdnaMap.createFromEntries(List.of()));
+
+        Assertions.assertEquals(
+                EdnaMap.of(1, 4, 2, 4, 3, 4, 4, 4, 5, 4, 6, 4, 7, 4),
+                EdnaMap.createFromEntries(List.of(
+                        Map.entry(1, 4), Map.entry(2, 4), Map.entry(3, 4),
+                        Map.entry(4, 4), Map.entry(5, 4), Map.entry(6, 4),
+                        Map.entry(7, 4)))
+        );
+    }
+
+    @Test
+    void createFromSequencedMap() {
+        Assertions.assertEquals(
+                EdnaMap.of(),
+                EdnaMap.createFromEntries(List.of()));
+
+        Assertions.assertEquals(
+                EdnaMap.of(1, 4, 2, 4, 3, 4, 4, 4, 5, 4, 6, 4, 7, 4),
+                EdnaMap.create(new LinkedHashMap<>(Map.of(
+                        1, 4, 2, 4, 3, 4, 4, 4, 5, 4, 6, 4, 7, 4)))
+        );
+    }
+
+    @Test
+    void createFromMap() {
+        Assertions.assertEquals(
+                EdnaMap.of(),
+                EdnaMap.createFromEntries(List.of()));
+
+        Assertions.assertEquals(
+                EdnaMap.of(1, 4, 2, 4, 3, 4, 4, 4, 5, 4, 6, 4, 7, 4),
+                EdnaMap.create(new LinkedHashMap<>(Map.of(
+                        1, 4, 2, 4, 3, 4, 4, 4, 5, 4, 6, 4, 7, 4)))
+        );
     }
 
     @Test

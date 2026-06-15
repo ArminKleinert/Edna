@@ -100,7 +100,8 @@ class EdnaReaderRefTest {
     @Test
     void refFromConfig() {
         var configText = "{ A 1, B 2, C 3 }";
-        var config = Edna.read(configText, Edna.defaultOptions(), Map.class);
+        @SuppressWarnings("unchecked")
+        var config = (Map<Object, Object>) Edna.read(configText, Edna.defaultOptions(), Map.class);
 
         var text = "[#edna/ref A #edna/ref B #edna/ref C]";
         Assertions.assertEquals(List.of(1L, 2L, 3L), Edna.read(text, options(config)));

@@ -149,9 +149,11 @@ public class EdnaWriter {
     }
 
     private void encodeIObj(final @NotNull IObj obj, final @NotNull Appendable writer, final int indent) throws IOException {
-        writer.append('^');
-        encode(obj.meta(), writer, indent);
-        writer.append(' ');
+        if (!obj.meta().isEmpty()) {
+            writer.append('^');
+            encode(obj.meta(), writer, indent);
+            writer.append(' ');
+        }
         encode(obj, writer, indent);
     }
 

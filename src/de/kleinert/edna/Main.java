@@ -90,7 +90,7 @@ public class Main {
             System.out.println(o.getClass());
         }
         {
-            var o = new EdnaMap<>(Map.of("r", 1, "a", 3).entrySet().stream().toList());
+            var o = EdnaMap.createFromEntries(Map.of("r", 1, "a", 3).entrySet().stream().toList());
             System.out.println(o);
             System.out.println(o.getClass());
         }
