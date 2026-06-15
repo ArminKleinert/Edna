@@ -81,6 +81,10 @@ public class EdnaWriter {
                 if (tryEncoder(l, writer, indent))
                     encodePersistentList(l, writer, indent);
             }
+            case Deque<?> l -> {
+                if (tryEncoder(l, writer, indent))
+                    encodePersistentList(l, writer, indent);
+            }
             case List<?> l -> {
                 if (tryEncoder(l, writer, indent))
                     encodeVector(l, writer, indent);
@@ -276,7 +280,7 @@ public class EdnaWriter {
         formatCollectionTo(l, "[", "]", writer, indent);
     }
 
-    private void encodePersistentList(final @NotNull List<?> l, final @NotNull Appendable writer, final int indent) throws IOException {
+    private void encodePersistentList(final @NotNull SequencedCollection<?> l, final @NotNull Appendable writer, final int indent) throws IOException {
         formatCollectionTo(l, "(", ")", writer, indent);
     }
 
@@ -320,7 +324,7 @@ public class EdnaWriter {
         writer.append(s);
     }
 
-    private void formatCollectionTo(final @NotNull List<?> l, final @NotNull String open, final @NotNull String close, final @NotNull Appendable writer, int indent, final boolean isMap) throws IOException {
+    private void formatCollectionTo(final @NotNull SequencedCollection<?> l, final @NotNull String open, final @NotNull String close, final @NotNull Appendable writer, int indent, final boolean isMap) throws IOException {
         indent = options.encoderPrettyPrint() ? indent : 0;
 
         // Try inline tag (dry-run)
@@ -382,7 +386,7 @@ public class EdnaWriter {
         appendIfPrettyEnabled(writer, options.encoderLineIndent().repeat(indent)).append(close);
     }
 
-    private void formatCollectionTo(final @NotNull List<?> l, final @NotNull String open, final @NotNull String close, final @NotNull Appendable writer, final int indent) throws IOException {
+    private void formatCollectionTo(final @NotNull SequencedCollection<?> l, final @NotNull String open, final @NotNull String close, final @NotNull Appendable writer, final int indent) throws IOException {
         formatCollectionTo(l, open, close, writer, indent, false);
     }
 }

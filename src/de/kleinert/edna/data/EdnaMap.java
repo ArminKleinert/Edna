@@ -277,6 +277,11 @@ public final class EdnaMap<K, V>
     }
 
     @Override
+    public @NotNull String toString() {
+        return EdnaCollections.toStringHelper(this.sequencedEntrySet(), '{', '}', ',');
+    }
+
+    @Override
     public @Unmodifiable @NotNull Map<Object, Object> meta() {
         return meta;
     }

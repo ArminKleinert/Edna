@@ -6,6 +6,10 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 
+/**
+ * A list type used by this library. Unlike {@link EdnaList}, indexed access must have complexity {@code O(log(n))} or preferably {@code O(1)}.
+ * @param <T> Generic type for entries.
+ */
 @Unmodifiable
 public final class EdnaVector<T>
         extends AbstractList<T>
@@ -13,20 +17,34 @@ public final class EdnaVector<T>
     private final @NotNull List<T> delegate;
     private final @NotNull Map<Object, Object> meta;
 
-    public EdnaVector(final @NotNull List<T> delegate) {
+    private EdnaVector(final @NotNull List<T> delegate) {
         this(null, delegate);
     }
 
-    public EdnaVector(final @Nullable Map<Object, Object> meta, final @NotNull List<T> delegate) {
+    private EdnaVector(final @Nullable Map<Object, Object> meta, final @NotNull List<T> delegate) {
         this.meta = meta == null ? Map.of() : meta;
         this.delegate = Collections.unmodifiableList(delegate);
     }
 
+    /**
+     * Creates a new instance from variadic entries.
+     *
+     * @param xs  The entries.
+     * @param <T> The type of entries.
+     * @return A new instance.
+     */
     @SafeVarargs
     public static <T> @NotNull EdnaVector<T> of(T... xs) {
         return new EdnaVector<>(Arrays.asList(xs));
     }
 
+    /**
+     * Copies the contents of the input into a new instance.
+     *
+     * @param xs  The entries.
+     * @param <T> The type of entries.
+     * @return A new instance.
+     */
     public static <T> @NotNull EdnaVector<T> create(
             final @NotNull Iterable<T> xs) {
         if (xs instanceof EdnaVector<?>)

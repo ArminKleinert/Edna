@@ -13,7 +13,7 @@ public final class EdnaSet<T>
     private final @NotNull SequencedSet<T> delegate;
     private final @NotNull Map<Object, Object> meta;
 
-    public EdnaSet(final @NotNull List<T> delegate) {
+    private EdnaSet(final @NotNull List<T> delegate) {
         this(null, new LinkedHashSet<>(delegate));
     }
 
