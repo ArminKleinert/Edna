@@ -6,6 +6,13 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 
+/**
+ *
+ * All collection types in Edna are unmodifiable, meaning that all mutating methods throw exceptions.
+ *
+ * @param <K>
+ * @param <V>
+ */
 @Unmodifiable
 public final class EdnaMap<K, V>
         extends AbstractMap<K, V>
@@ -47,6 +54,7 @@ public final class EdnaMap<K, V>
      * @param <K> Key type.
      * @param <V> Value type.
      * @return A new instance.
+     * @throws IllegalArgumentException if there are duplicate keys or if there is a key without an associated value.
      * @see #create(List)
      */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k, V v) {
@@ -64,6 +72,7 @@ public final class EdnaMap<K, V>
      * @param <K> Key type.
      * @param <V> Value type.
      * @return A new instance.
+     * @throws IllegalArgumentException if there are duplicate keys or if there is a key without an associated value.
      * @see #create(List)
      */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k1, V v1, K k2, V v2) {
@@ -83,6 +92,7 @@ public final class EdnaMap<K, V>
      * @param <K> Key type.
      * @param <V> Value type.
      * @return A new instance.
+     * @throws IllegalArgumentException if there are duplicate keys or if there is a key without an associated value.
      * @see #create(List)
      */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3) {
@@ -105,6 +115,7 @@ public final class EdnaMap<K, V>
      * @param <V> Value type.
      * @return A new instance.
      * @see #create(List)
+     * @throws IllegalArgumentException if there are duplicate keys or if there is a key without an associated value.
      */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
         return create(List.of(k1, v1, k2, v2, k3, v3, k4, v4));
@@ -128,6 +139,7 @@ public final class EdnaMap<K, V>
      * @param <V> Value type.
      * @return A new instance.
      * @see #create(List)
+     * @throws IllegalArgumentException if there are duplicate keys or if there is a key without an associated value.
      */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
         return create(List.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
@@ -152,6 +164,7 @@ public final class EdnaMap<K, V>
      * @param <V> Value type.
      * @return A new instance.
      * @see #create(List)
+     * @throws IllegalArgumentException if there are duplicate keys or if there is a key without an associated value.
      */
     public static <K, V> @NotNull EdnaMap<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
         return create(List.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6));
@@ -166,6 +179,7 @@ public final class EdnaMap<K, V>
      * @param <V> Value type.
      * @return A new instance.
      * @see #create(List)
+     * @throws IllegalArgumentException if there are duplicate keys or if there is a key without an associated value.
      */
     public static <K, V> @NotNull EdnaMap<K, V> of(final Object... kvs) {
         return create(Arrays.stream(kvs).toList());
@@ -207,7 +221,7 @@ public final class EdnaMap<K, V>
             final var v = (V) kvIter.next();
             kvList.add(new SimpleEntry<>(k, v));
         }
-        return new EdnaMap<>(kvList);
+        return createFromEntries(kvList);
     }
 
     /**
@@ -234,30 +248,21 @@ public final class EdnaMap<K, V>
     }
 
     /**
-     * Create a new instance with the provided Map. It guarantees that the order of elements is the same as in the input.
+     * Create a new instance with the provided Map. If the input is a {@link SequencedMap}, the implementation guarantees that the order of elements is preserved when copying.
+     *
      * @param kvs The Map.
-     * @return A new instanced.
      * @param <K> Key type.
      * @param <V> Value type.
-     */
-    public static <K, V> @NotNull EdnaMap<K, V> create(
-            final @NotNull SequencedMap<K, V> kvs) {
-        if (kvs instanceof EdnaMap<K, V>) return (EdnaMap<K, V>) kvs;
-        if (kvs.isEmpty()) return empty();
-        return new EdnaMap<>(null, new LinkedHashMap<>(kvs));
-    }
-
-    /**
-     * Create a new instance with the provided Map.
-     * @param kvs The Map.
      * @return A new instanced.
-     * @param <K> Key type.
-     * @param <V> Value type.
      */
     public static <K, V> @NotNull EdnaMap<K, V> create(
             final @NotNull Map<K, V> kvs) {
         if (kvs instanceof EdnaMap<K, V>) return (EdnaMap<K, V>) kvs;
         if (kvs.isEmpty()) return empty();
+
+        if (kvs instanceof SequencedMap<K, V>)
+            return createFromEntries(((SequencedMap<K, V>) kvs).sequencedEntrySet().stream().toList());
+
         return createFromEntries(kvs.entrySet().stream().toList());
     }
 

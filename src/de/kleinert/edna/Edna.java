@@ -18,6 +18,7 @@ import java.util.Spliterators;
 import java.util.stream.StreamSupport;
 
 public class Edna {
+    private Edna(){}
     public static @NotNull EdnaOptions defaultOptions() {
         return EdnaOptions.defaultOptions();
     }

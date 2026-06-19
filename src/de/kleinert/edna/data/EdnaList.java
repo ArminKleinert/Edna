@@ -5,9 +5,11 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 /**
  * A list type used by this library. Unlike {@link EdnaVector}, this type does not make guarantees about access complexity.
+ * All collection types in Edna are unmodifiable, meaning that all mutating methods throw exceptions.
  *
  * @param <T> Generic type for entries.
  */
@@ -51,11 +53,12 @@ public final class EdnaList<T>
             final @NotNull Iterable<T> xs) {
         if (xs instanceof EdnaList<?>)
             return (EdnaList<T>) xs;
-        final @NotNull var temp = new ArrayList<T>();
-        for (T x : xs) {
-            temp.add(x);
-        }
-        return new EdnaList<>(temp);
+        var spliterator = Spliterators
+                .spliteratorUnknownSize(xs.iterator(), Spliterator.ORDERED);
+        return new EdnaList<>(
+                StreamSupport
+                        .stream(spliterator, false)
+                        .toList());
     }
 
     @Override

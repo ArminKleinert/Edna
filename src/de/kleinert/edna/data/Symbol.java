@@ -7,7 +7,6 @@ import java.util.OptionalInt;
 
 public record Symbol(@Nullable String namespace,
                      @NotNull String name) implements Comparable<Symbol> {
-
     public static @NotNull Symbol symbol(final @Nullable String namespace,
                                          final @NotNull String name) {
         return new Symbol(namespace, name);

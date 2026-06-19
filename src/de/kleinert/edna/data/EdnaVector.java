@@ -7,7 +7,8 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.*;
 
 /**
- * A list type used by this library. Unlike {@link EdnaList}, indexed access must have complexity {@code O(log(n))} or preferably {@code O(1)}.
+ * A list type used by this library. Unlike {@link EdnaList}, indexed access must have complexity {@code O(log(n))} or preferably {@code O(1)} as specified in the documentation of {@link RandomAccess},
+ * All collection types in Edna are unmodifiable, meaning that all mutating methods throw exceptions.
  * @param <T> Generic type for entries.
  */
 @Unmodifiable

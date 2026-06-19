@@ -21,7 +21,7 @@ public class Keyword implements Comparable<Keyword> {
 
     private static final ReferenceQueue<Keyword> rq = new ReferenceQueue<>();
 
-    public static void clearCache() {
+    private static void clearCache() {
         if (rq.poll() == null)
             return;
 
@@ -75,8 +75,7 @@ public class Keyword implements Comparable<Keyword> {
 
     public static @NotNull Keyword parseChecked(final @NotNull String s,
                                                 final boolean allowUTF) {
-        var name = s.startsWith(":") ? s : ":" + s;
-        var temp = parse(name, allowUTF);
+        var temp = parse(s, allowUTF);
         if (temp == null)
             throw new IllegalArgumentException("Illegal keyword format: " + s);
         return temp;

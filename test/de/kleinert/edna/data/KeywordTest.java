@@ -91,12 +91,12 @@ class KeywordTest {
 
     @Test
     void parseNamespaceAndName() {
-        Assertions.assertEquals(Keyword.keyword("ns", "abc"), Keyword.parse(":ns/abc"));
+        Assertions.assertSame(Keyword.keyword("ns", "abc"), Keyword.parse(":ns/abc"));
     }
 
     @Test
     void parseName() {
-        Assertions.assertEquals(Keyword.keyword("abc"), Keyword.parse(":abc"));
+        Assertions.assertSame(Keyword.keyword("abc"), Keyword.parse(":abc"));
     }
 
     @Test
@@ -147,15 +147,16 @@ class KeywordTest {
 
     @Test
     void parseChecked() {
-        Assertions.assertEquals(Keyword.keyword("ns", "abc"), Keyword.parseChecked("ns/abc"));
-        Assertions.assertEquals(Keyword.keyword("abc"), Keyword.parseChecked("abc"));
-        Assertions.assertEquals(Keyword.keyword("🎁"), Keyword.parseChecked("🎁", true));
+        Assertions.assertSame(Keyword.keyword("ns", "abc"), Keyword.parseChecked(":ns/abc"));
+        Assertions.assertSame(Keyword.keyword("abc"), Keyword.parseChecked(":abc"));
+        Assertions.assertSame(Keyword.keyword("🎁"), Keyword.parseChecked(":🎁", true));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked("")); //not valid
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked("🎁"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked("a/+1"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked("🎁/a"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked("a~/abc"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked(":")); //not valid
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked(":🎁"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked(":a/+1"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked(":🎁/a"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked(":a~/abc"));
     }
 
     @Test
@@ -269,9 +270,9 @@ class KeywordTest {
 
     @Test
     void get() {
-        Assertions.assertEquals(Keyword.keyword(null, "abc"), Keyword.get("abc"));
-        Assertions.assertEquals(Keyword.keyword("ns", "+"), Keyword.get("ns/+"));
-        Assertions.assertEquals(Keyword.keyword("ns", "abc"), Keyword.get("ns/abc"));
+        Assertions.assertSame(Keyword.keyword(null, "abc"), Keyword.get("abc"));
+        Assertions.assertSame(Keyword.keyword("ns", "+"), Keyword.get("ns/+"));
+        Assertions.assertSame(Keyword.keyword("ns", "abc"), Keyword.get("ns/abc"));
         Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked("ns/🎁"));
         Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked("ns/"));
         Assertions.assertThrows(IllegalArgumentException.class, () -> Keyword.parseChecked("/abc"));
@@ -306,7 +307,7 @@ class KeywordTest {
         Assertions.assertNull(Keyword.find(it)); // Was not interned by the tag call.
 
         var k = Keyword.get(it); // Create and intern
-        Assertions.assertEquals(k, Keyword.find(it));
+        Assertions.assertSame(k, Keyword.find(it));
     }
 
 

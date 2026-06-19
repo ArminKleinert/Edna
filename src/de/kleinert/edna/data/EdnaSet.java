@@ -6,6 +6,10 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 
+/**
+ *The Set type used by Edna. Elements are guaranteed to be ordered and the Set is unmodifiable, otherwise no guarantees are made.
+ * @param <T> The generic type.
+ */
 @Unmodifiable
 public final class EdnaSet<T>
         extends AbstractSet<T>
@@ -13,29 +17,42 @@ public final class EdnaSet<T>
     private final @NotNull SequencedSet<T> delegate;
     private final @NotNull Map<Object, Object> meta;
 
-    private EdnaSet(final @NotNull List<T> delegate) {
-        this(null, new LinkedHashSet<>(delegate));
-    }
-
     private EdnaSet(final @Nullable Map<Object, Object> meta, final @NotNull SequencedSet<T> delegate) {
-        this.meta = meta == null ? Map.of() : meta;
+        this.meta = meta == null ? Map.of() : EdnaMap.create(meta);
         this.delegate = delegate;
     }
 
+    /**
+     * Creates a new instance from variadic entries.
+     *
+     * @param xs  The entries.
+     * @param <T> The type of entries.
+     * @return A new instance.
+     */
     @SafeVarargs
     public static <T> @NotNull EdnaSet<T> of(T... xs) {
-        return new EdnaSet<>(Arrays.asList(xs));
+        return new EdnaSet<>(null, new LinkedHashSet<>(Arrays.asList(xs)));
     }
 
+    /**
+     * Copies the contents of the input into a new instance.
+     *
+     * @param xs  The entries.
+     * @param <T> The type of entries.
+     * @return A new instance.
+     */
     public static <T> @NotNull EdnaSet<T> create(
             final @NotNull Iterable<T> xs) {
         if (xs instanceof EdnaSet<?>)
             return (EdnaSet<T>) xs;
-        final @NotNull var temp = new ArrayList<T>();
+        final @NotNull var temp = new LinkedHashSet<T>();
         for (final T x : xs) {
-            temp.add(x);
+            var alreadyPresent = temp.add(x);
+            if (!alreadyPresent) {
+                throw new IllegalArgumentException("Duplicate element " + x + " was already added.");
+            }
         }
-        return new EdnaSet<>(temp);
+        return new EdnaSet<>(null, temp);
     }
 
     @Override
