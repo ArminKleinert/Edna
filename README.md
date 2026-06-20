@@ -14,7 +14,6 @@ for *personal use*.
 - [x] Uses UTF-8 for inputs.
 - [x] Can write to strings, files and any `Appendable`.
 
-
 - [x] Can parse any type mandated by the EDN specification.
 - [x] [Tagged elements](https://github.com/edn-format/edn#tagged-elements)
     - Note that Edna handles tagged elements as function that take an object, not a Map, as input. This allows doing

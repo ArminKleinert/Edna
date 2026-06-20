@@ -143,20 +143,25 @@ public final class CodePointIterator implements PrimitiveIterator.OfInt, AutoClo
         }
 
         public boolean hasNext() {
-            if (memory != -1) return true;
+            if (memory != -1) // If memory is not empty
+                return true;
+
+            // If memory is empty, try to read ahead.
             final int temp;
             try {
                 temp = input.read();
             } catch (final @NotNull IOException e) {
                 throw new CPIException(e);
             }
-            if (temp == -1) return false;
+            if (temp == -1) return false; // EOF -> Does not have next
+
+            // Has next. Save to memory and return true.
             memory = temp;
             return true;
         }
 
         public int nextInt() {
-            if (memory != -1) {
+            if (memory != -1) { // If memory is not empty, use and clear it.
                 final int temp = memory;
                 memory = -1;
                 return temp;
@@ -179,20 +184,25 @@ public final class CodePointIterator implements PrimitiveIterator.OfInt, AutoClo
         }
 
         public boolean hasNext() {
-            if (memory != -1) return true;
+            if (memory != -1) // If memory is not empty
+                return true;
+
+            // If memory is empty, try to read ahead.
             final int temp;
             try {
                 temp = input.read();
             } catch (IOException e) {
                 throw new CPIException(e);
             }
-            if (temp == -1) return false;
+            if (temp == -1) return false; // EOF -> Does not have next
+
+            // Has next. Save to memory and return true.
             memory = temp;
             return true;
         }
 
         public int nextInt() {
-            if (memory != -1) {
+            if (memory != -1) { // If memory is not empty, use and clear it.
                 final int temp = memory;
                 memory = -1;
                 return temp;

@@ -54,7 +54,7 @@ public class EdnaReader {
     public static @NotNull Iterator<Object> reader(
             final @NotNull CodePointIterator cpi,
             final @NotNull EdnaOptions options) {
-        EdnaReader parser = new EdnaReader(options, cpi);
+        final @NotNull EdnaReader parser = new EdnaReader(options, cpi);
         var iterable = new Iterable<>() {
             @Override
             public @NotNull Iterator<Object> iterator() {
@@ -117,13 +117,6 @@ public class EdnaReader {
         return castClass.cast(temp);
     }
 
-    public static @NotNull List<Object> readMulti(
-            final @NotNull CodePointIterator cpi,
-            final @NotNull EdnaOptions options) {
-        //noinspection unchecked
-        return Collections.unmodifiableList((List<Object>) (Objects.requireNonNull(new EdnaReader(options, cpi).readString(true, false))));
-    }
-
     private @Nullable Object readString(final boolean readMulti, final boolean stopAfterOne) {
         List<?> data;
         var pars = readForm(0, stopAfterOne, true);
@@ -146,7 +139,7 @@ public class EdnaReader {
 
 
     private Object readForm(final int level, final boolean stopAfterOne, final boolean mayReturnNothing) {
-        @NotNull List<@Nullable Object> res = new ArrayList<>();
+        final @NotNull List<@Nullable Object> res = new ArrayList<>();
         int linePos = 0;
         int codePosIndex = 0;
 

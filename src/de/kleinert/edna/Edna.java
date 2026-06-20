@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Spliterators;
 import java.util.stream.Stream;
@@ -57,11 +56,11 @@ public class Edna {
     }
 
     /**
-     * Parse text with the given option and then cast the result to the specified type.
+     * Parse text with the given option and then cast the result to the specified type. This method is theoretically equivalent to {@link #read(Reader, EdnaOptions, Class)} if using a {@link StringReader}. But the actual implementation might vary.
      * @param text Input text.
      * @param options The options used. If null, defaults to {@link #defaultOptions()}.
      * @param castClass The expected result class.
-     * @return The parsed
+     * @return The parsed result.
      * @param <T> Output type. Specified by the class argument.
      * @throws ClassCastException If the output is not convertable to T.
      */
@@ -71,17 +70,28 @@ public class Edna {
         return readSingle(new CodePointIterator(text.codePoints()), options, castClass);
     }
 
+    /**
+     * Equivalent to {@link #read(String, EdnaOptions, Class)} with the class being set to {@code Object.class}.
+     * @param text Input text.
+     * @param options The options used. If null, defaults to {@link #defaultOptions()}.
+     * @return The parsed result.
+     */
     public static @Nullable Object read(final @NotNull String text,
                                         final @Nullable EdnaOptions options) {
         return read(text, options, Object.class);
     }
 
+    /**
+     * Equivalent to {@link #read(String, EdnaOptions)} with the options being set to {@link #defaultOptions()}.
+     * @param text Input text.
+     * @return The parsed result.
+     */
     public static @Nullable Object read(final @NotNull String text) {
         return read(text, null);
     }
 
     /**
-     * Parse text from a reader with the given option and then cast the result to the specified type. This method is not necessarily thread-safe and will not be held accountable if the reader is used by someone else.
+     * Equivalent to {@link #read(String, EdnaOptions, Class)} except the input is received lazily from the reader. Note that this method is not thread-safe. Edna will not be held accountable if the reader is used somewhere else.
      * @param reader Input.
      * @param options The options used. If null, defaults to {@link #defaultOptions()}.
      * @param castClass The expected result class.
@@ -96,16 +106,29 @@ public class Edna {
         return readSingle(cpi, options, castClass);
     }
 
+    /**
+     * Equivalent to {@link #read(Reader, EdnaOptions, Class)} with the class being set to {@code Object.class}.
+     * @param reader Input reader.
+     * @param options The options used. If null, defaults to {@link #defaultOptions()}.
+     * @return The parsed result.
+     * @see #read(Reader, EdnaOptions, Class)
+     */
     public static @Nullable Object read(final @NotNull Reader reader,
                                         final @Nullable EdnaOptions options) {
         return read(reader, options, Object.class);
     }
 
+    /**
+     * Equivalent to {@link #read(Reader, EdnaOptions)} with the options being set to {@link #defaultOptions()}.
+     * @param reader Input reader.
+     * @return The parsed result.
+     * @see #read(Reader, EdnaOptions, Class)
+     */
     public static @Nullable Object read(final @NotNull Reader reader) {
         return read(reader, null);
     }
 
-    private static @NotNull @Unmodifiable Stream<Object> readMulti(
+    private static @NotNull @Unmodifiable Stream<Object> stream(
             final @NotNull CodePointIterator cpi,
             final @Nullable EdnaOptions options) {
         final Iterator<Object> iter = EdnaReader.reader(cpi, optsOrDefault(options));
@@ -113,25 +136,35 @@ public class Edna {
         return StreamSupport.stream(spliterator, false);
     }
 
-    public static @NotNull @Unmodifiable Stream<Object> readMulti(final @NotNull String text,
-                                                                final @Nullable EdnaOptions options) {
-        return readMulti(new CodePointIterator(text.codePoints()), options);
+    /**
+     * Creates a stream of objects parsed from an EDN input. The stream terminates if an error or end-of-input is encountered.
+     * @param text Input text.
+     * @param options The options used. If null, defaults to {@link #defaultOptions()}.
+     * @return The parsed results as a lazy stream.
+     */
+    public static @NotNull @Unmodifiable Stream<Object> stream(final @NotNull String text,
+                                                               final @Nullable EdnaOptions options) {
+        return stream(new CodePointIterator(text.codePoints()), options);
     }
 
-    public static @NotNull @Unmodifiable Stream<Object> readMulti(final @NotNull String text) {
-        return readMulti(new CodePointIterator(text.codePoints()), null);
+    /**
+     * Equivalent to {@link #stream(String, EdnaOptions)} with the options being set to {@link #defaultOptions()}.
+     * @param text Input text.
+     * @return The parsed result.
+     */
+    public static @NotNull @Unmodifiable Stream<Object> stream(final @NotNull String text) {
+        return stream(new CodePointIterator(text.codePoints()), null);
     }
 
-    public static @NotNull @Unmodifiable Stream<Object> readMulti(
+    public static @NotNull @Unmodifiable Stream<Object> stream(
             final @NotNull Reader reader,
             final @Nullable EdnaOptions options) {
-        final CodePointIterator cpi = new CodePointIterator(reader);
-        return readMulti(cpi, options);
+        return stream(new CodePointIterator(reader), options);
     }
 
-    public static @NotNull @Unmodifiable Stream<Object> readMulti(
+    public static @NotNull @Unmodifiable Stream<Object> stream(
             final @NotNull Reader reader) {
-        return readMulti(reader, null);
+        return stream(reader, null);
     }
 
     private static @NotNull Iterator<Object> reader(

@@ -9,6 +9,14 @@ import java.util.*;
 
 class EdnaReaderBasicsTest {
     @Test
+    void parseBasicExampleTest() {
+        Assertions.assertEquals(List.of("abc"), Edna.read("[\"abc\"]"));
+
+        var opts = Edna.defaultOptions().copy(b -> b.allowSymbolicValues(true));
+        Assertions.assertTrue(Edna.read("##Inf", opts, Double.class).isInfinite());
+
+    }
+    @Test
     void parseStringBasicTest() {
         Assertions.assertInstanceOf(String.class, Edna.read("\"\""));
         Assertions.assertEquals("", Edna.read("\"\""));
