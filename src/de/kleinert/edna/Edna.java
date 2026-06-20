@@ -15,14 +15,29 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Spliterators;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * The primary interface through which Edna is accessed. Provides methods for reading and writing.
+ */
 public class Edna {
     private Edna(){}
+
+    /**
+     * Default parsing options specified in the EDN file specification.
+     * @return Default options.
+     * @see EdnaOptions#defaultOptions()
+     */
     public static @NotNull EdnaOptions defaultOptions() {
         return EdnaOptions.defaultOptions();
     }
 
+    /**
+     * Default parsing options.
+     * @return Default options.
+     * @see EdnaOptions#defaultOptions()
+     */
     public static @NotNull EdnaOptions extendedOptions() {
         return EdnaOptions.extendedOptions();
     }
@@ -41,6 +56,15 @@ public class Edna {
         return castedOutput;
     }
 
+    /**
+     * Parse text with the given option and then cast the result to the specified type.
+     * @param text Input text.
+     * @param options The options used. If null, defaults to {@link #defaultOptions()}.
+     * @param castClass The expected result class.
+     * @return The parsed
+     * @param <T> Output type. Specified by the class argument.
+     * @throws ClassCastException If the output is not convertable to T.
+     */
     public static <T> @Nullable T read(final @NotNull String text,
                                        final @Nullable EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
@@ -56,6 +80,15 @@ public class Edna {
         return read(text, null);
     }
 
+    /**
+     * Parse text from a reader with the given option and then cast the result to the specified type. This method is not necessarily thread-safe and will not be held accountable if the reader is used by someone else.
+     * @param reader Input.
+     * @param options The options used. If null, defaults to {@link #defaultOptions()}.
+     * @param castClass The expected result class.
+     * @return The parsed
+     * @param <T> Output type. Specified by the class argument.
+     * @throws ClassCastException If the output is not convertable to T.
+     */
     public static <T> @Nullable T read(final @NotNull Reader reader,
                                        final @Nullable EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
@@ -72,31 +105,31 @@ public class Edna {
         return read(reader, null);
     }
 
-    private static @NotNull @Unmodifiable List<Object> readMulti(
+    private static @NotNull @Unmodifiable Stream<Object> readMulti(
             final @NotNull CodePointIterator cpi,
             final @Nullable EdnaOptions options) {
         final Iterator<Object> iter = EdnaReader.reader(cpi, optsOrDefault(options));
         final var spliterator = Spliterators.spliteratorUnknownSize(iter, 0);
-        return StreamSupport.stream(spliterator, false).toList();
+        return StreamSupport.stream(spliterator, false);
     }
 
-    public static @NotNull @Unmodifiable List<Object> readMulti(final @NotNull String text,
+    public static @NotNull @Unmodifiable Stream<Object> readMulti(final @NotNull String text,
                                                                 final @Nullable EdnaOptions options) {
         return readMulti(new CodePointIterator(text.codePoints()), options);
     }
 
-    public static @NotNull @Unmodifiable List<Object> readMulti(final @NotNull String text) {
+    public static @NotNull @Unmodifiable Stream<Object> readMulti(final @NotNull String text) {
         return readMulti(new CodePointIterator(text.codePoints()), null);
     }
 
-    public static @NotNull @Unmodifiable List<Object> readMulti(
+    public static @NotNull @Unmodifiable Stream<Object> readMulti(
             final @NotNull Reader reader,
             final @Nullable EdnaOptions options) {
         final CodePointIterator cpi = new CodePointIterator(reader);
         return readMulti(cpi, options);
     }
 
-    public static @NotNull @Unmodifiable List<Object> readMulti(
+    public static @NotNull @Unmodifiable Stream<Object> readMulti(
             final @NotNull Reader reader) {
         return readMulti(reader, null);
     }

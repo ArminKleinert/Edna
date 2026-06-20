@@ -172,7 +172,7 @@ public final class EdnaMap<K, V>
 
 
     /**
-     * Create a new instance with the provided keys and values.
+     * Create a new instance with the provided keys and values. It is assumed that the argument array consists of keys and values of the specified types.
      *
      * @param kvs Keys and values as a variadic argument.
      * @param <K> Key type.
