@@ -99,7 +99,7 @@ public class EdnaReader {
                     private Object readSkipNothing() {
                         var temp = parser.NOTHING;
                         while (temp == parser.NOTHING) {
-                            temp = parser.readString(false, true);
+                            temp = parser.readString(true);
                         }
                         return temp;
                     }
@@ -112,22 +112,19 @@ public class EdnaReader {
     public static <T> @Nullable T read(final @NotNull CodePointIterator cpi,
                                        final @NotNull EdnaOptions options,
                                        final @NotNull Class<T> castClass) {
-        final var temp = new EdnaReader(options, cpi).readString(false, false);
+        final var temp = new EdnaReader(options, cpi).readString(false);
         if (temp == null) return null;
         return castClass.cast(temp);
     }
 
-    private @Nullable Object readString(final boolean readMulti, final boolean stopAfterOne) {
+    private @Nullable Object readString(final boolean stopAfterOne) {
         List<?> data;
         var pars = readForm(0, stopAfterOne, true);
 
         if (stopAfterOne)
-            data = Arrays.asList(pars);
+            data = Collections.singletonList(pars);
         else
             data = (List<?>) pars;
-
-        if (readMulti)
-            return data;
 
         if (data.size() != 1) {
             throw new EdnaReaderException(

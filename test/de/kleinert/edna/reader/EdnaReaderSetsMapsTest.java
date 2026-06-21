@@ -60,7 +60,7 @@ class EdnaReaderSetsMapsTest {
             Assertions.assertEquals(Map.of(1L, 2L), parsed);
         }
         {
-            Set<Long> treeSet = new TreeSet<>();
+            Set<Object> treeSet = new TreeSet<>();
             var options = Edna.defaultOptions().copy((b) -> b.listToEdnSetConverter((it) -> treeSet));
             var parsed = Edna.read("#{1 2}", options);
             Assertions.assertInstanceOf(TreeSet.class, parsed);

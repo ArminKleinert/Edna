@@ -40,7 +40,7 @@ public class EdnaWriter {
 
     private boolean tryEncoder(final @NotNull Object obj, final @NotNull Appendable writer, int indent) throws IOException {
         indent = options.encoderPrettyPrint() ? indent : 0;
-        AtomicReference<Function<Object, EdnaTagVal<String, ?>>> encoder = new AtomicReference<>(null);
+        AtomicReference<Function<Object, EdnaTagVal>> encoder = new AtomicReference<>(null);
         options.taggedElementEncoders().forEach((jClass, enc) -> {
             if (encoder.get() == null && jClass.isInstance(obj)) {
                 encoder.set(enc);

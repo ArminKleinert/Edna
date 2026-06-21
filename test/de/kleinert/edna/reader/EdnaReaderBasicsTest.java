@@ -13,9 +13,13 @@ class EdnaReaderBasicsTest {
         Assertions.assertEquals(List.of("abc"), Edna.read("[\"abc\"]"));
 
         var opts = Edna.defaultOptions().copy(b -> b.allowSymbolicValues(true));
-        Assertions.assertTrue(Edna.read("##Inf", opts, Double.class).isInfinite());
+        Assertions.assertTrue(Objects.requireNonNull(Edna.read("##Inf", opts, Double.class)).isInfinite());
 
+        Assertions.assertEquals(List.of(1L, 2L, 3L), Edna.stream("1 2 3").toList());
+
+        Edna.reader("1 2 3").forEachRemaining(System.out::println);
     }
+
     @Test
     void parseStringBasicTest() {
         Assertions.assertInstanceOf(String.class, Edna.read("\"\""));
@@ -26,7 +30,7 @@ class EdnaReaderBasicsTest {
     @Test
     void parseStringEscapeSequenceTest() {
         Assertions.assertEquals("\n", Edna.read("\"\\n\""));
-        Assertions.assertEquals(List.of("", ""), Arrays.asList(((String) Edna.read("\"\\n\"")).split("\n", -1)));
+        Assertions.assertEquals(List.of("", ""), Arrays.asList(((String) Objects.requireNonNull(Edna.read("\"\\n\""))).split("\n", -1)));
         Assertions.assertEquals("\t", Edna.read("\"\\t\""));
 
         Assertions.assertEquals("\t", Edna.read("\"\\t\""));

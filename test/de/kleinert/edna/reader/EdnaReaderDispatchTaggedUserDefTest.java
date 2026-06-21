@@ -43,7 +43,7 @@ class EdnaReaderDispatchTaggedUserDefTest {
 
     @Test
     void parseDecoderTest() {
-        Function<Object, Object> mapOrListToPair = (o) -> switch (o) {
+        Function<Object, List<Object>> mapOrListToPair = (o) -> switch (o) {
             case Map<?, ?> m -> List.of(m.get("tag"), m.get("element"));
             case List<?> l -> List.of(l.get(0), l.get(1));
             default -> throw new IllegalArgumentException();

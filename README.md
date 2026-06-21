@@ -38,9 +38,9 @@ These features are not in the specification, but most people implement them anyw
 
 - [x] Casting values read to get objects of concrete classes.
 - [x] Three different reader functions.
-    - `Edna.read` returns a single value and requires that the input resolves to a single value. (eager)
-    - `Edna.readAll` returns a list of all values. (eager)
-    - `Edna.reader` returns an iterator. (lazy)
+    - `Edna.read` returns a single value and requires that the input resolves to a single value.
+    - `Edna.stream` returns a `Stream<Object>` of all values.
+    - `Edna.reader` returns an `Iterator<Object>` of all values.
 - [x] Symbols and keywords with Unicode characters. This requires the `allowUTFSymbols` option.
 - [x] Tagged elements without a namespace. Available through the `allowTaggedElementsWithoutNS` option.
 - [x] Supports octal chars like Clojure with the `allowBase8Chars` option.
@@ -60,31 +60,30 @@ These features are not in the specification, but most people implement them anyw
 
 ## Options
 
-| Name                            | Meaning                                                                   | Type                                                            | Default                               |
-|---------------------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------|---------------------------------------|
-| `allowSchemeUTF32Codes`         | Allow `\xXXXXXXXX` Char32 literals.                                       | `boolean`                                                       | `false`                               |
-| `allowDispatchChars`            | Allow Char32 literals.                                                    | `boolean`                                                       | `false`                               |
-| `allowBase8Chars`               | Allow octal chars.                                                        | `boolean`                                                       | `false`                               |
-| `taggedElementDecoders`         | Converters for tagged elements.                                           | `Map<String, Function<Object, Object>>`                         | Empty map                             |
-| `taggedElementEncoders`         |                                                                           | `SequencedMap<Class<?>, Function<Object, EdnaPair<String, ?>>>` | Empty map                             |
-| `moreNumberPrefixes`            | `0x` (hex), `0o` (octal), `0b` (binary) and `XXr` prefixes for integrals. | `boolean`                                                       | `false`                               |
-| `allowTaggedElementsWithoutNS`  | Allow tagged elements without namespaces.                                 | `boolean`                                                       | `false`                               |
-| `allowMoreEncoderDecoderNames`  | Allows tagged elements without namespaces.                                | `boolean`                                                       | `false`                               |
-| `encodingSequenceSeparator`     |                                                                           | `String`                                                        | `", "`                                |
-| `listToEdnListConverter`        | Converter from `(...)` sequences to lists.                                | `Function<List<?>, List<?>>`                                    | `EdnaList::new`                       |
-| `listToEdnVectorConverter`      | Converter from `[...]` vectors to lists.                                  | `Function<List<?>, List<?>>`                                    | `EdnaVector::new`                     |
-| `listToEdnSetConverter`         | Converter from element list in `#{...}` into sets.                        | `Function<List<?>, Set<?>>`                                     | `EdnaSet::new`                        |
-| `listToEdnMapConverter`         | Converter from pairs in `{...}` into maps.                                | `Function<List<Map.Entry<Object, Object>>, Map<?, ?>>`          | `EdnaMap::new`                        |
-| `allowUTFSymbols`               | Allow UTF-8 codepoints in `Symbol` and `Keyword` names and namespaces.    | `boolean`                                                       | `false`                               |
-| `encoderSequenceElementLimit`   |                                                                           | `int`                                                           | May vary                              |
-| `encoderCollectionElementLimit` |                                                                           | `int`                                                           | May vary                              |
-| `encoderMaxColumn`              |                                                                           | `int`                                                           | May vary                              |
-| `encoderLineIndent`             |                                                                           | `String`                                                        | May vary                              |
-| `encoderPrettyPrint`            | Use pretty printing when writing.                                         | `boolean`                                                       | `true`                                |
-| `allowMetaData`                 | Allow metadata `^{...} e` (map), `^:... e` (keyword), `^... e` (symbol)   | `boolean`                                                       | `false`                               |
-| `allowZeroPrefix`               | Allow numbers other than `0` to start with `0`.                           | `boolean`                                                       | `false`                               |
-| `allowSymbolicValues`           | Use the `symbolicValues` map for the reader.                              | `boolean`                                                       | `false`                               |
-| `symbolicValues`                | Symbolic value map with the keys being symbols without the `##` prefix.   | `Map<Symbol, Object>`                                           | Map with keys `NaN`, `Inf` and `-Inf` |
+| Name                            | Meaning                                                  | Type                                                   | Default                          |
+|---------------------------------|----------------------------------------------------------|--------------------------------------------------------|----------------------------------|
+| `allowSchemeUTF32Codes`         | Allow `\xXXXXXXXX` Char32 literals.                      | `boolean`                                              | `false`                          |
+| `allowDispatchChars`            | Allow Char32 literals.                                   | `boolean`                                              | `false`                          |
+| `allowBase8Chars`               | Allow octal chars.                                       | `boolean`                                              | `false`                          |
+| `taggedElementDecoders`         | Converters for tagged elements.                          | `Map<String, Function<Object, Object>>`                | Empty map                        |
+| `taggedElementEncoders`         |                                                          | `SequencedMap<Class<?>, Function<Object, EdnaTagVal>>` | Empty map                        |
+| `moreNumberPrefixes`            | `0x`, `0o`, `0b` and `XXr` prefixes for integrals.       | `boolean`                                              | `false`                          |
+| `allowTaggedElementsWithoutNS`  | Allow tagged elements without namespaces.                | `boolean`                                              | `false`                          |
+| `encodingSequenceSeparator`     |                                                          | `String`                                               | `", "`                           |
+| `listToEdnListConverter`        | Converter from `(...)` sequences to lists.               | `Function<List<Object>, List<Object>>`                 | `EdnaList::create`               |
+| `listToEdnVectorConverter`      | Converter from `[...]` sequences to lists.               | `Function<List<Object>, List<Object>>`                 | `EdnaVector::create`             |
+| `listToEdnSetConverter`         | Converter from `#{...}` sequences to lists.              | `Function<List<Object>, Set<Object>>`                  | `EdnaSet::create`                |
+| `listToEdnMapConverter`         | Converter from `{...}` sequences to lists.               | `Function<List<Object>, Map<Object, Object>>`          | `EdnaMap::create`                |
+| `allowUTFSymbols`               | Allow UTF-8 codepoints in `Symbol` and `Keyword`.        | `boolean`                                              | `false`                          |
+| `encoderSequenceElementLimit`   |                                                          | `int`                                                  | May vary                         |
+| `encoderCollectionElementLimit` |                                                          | `int`                                                  | May vary                         |
+| `encoderMaxColumn`              |                                                          | `int`                                                  | May vary                         |
+| `encoderLineIndent`             |                                                          | `String`                                               | May vary                         |
+| `encoderPrettyPrint`            | Use pretty printing when writing.                        | `boolean`                                              | `true`                           |
+| `allowMetaData`                 | Allow metadata in the input.                             | `boolean`                                              | `false`                          |
+| `allowZeroPrefix`               | Allow numbers other than `0` to start with `0`.          | `boolean`                                              | `false`                          |
+| `allowSymbolicValues`           | Use the `symbolicValues` map for the reader.             | `boolean`                                              | `false`                          |
+| `symbolicValues`                | Map with the keys being symbols without the `##` prefix. | `Map<@NotNull Symbol, Object>`                         | Map with `NaN`, `Inf` and `-Inf` |
 
 To copy options with some changed, you can use the `EdnaOptions.copy` method. It takes a function which instantiates a
 builder object. Options can be applied to it by writing the name and the new value. Example:
@@ -93,8 +92,8 @@ builder object. Options can be applied to it by writing the name and the new val
 import de.kleinert.edna.Edna;
 
 var opts = Edna.defaultOptions().copy(builder -> builder
-        .allowZeroPrefix(true)
-        .allowMetaData(true)
+                .allowZeroPrefix(true)
+                .allowMetaData(true)
         //.OptionName(blablabla)
 );
 ```

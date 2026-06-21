@@ -12,14 +12,14 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
                           boolean allowDispatchChars,
                           boolean allowBase8Chars,
                           @NotNull Map<@NotNull String, @NotNull Function<Object, Object>> taggedElementDecoders,
-                          @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<@NotNull Object, EdnaTagVal<String, ?>>> taggedElementEncoders,
+                          @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<@NotNull Object, @NotNull EdnaTagVal>> taggedElementEncoders,
                           boolean moreNumberPrefixes,
                           boolean allowTaggedElementsWithoutNS,
                           @NotNull String encodingSequenceSeparator,
-                          @NotNull Function<@NotNull List<@Nullable Object>, List<Object>> listToEdnListConverter,
-                          @NotNull Function<@NotNull List<@Nullable Object>, List<Object>> listToEdnVectorConverter,
-                          @NotNull Function<@NotNull List<@Nullable Object>, Set<Object>> listToEdnSetConverter,
-                          @NotNull Function<@NotNull List<@Nullable Object>, Map<Object, Object>> listToEdnMapConverter,
+                          @NotNull Function<@NotNull List<@Nullable Object>, List<@Nullable Object>> listToEdnListConverter,
+                          @NotNull Function<@NotNull List<@Nullable Object>, List<@Nullable Object>> listToEdnVectorConverter,
+                          @NotNull Function<@NotNull List<@Nullable Object>, Set<@Nullable Object>> listToEdnSetConverter,
+                          @NotNull Function<@NotNull List<@Nullable Object>, Map<@Nullable Object, @Nullable Object>> listToEdnMapConverter,
                           boolean allowUTFSymbols,
                           int encoderSequenceElementLimit,
                           int encoderCollectionElementLimit,
@@ -85,15 +85,15 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
         private boolean allowSchemeUTF32Codes;
         private boolean allowDispatchChars;
         private boolean allowBase8Chars;
-        private @NotNull Map<@NotNull String, @NotNull Function<@Nullable Object, Object>> taggedElementDecoders;
-        private @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<@NotNull Object, EdnaTagVal<String, ?>>> taggedElementEncoders;
+        private @NotNull Map<@NotNull String, @NotNull Function<Object, Object>> taggedElementDecoders;
+        private @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<@NotNull Object, @NotNull EdnaTagVal>> taggedElementEncoders;
         private boolean moreNumberPrefixes;
         private boolean allowTaggedElementsWithoutNS;
         private @NotNull String encodingSequenceSeparator;
-        private @NotNull Function<@NotNull List<Object>, @Nullable List<Object>> listToEdnListConverter;
-        private @NotNull Function<@NotNull List<Object>, @Nullable List<Object>> listToEdnVectorConverter;
-        private @NotNull Function<@NotNull List<Object>, @Nullable Set<Object>> listToEdnSetConverter;
-        private @NotNull Function<@NotNull List<@Nullable Object>, @Nullable Map<Object, Object>> listToEdnMapConverter;
+        private @NotNull Function<@NotNull List<@Nullable Object>, List<@Nullable Object>> listToEdnListConverter;
+        private @NotNull Function<@NotNull List<@Nullable Object>, List<@Nullable Object>> listToEdnVectorConverter;
+        private @NotNull Function<@NotNull List<@Nullable Object>, Set<@Nullable Object>> listToEdnSetConverter;
+        private @NotNull Function<@NotNull List<@Nullable Object>, Map<@Nullable Object, @Nullable Object>> listToEdnMapConverter;
         private boolean allowUTFSymbols;
         private int encoderSequenceElementLimit;
         private int encoderCollectionElementLimit;
@@ -145,14 +145,17 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
-        public <K, V> Builder taggedElementDecoders(final Map<@NotNull String, @NotNull Function<K, V>> v) {
+        public <A, B> Builder taggedElementDecoders(final Map<@NotNull String, @NotNull Function<A, B>> v) {
             //noinspection unchecked,rawtypes
             this.taggedElementDecoders = new HashMap<>((Map) v);
             return this;
         }
 
-        public Builder taggedElementEncoders(final @NotNull SequencedMap<@NotNull Class<?>, @NotNull Function<Object, EdnaTagVal<String, ?>>> v) {
-            this.taggedElementEncoders = new LinkedHashMap<>(v);
+        public <A> Builder taggedElementEncoders(final @NotNull SequencedMap<@NotNull Class, @NotNull Function<A, EdnaTagVal>> v) {
+            //noinspection unchecked
+            this.taggedElementEncoders = new LinkedHashMap<>(
+                    (Map<Class<?>, Function<@NotNull Object, @NotNull EdnaTagVal>>) (Map<?, ?>) v
+            );
             return this;
         }
 
@@ -171,27 +174,27 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
-        public <T1, T2> Builder listToEdnListConverter(final @NotNull Function<@NotNull List<T1>, List<T2>> v) {
-            //noinspection unchecked,rawtypes
-            this.listToEdnListConverter = (Function<List<Object>, List<Object>>) ((Function) v);
+        public <A> Builder listToEdnListConverter(final @NotNull Function<@NotNull List<@Nullable Object>, List<A>> v) {
+            // noinspection unchecked
+            this.listToEdnListConverter = (@NotNull Function<@NotNull List<@Nullable Object>, List<@Nullable Object>>) ((Function<?, ?>) v);
             return this;
         }
 
-        public <T1, T2> Builder listToEdnVectorConverter(final @NotNull Function<@NotNull List<T1>, List<T2>> v) {
-            //noinspection unchecked,rawtypes
-            this.listToEdnVectorConverter = (Function<List<Object>, List<Object>>) ((Function) v);
+        public <A> Builder listToEdnVectorConverter(final @NotNull Function<@NotNull List<@Nullable Object>, List<A>> v) {
+            //noinspection unchecked
+            this.listToEdnVectorConverter = (@NotNull Function<@NotNull List<@Nullable Object>, List<@Nullable Object>>) ((Function<?, ?>) v);
             return this;
         }
 
-        public <T1, T2> Builder listToEdnSetConverter(final @NotNull Function<@NotNull List<T1>, Set<T2>> v) {
-            //noinspection unchecked,rawtypes
-            this.listToEdnSetConverter = (Function<List<Object>, Set<Object>>) ((Function) v);
+        public <A> Builder listToEdnSetConverter(final @NotNull Function<@NotNull List<@Nullable Object>, Set<A>> v) {
+            //noinspection unchecked
+            this.listToEdnSetConverter = (Function<@NotNull List<@Nullable Object>, Set<@Nullable Object>>) ((Function<?, ?>) v);
             return this;
         }
 
-        public <KV, K2, V2> Builder listToEdnMapConverter(final @NotNull Function<@NotNull List<@Nullable KV>, Map<K2, V2>> v) {
-            //noinspection unchecked,rawtypes
-            this.listToEdnMapConverter = (Function) v;
+        public <A, B> Builder listToEdnMapConverter(final @NotNull Function<@NotNull List<@Nullable Object>, Map<A, B>> v) {
+            // noinspection unchecked
+            this.listToEdnMapConverter = (Function<@NotNull List<@Nullable Object>, Map<@Nullable Object, @Nullable Object>>) ((Function<?, ?>) v);
             return this;
         }
 
@@ -240,7 +243,7 @@ public record EdnaOptions(boolean allowSchemeUTF32Codes,
             return this;
         }
 
-        public <T> Builder symbolicValues(final Map<@NotNull Symbol, T> v) {
+        public Builder symbolicValues(final Map<@NotNull Symbol, ?> v) {
             this.symbolicValues = new HashMap<>(v);
             return this;
         }

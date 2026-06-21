@@ -176,8 +176,8 @@ class EdnaWriterTest {
         Assertions.assertEquals("[]", Edna.pprintToString(new byte[0]));
         Assertions.assertEquals("[0, 0]", Edna.pprintToString(new byte[2]));
 
-        var encoders = new LinkedHashMap<Class<?>, Function<Object, EdnaTagVal<String, ?>>>(Map.of(
-                byte[].class, (it) -> new EdnaTagVal<>("bytearray", bytesToList((byte[]) it))
+        var encoders = new LinkedHashMap<Class, Function<Object, EdnaTagVal>>(Map.of(
+                byte[].class, (it) -> new EdnaTagVal("bytearray", bytesToList((byte[]) it))
         ));
         var options = Edna.defaultOptions().copy(b -> b.taggedElementEncoders(encoders));
         Assertions.assertEquals("#bytearray [0, 0]", Edna.pprintToString(new byte[2], options));
@@ -188,9 +188,11 @@ class EdnaWriterTest {
         Assertions.assertEquals("[]", Edna.pprintToString(new short[0]));
         Assertions.assertEquals("[0, 0]", Edna.pprintToString(new short[2]));
 
-        var encoders = new LinkedHashMap<Class<?>, Function<Object, EdnaTagVal<String, ?>>>(Map.of(
-                short[].class, (it) -> new EdnaTagVal<>("shortarray", shortsToList((short[]) it))
-        ));
+        Function<Object, EdnaTagVal> convShort = (it) -> new EdnaTagVal("shortarray", shortsToList((short[]) it));
+        var ttt = Map.of(
+                short[].class, convShort
+        );
+        var encoders = new LinkedHashMap<Class, Function<Object, EdnaTagVal>>(ttt);
         var options = Edna.defaultOptions().copy(b -> b.taggedElementEncoders(encoders));
         Assertions.assertEquals("#shortarray [0, 0]", Edna.pprintToString(new short[2], options));
     }
@@ -200,8 +202,8 @@ class EdnaWriterTest {
         Assertions.assertEquals("[]", Edna.pprintToString(new int[0]));
         Assertions.assertEquals("[0, 0]", Edna.pprintToString(new int[2]));
 
-        var encoders = new LinkedHashMap<Class<?>, Function<Object, EdnaTagVal<String, ?>>>(Map.of(
-                int[].class, (it) -> new EdnaTagVal<>("intarray", Arrays.stream(((int[]) it)).boxed().toList())
+        var encoders = new LinkedHashMap<Class, Function<Object, EdnaTagVal>>(Map.of(
+                int[].class, (it) -> new EdnaTagVal("intarray", Arrays.stream(((int[]) it)).boxed().toList())
         ));
         var options = Edna.defaultOptions().copy(b -> b.taggedElementEncoders(encoders));
         Assertions.assertEquals("#intarray [0, 0]", Edna.pprintToString(new int[2], options));
@@ -212,8 +214,8 @@ class EdnaWriterTest {
         Assertions.assertEquals("[]", Edna.pprintToString(new long[0]));
         Assertions.assertEquals("[0, 0]", Edna.pprintToString(new long[2]));
 
-        var encoders = new LinkedHashMap<Class<?>, Function<Object, EdnaTagVal<String, ?>>>(Map.of(
-                long[].class, (it) -> new EdnaTagVal<>("longarray", Arrays.stream(((long[]) it)).boxed().toList())
+        var encoders = new LinkedHashMap<Class, Function<Object, EdnaTagVal>>(Map.of(
+                long[].class, (it) -> new EdnaTagVal("longarray", Arrays.stream(((long[]) it)).boxed().toList())
         ));
         var options = Edna.defaultOptions().copy(b -> b.taggedElementEncoders(encoders));
         Assertions.assertEquals("#longarray [0, 0]", Edna.pprintToString(new long[2], options));
@@ -224,8 +226,8 @@ class EdnaWriterTest {
         Assertions.assertEquals("[]", Edna.pprintToString(new float[0]));
         Assertions.assertEquals("[0.0, 0.0]", Edna.pprintToString(new float[2]));
 
-        var encoders = new LinkedHashMap<Class<?>, Function<Object, EdnaTagVal<String, ?>>>(Map.of(
-                float[].class, (it) -> new EdnaTagVal<>("floatarray", floatsToList((float[]) it))
+        var encoders = new LinkedHashMap<Class, Function<Object, EdnaTagVal>>(Map.of(
+                float[].class, (it) -> new EdnaTagVal("floatarray", floatsToList((float[]) it))
         ));
         var options = Edna.defaultOptions().copy(b -> b.taggedElementEncoders(encoders));
         Assertions.assertEquals("#floatarray [0.0, 0.0]", Edna.pprintToString(new float[2], options));
@@ -236,8 +238,8 @@ class EdnaWriterTest {
         Assertions.assertEquals("[]", Edna.pprintToString(new double[0]));
         Assertions.assertEquals("[0.0, 0.0]", Edna.pprintToString(new double[2]));
 
-        var encoders = new LinkedHashMap<Class<?>, Function<Object, EdnaTagVal<String, ?>>>(Map.of(
-                double[].class, (it) -> new EdnaTagVal<>("doublearray", Arrays.stream(((double[]) it)).boxed().toList())
+        var encoders = new LinkedHashMap<Class, Function<Object, EdnaTagVal>>(Map.of(
+                double[].class, (it) -> new EdnaTagVal("doublearray", Arrays.stream(((double[]) it)).boxed().toList())
         ));
         var options = Edna.defaultOptions().copy(b -> b.taggedElementEncoders(encoders));
         Assertions.assertEquals("#doublearray [0.0, 0.0]", Edna.pprintToString(new double[2], options));
@@ -248,8 +250,8 @@ class EdnaWriterTest {
         Assertions.assertEquals("[]", Edna.pprintToString(new Keyword[0]));
         Assertions.assertEquals("[:a, :b]", Edna.pprintToString(new Keyword[]{Keyword.get("a"), Keyword.get("b")}));
 
-        var encoders = new LinkedHashMap<Class<?>, Function<Object, EdnaTagVal<String, ?>>>(Map.of(
-                Keyword[].class, (it) -> new EdnaTagVal<>("array", Arrays.stream(((Keyword[]) it)).toList())
+        var encoders = new LinkedHashMap<Class, Function<Object, EdnaTagVal>>(Map.of(
+                Keyword[].class, (it) -> new EdnaTagVal("array", Arrays.stream(((Keyword[]) it)).toList())
         ));
         var options = Edna.defaultOptions().copy(b -> b.taggedElementEncoders(encoders));
         Assertions.assertEquals("#array [:a, :b]", Edna.pprintToString(new Keyword[]{Keyword.get("a"), Keyword.get("b")}, options));
@@ -267,8 +269,8 @@ class EdnaWriterTest {
         Assertions.assertEquals("#{}", Edna.pprintToString(EdnaSet.of()));
         Assertions.assertEquals("#{:a, :b}", Edna.pprintToString(EdnaSet.of(Keyword.get("a"), Keyword.get("b"))));
 
-        var encoders = new LinkedHashMap<Class<?>, Function<Object, EdnaTagVal<String, ?>>>(Map.of(
-                Set.class, (it) -> new EdnaTagVal<>("set", ((Set<?>) it).stream().toList())
+        var encoders = new LinkedHashMap<Class, Function<Object, EdnaTagVal>>(Map.of(
+                Set.class, (it) -> new EdnaTagVal("set", ((Set<?>) it).stream().toList())
         ));
         var options = Edna.defaultOptions().copy(b -> b.taggedElementEncoders(encoders));
         Assertions.assertEquals(
@@ -339,8 +341,9 @@ class EdnaWriterTest {
 
     @Test
     void encodeCustom() {
-        var encoders = EdnaMap.<Class<?>, Function<Object, EdnaTagVal<String, ?>>>of(
-                File.class, (it) -> new EdnaTagVal<>("file", ((File) it).getName())
+        Function<?, EdnaTagVal> itToTag = (it) -> new EdnaTagVal("file", ((File) it).getName());
+        var encoders = EdnaMap.<Class, Function<Object, EdnaTagVal>>of(
+                File.class, itToTag
         );
         var options = Edna.defaultOptions().copy(b -> b.taggedElementEncoders(encoders));
         Assertions.assertEquals(
