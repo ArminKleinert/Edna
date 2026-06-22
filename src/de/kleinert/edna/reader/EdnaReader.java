@@ -284,12 +284,13 @@ public class EdnaReader {
 
         switch (token.codePointAt(0)) {
             case '\\' -> {
-                if (options.allowDispatchChars()) {
-                    final var linePos1 = cpi.getLineIdx();
-                    final var codePosIndex1 = cpi.getTextIndex();
-                    var subToken = token.substring(1);
-                    return readDispatchUnicodeChar(linePos1, codePosIndex1, subToken, true);
-                }
+                final var linePos1 = cpi.getLineIdx();
+                final var codePosIndex1 = cpi.getTextIndex();
+                var subToken = token.substring(1);
+                if (!options.allowDispatchChars())
+                    throw new EdnaReaderException(linePos,codePosIndex, "Dispatch characters not allowed at token #\\"+subToken+".");
+                return readDispatchUnicodeChar(linePos1, codePosIndex1, subToken, true);
+
             }
             case '{' -> {
                 return readSet(level + 1, '}');
@@ -416,7 +417,7 @@ public class EdnaReader {
             floatyRegex = Pattern.compile("[+\\-]?[0-9]*\\.?[0-9]+([eE][+\\-][0-9]+)?M?");
             intRegex = Pattern.compile("[+\\-]?[0-9]+N?");
             expandedIntRegex = Pattern.compile("[+\\-]?(0[obx])?[0-9a-fA-F]+N?");
-            basedIntRegex = Pattern.compile("[+\\-]?([1-9][0-9]?)r[0-9a-fA-F]+N?");
+            basedIntRegex = Pattern.compile("[+\\-]?([1-9][0-9]?)r[0-9a-zA-Z]+N?"); // It's a pun because it lets the user define a number of any base which is allowed by Long.parseLong or BigInteger.valueOf.
         }
 
         final var tokenLen = token.length();
@@ -479,10 +480,15 @@ public class EdnaReader {
             throw new EdnaReaderException(linePos, codePosIndex, "Invalid number format: " + token);
         }
 
-        if (token.endsWith("M"))
-            return BigDecimal.valueOf(sign).multiply(new BigDecimal(token.substring(startIndex, tokenLen - 1)));
-        if (token.endsWith("N"))
+        if (token.endsWith("N")) {
             return BigInteger.valueOf(sign).multiply(new BigInteger(token.substring(startIndex, tokenLen - 1), base));
+        }
+        if (token.endsWith("M")) {
+            var subs = token.substring(startIndex, tokenLen - 1);
+            if (base != 10)
+                throw new EdnaReaderException(linePos,codePosIndex,"Big decimal literal of base other than 10: " + subs);
+            return BigDecimal.valueOf(sign).multiply(new BigDecimal(subs));
+        }
 
         final var tokenSubs = token.substring(startIndex, tokenLen);
 
@@ -535,7 +541,12 @@ public class EdnaReader {
         final var linePos = cpi.getLineIdx();
         final var codePosIndex = cpi.getTextIndex();
         final var token = readToken(this::isNotBreakingSymbol);
-        return readDispatchUnicodeChar(linePos, codePosIndex, token, false).toChar();
+        final var c32 = readDispatchUnicodeChar(linePos, codePosIndex, token, false);
+        try {
+            return c32.toChar();
+        } catch (IllegalArgumentException iae) {
+            throw new EdnaReaderException(linePos, codePosIndex, "Failed to convert Char32 to char.", iae);
+        }
     }
 
     private Char32 readDispatchUnicodeChar(final int linePos,

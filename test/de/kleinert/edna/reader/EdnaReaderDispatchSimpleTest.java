@@ -69,20 +69,20 @@ public class EdnaReaderDispatchSimpleTest {
         Assertions.assertThrows(EdnaReaderException.class, () -> Edna.read("#\\x000003bb"));
 
         // Simple dispatch "char" (string)
-        Assertions.assertEquals(new Char32('a'), Edna.read("#\\a", Edna.extendedOptions()));
+        Assertions.assertEquals(Char32.valueOf('a'), Edna.read("#\\a", Edna.extendedOptions()));
 
         // Octal dispatch "char" (string)
-        Assertions.assertEquals(new Char32('!'), Edna.read("#\\o41", Edna.extendedOptions()));
-        Assertions.assertEquals(new Char32('!'), Edna.read("#\\o041", Edna.extendedOptions()));
-        Assertions.assertEquals(new Char32('ǂ'), Edna.read("#\\o702", Edna.extendedOptions()));
+        Assertions.assertEquals(Char32.valueOf('!'), Edna.read("#\\o41", Edna.extendedOptions()));
+        Assertions.assertEquals(Char32.valueOf('!'), Edna.read("#\\o041", Edna.extendedOptions()));
+        Assertions.assertEquals(Char32.valueOf('ǂ'), Edna.read("#\\o702", Edna.extendedOptions()));
 
         // Hexadecimal dispatch "char" (string)
-        Assertions.assertEquals(new Char32('λ'), Edna.read("#\\u03BB", Edna.extendedOptions()));
-        Assertions.assertEquals(new Char32('λ'), Edna.read("#\\u000003bb", Edna.extendedOptions()));
-        Assertions.assertEquals(new Char32('λ'), Edna.read("#\\x000003bb", Edna.extendedOptions()));
-        Assertions.assertEquals(new Char32('ῷ'), Edna.read("#\\u1ff7", Edna.extendedOptions()));
-        Assertions.assertEquals(new Char32('ῷ'), Edna.read("#\\u00001ff7", Edna.extendedOptions()));
-        Assertions.assertEquals(new Char32('ῷ'), Edna.read("#\\x00001ff7", Edna.extendedOptions()));
+        Assertions.assertEquals(Char32.valueOf('λ'), Edna.read("#\\u03BB", Edna.extendedOptions()));
+        Assertions.assertEquals(Char32.valueOf('λ'), Edna.read("#\\u000003bb", Edna.extendedOptions()));
+        Assertions.assertEquals(Char32.valueOf('λ'), Edna.read("#\\x000003bb", Edna.extendedOptions()));
+        Assertions.assertEquals(Char32.valueOf('ῷ'), Edna.read("#\\u1ff7", Edna.extendedOptions()));
+        Assertions.assertEquals(Char32.valueOf('ῷ'), Edna.read("#\\u00001ff7", Edna.extendedOptions()));
+        Assertions.assertEquals(Char32.valueOf('ῷ'), Edna.read("#\\x00001ff7", Edna.extendedOptions()));
 
         // Hexadecimal dispatch "char" (string) over 2^16
         Assertions.assertEquals(

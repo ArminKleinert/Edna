@@ -73,12 +73,12 @@ class EdnaReaderCharTest {
         Assertions.assertEquals('\u271D', Edna.read("\\u271D")); // Latin cross
 
         var options = Edna.extendedOptions();
-        Assertions.assertEquals(new Char32('\n'), Edna.read("#\\newline", options));
-        Assertions.assertEquals(new Char32(' '), Edna.read("#\\space", options));
-        Assertions.assertEquals(new Char32('\t'), Edna.read("#\\tab", options));
-        Assertions.assertEquals(new Char32('\b'), Edna.read("#\\backspace", options));
-        Assertions.assertEquals(new Char32(12), Edna.read("#\\formfeed", options));
-        Assertions.assertEquals(new Char32('\r'), Edna.read("#\\return", options));
+        Assertions.assertEquals(Char32.valueOf('\n'), Edna.read("#\\newline", options));
+        Assertions.assertEquals(Char32.valueOf(' '), Edna.read("#\\space", options));
+        Assertions.assertEquals(Char32.valueOf('\t'), Edna.read("#\\tab", options));
+        Assertions.assertEquals(Char32.valueOf('\b'), Edna.read("#\\backspace", options));
+        Assertions.assertEquals(Char32.valueOf(12), Edna.read("#\\formfeed", options));
+        Assertions.assertEquals(Char32.valueOf('\r'), Edna.read("#\\return", options));
 
         Assertions.assertEquals(
                 Char32.valueOf("\uD83D\uDD46"),

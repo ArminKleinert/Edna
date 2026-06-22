@@ -10,6 +10,13 @@ import java.util.Objects;
 
 class EdnaReaderSymbolicValueTest {
     @Test
+    void testStandardSymbolicUnavailable() {
+        Assertions.assertThrows(EdnaReaderException.class, ()->Edna.read("##NaN"));
+        Assertions.assertThrows(EdnaReaderException.class, ()->Edna.read("##Inf"));
+        Assertions.assertThrows(EdnaReaderException.class, ()->Edna.read("##-Inf"));
+    }
+
+    @Test
     void parseStandardSymbolicTest() {
         var optionsWithSymbolics = Edna.defaultOptions().copy(b -> b.allowSymbolicValues(true));
         Assertions.assertTrue(((Double) Objects.requireNonNull(Edna.read("##NaN", optionsWithSymbolics))).isNaN());
@@ -25,5 +32,8 @@ class EdnaReaderSymbolicValueTest {
                 .allowSymbolicValues(true)
                 .symbolicValues(sv));
         Assertions.assertSame(o, Edna.read("##abc", optionsWithSymbolics));
+
+        // Test the availability of the default symbolics
+        Assertions.assertTrue(((Double) Objects.requireNonNull(Edna.read("##Inf", optionsWithSymbolics))).isInfinite());
     }
 }

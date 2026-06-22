@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -23,12 +22,12 @@ public class EdnaWriter {
     }
 
     public static void pprint(final @Nullable Object obj, final @NotNull EdnaOptions options, final @NotNull Appendable writer) throws IOException {
-        new EdnaWriter(options).encode(obj, writer, 0);
+        new EdnaWriter(options).encode(obj, writer, 0, null);
         if (writer instanceof Flushable) ((Flushable) writer).flush();
     }
 
     public static void pprintln(final @Nullable Object obj, final @NotNull EdnaOptions options, final @NotNull Appendable writer) throws IOException {
-        new EdnaWriter(options).encode(obj, writer, 0);
+        new EdnaWriter(options).encode(obj, writer, 0, null);
         writer.append('\n');
         if (writer instanceof Flushable) ((Flushable) writer).flush();
     }
@@ -38,29 +37,31 @@ public class EdnaWriter {
         return writer;
     }
 
-    private boolean tryEncoder(final @NotNull Object obj, final @NotNull Appendable writer, int indent) throws IOException {
+    private boolean tryEncoder(final @NotNull Object obj, final @NotNull Appendable writer, int indent,final @Nullable Class<?> blockedEncoder) throws IOException {
         indent = options.encoderPrettyPrint() ? indent : 0;
-        AtomicReference<Function<Object, EdnaTagVal>> encoder = new AtomicReference<>(null);
-        options.taggedElementEncoders().forEach((jClass, enc) -> {
-            if (encoder.get() == null && jClass.isInstance(obj)) {
-                encoder.set(enc);
+        Map.Entry<@NotNull Class<?>, @NotNull Function<@NotNull Object, @NotNull EdnaTagVal>> entry = null;
+        for (var classFunctionEntry : options.taggedElementEncoders().sequencedEntrySet()) {
+            var jClass = classFunctionEntry.getKey();
+            if (jClass != blockedEncoder && jClass.isInstance(obj)) {
+                entry = classFunctionEntry;
+                break;
             }
-        });
-        if (encoder.get() == null)
+        }
+
+        if (entry == null)
             return true;
 
-        var r = encoder.get().apply(obj);
-        if (r == null)
-            return true;
+        var encoder = entry.getValue();
+        var r = encoder.apply(obj);
 
         var prefix = r.tag();
         var output = r.element();
         if (prefix != null && !prefix.isBlank()) writer.append('#').append(prefix).append(' ');
-        this.encode(output, writer, indent);
+        this.encode(output, writer, indent, entry.getKey());
         return false;
     }
 
-    private void encode(final Object obj, final @NotNull Appendable writer, int indent) throws IOException {
+    private void encode(final Object obj, final @NotNull Appendable writer, int indent, final @Nullable Class<?> blockedEncoder) throws IOException {
         indent = options.encoderPrettyPrint() ? indent : 0;
         int finalIndent = indent;
 
@@ -70,39 +71,39 @@ public class EdnaWriter {
             case String s -> encodeString(s, writer);
 
             case Keyword k -> {
-                if (tryEncoder(k, writer, indent))
+                if (tryEncoder(k, writer, indent, blockedEncoder))
                     encodeKeyword(k, writer);
             }
             case Symbol s -> {
-                if (tryEncoder(s, writer, indent))
+                if (tryEncoder(s, writer, indent, blockedEncoder))
                     encodeSymbol(s, writer);
             }
-            case EdnaList<?> l -> {
-                if (tryEncoder(l, writer, indent))
+            case AbstractSequentialList<?> l -> {
+                if (tryEncoder(l, writer, indent, blockedEncoder))
                     encodePersistentList(l, writer, indent);
             }
             case Deque<?> l -> {
-                if (tryEncoder(l, writer, indent))
+                if (tryEncoder(l, writer, indent, blockedEncoder))
                     encodePersistentList(l, writer, indent);
             }
             case List<?> l -> {
-                if (tryEncoder(l, writer, indent))
+                if (tryEncoder(l, writer, indent, blockedEncoder))
                     encodeVector(l, writer, indent);
             }
             case Object[] l -> {
-                if (tryEncoder(l, writer, indent))
+                if (tryEncoder(l, writer, indent, blockedEncoder))
                     encodeVector(Arrays.stream(l).toList(), writer, indent);
             }
             case Set<?> s -> {
-                if (tryEncoder(s, writer, indent))
+                if (tryEncoder(s, writer, indent, blockedEncoder))
                     encodeSet(s, writer, indent);
             }
             case Map<?, ?> m -> {
-                if (tryEncoder(m, writer, indent))
+                if (tryEncoder(m, writer, indent, blockedEncoder))
                     encodeMap(m, writer, indent);
             }
             case Iterable<?> i -> {
-                if (tryEncoder(i, writer, indent))
+                if (tryEncoder(i, writer, indent, blockedEncoder))
                     encodeOtherIterable(i, writer, indent);
             }
 
@@ -122,31 +123,31 @@ public class EdnaWriter {
             case Instant i -> encodeInstant(i, writer);
 
             case byte[] a -> {
-                if (tryEncoder(a, writer, indent))
-                    encode(Arrays.stream(byteArrayToLongArray(a)).boxed().toList(), writer, finalIndent);
+                if (tryEncoder(a, writer, indent, blockedEncoder))
+                    encode(Arrays.stream(byteArrayToLongArray(a)).boxed().toList(), writer, finalIndent, null);
             }
             case short[] a -> {
-                if (tryEncoder(a, writer, indent))
-                    encode(Arrays.stream(shortArrayToLongArray(a)).boxed().toList(), writer, finalIndent);
+                if (tryEncoder(a, writer, indent, blockedEncoder))
+                    encode(Arrays.stream(shortArrayToLongArray(a)).boxed().toList(), writer, finalIndent, null);
             }
             case int[] a -> {
-                if (tryEncoder(a, writer, indent))
-                    encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
+                if (tryEncoder(a, writer, indent, blockedEncoder))
+                    encode(Arrays.stream(a).boxed().toList(), writer, finalIndent, null);
             }
             case long[] a -> {
-                if (tryEncoder(a, writer, indent))
-                    encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
+                if (tryEncoder(a, writer, indent, blockedEncoder))
+                    encode(Arrays.stream(a).boxed().toList(), writer, finalIndent, null);
             }
             case float[] a -> {
-                if (tryEncoder(a, writer, indent))
-                    encode(Arrays.stream(floatArrayToDoubleArray(a)).boxed().toList(), writer, finalIndent);
+                if (tryEncoder(a, writer, indent, blockedEncoder))
+                    encode(Arrays.stream(floatArrayToDoubleArray(a)).boxed().toList(), writer, finalIndent, null);
             }
             case double[] a -> {
-                if (tryEncoder(a, writer, indent))
-                    encode(Arrays.stream(a).boxed().toList(), writer, finalIndent);
+                if (tryEncoder(a, writer, indent, blockedEncoder))
+                    encode(Arrays.stream(a).boxed().toList(), writer, finalIndent, null);
             }
             default -> {
-                if (tryEncoder(obj, writer, indent))
+                if (tryEncoder(obj, writer, indent, blockedEncoder))
                     encodeAnything(obj.toString(), writer);
             }
         }
@@ -155,10 +156,10 @@ public class EdnaWriter {
     private void encodeIObj(final @NotNull IObj obj, final @NotNull Appendable writer, final int indent) throws IOException {
         if (!obj.meta().isEmpty()) {
             writer.append('^');
-            encode(obj.meta(), writer, indent);
+            encode(obj.meta(), writer, indent, null);
             writer.append(' ');
         }
-        encode(obj, writer, indent);
+        encode(obj, writer, indent, null);
     }
 
     private long[] byteArrayToLongArray(final byte @NotNull [] a) {
@@ -334,15 +335,15 @@ public class EdnaWriter {
         if (isMap) {
             for (int i = 0; i < l.size(); i++) {
                 var e = (Map.Entry<?, ?>) entryIteratorDry.next();
-                encode(e.getKey(), tmp, indent + 1);
+                encode(e.getKey(), tmp, indent + 1, null);
                 tmp.append(' ');
-                encode(e.getValue(), tmp, indent + 1);
+                encode(e.getValue(), tmp, indent + 1, null);
                 if (i != l.size() - 1) tmp.append(options.encodingSequenceSeparator());
             }
         } else {
             for (int i = 0; i < l.size(); i++) {
                 var e = entryIteratorDry.next();
-                encode(e, tmp, indent + 1);
+                encode(e, tmp, indent + 1, null);
                 if (i != l.size() - 1) tmp.append(options.encodingSequenceSeparator());
             }
         }
@@ -363,9 +364,9 @@ public class EdnaWriter {
             for (int i = 0; i < l.size(); i++) {
                 var e = (Map.Entry<?, ?>) entryIteratorML.next();
                 appendIfPrettyEnabled(writer, pad);
-                encode(e.getKey(), tmp, indent + 1);
+                encode(e.getKey(), tmp, indent + 1, null);
                 tmp.append(' ');
-                encode(e.getValue(), tmp, indent + 1);
+                encode(e.getValue(), tmp, indent + 1, null);
                 if (i != l.size()) {
                     tmp.append(options.encodingSequenceSeparator());
                     appendIfPrettyEnabled(writer, "\n");
@@ -375,7 +376,7 @@ public class EdnaWriter {
             for (int i = 0; i < l.size(); i++) {
                 var e = entryIteratorML.next();
                 appendIfPrettyEnabled(writer, pad);
-                encode(e, tmp, indent + 1);
+                encode(e, tmp, indent + 1, null);
                 if (i != l.size()) {
                     tmp.append(options.encodingSequenceSeparator());
                     appendIfPrettyEnabled(writer, "\n");
